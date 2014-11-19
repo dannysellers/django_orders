@@ -30,7 +30,14 @@ def about (request):
 
 def accounts (request):
 	context = RequestContext(request)
-	context_dict = {'name': 'Accounts'}
+
+	customer_list = Customer.objects.order_by('acct')[:10]
+
+	# Replace spaces with underscores to retrieve URL
+	for customer in customer_list:
+		customer.url = encode_url(customer.name)
+
+	context_dict = {'customer_list': customer_list}
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
@@ -39,7 +46,8 @@ def accountpage (request, account_name_url):
 	context = RequestContext(request)
 
 	# Change underscores in the account name to spaces
-	# The URL will have an underscore, which replaced with a space corresponds to the customer
+	# The URL will have an underscore, which replaced
+	# with a space corresponds to the customer
 	account_name = decode_url(account_name_url)
 	context_dict = {'account_name': account_name,
 					'account_name_url': account_name_url}
@@ -52,7 +60,7 @@ def accountpage (request, account_name_url):
 		context_dict['account_email'] = _customer.email
 
 	except Customer.DoesNotExist:
-		# If no customer's found, pass nothing
+		"""If no customer's found, return an error to populate the template"""
 		pass
 
 	return render_to_response('tracker/accounts.html', context_dict, context)

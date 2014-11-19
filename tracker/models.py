@@ -1,14 +1,10 @@
 from django.db import models
 
 
-class Customer(models.Model):
-	name = models.CharField(max_length=128, unique=False)
-	acct = models.IntegerField(max_length=5, primary_key=True, unique=True)
-	email = models.EmailField()
-
-	def __unicode__(self):
-		return '{}: {}'.format(self.acct, self.name)
-
+CUSTOMER_STATUS_CODES = (
+	('0', 'inactive'),
+	('1', 'active'),
+)
 
 INVENTORY_STATUS_CODES = (
 	('0', 'inventory_received'),
@@ -17,6 +13,16 @@ INVENTORY_STATUS_CODES = (
 	('3', 'order_completed'),
 	('4', 'shipped'),
 )
+
+
+class Customer(models.Model):
+	name = models.CharField(max_length=128, unique=False)
+	acct = models.IntegerField(max_length=5, primary_key=True, unique=True)
+	email = models.EmailField()
+	status = models.CharField(max_length=1, choices=CUSTOMER_STATUS_CODES)
+
+	def __unicode__(self):
+		return '{}: {}'.format(self.acct, self.name)
 
 
 class Inventory(models.Model):

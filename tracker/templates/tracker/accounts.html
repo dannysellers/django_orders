@@ -14,6 +14,16 @@
 			<a href="/inventory">Inventory</a>
 		</nav>
 
+		{% if customer_list %}
+			<ul>
+			{% for customer in customer_list %}
+				<li>{{ customer.name }}</li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			No accounts received.
+		{% endif %}
+
 		{% if customer %}
 			<ul>
 				<li>Name: {{ account_name }}</li>
@@ -22,7 +32,7 @@
 			</ul>
 		{% endif %}
 
-		<a href="/add_account.html">Add new account</a>
+		<br/><a href="/add_account.html">Add new account</a>
 	</body>
 
 {% endblock %}

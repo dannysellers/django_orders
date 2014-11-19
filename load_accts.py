@@ -17,7 +17,7 @@ def load_db(filename):
 
 
 def add_customer(name, acct, email='address@domain.com'):
-	c = Customer.objects.get_or_create(name=name, acct=acct, email=email)
+	c = Customer.objects.get_or_create(name=name, acct=acct, email=email, status=1)
 	return c
 
 
