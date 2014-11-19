@@ -16,10 +16,6 @@ def load_db(filename):
 		print("{} accounts loaded.".format(len(Customer.objects.all())))
 
 
-def add_item():
-	pass
-
-
 def add_customer(name, acct, email='address@domain.com'):
 	c = Customer.objects.get_or_create(name=name, acct=acct, email=email)
 	return c
