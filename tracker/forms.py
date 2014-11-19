@@ -1,5 +1,6 @@
 from django import forms
 import models
+from datetime import date
 
 
 class CustomerForm(forms.ModelForm):
@@ -19,7 +20,7 @@ class InventoryForm(forms.ModelForm):
 	weight = forms.CharField(max_length=4, help_text="Weight")
 	palletized = forms.BooleanField(initial=False, help_text="Palletized?:")
 	palletweight = forms.CharField(help_text="Pallet weight:")
-	arrival = forms.DateField(widget=forms.HiddenInput())  # set to now here?
+	arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
 	status = forms.CharField(widget=forms.HiddenInput(), initial=0)  # choices?
 
 	class Meta:

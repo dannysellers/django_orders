@@ -52,3 +52,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Account list
+account_list.csv
