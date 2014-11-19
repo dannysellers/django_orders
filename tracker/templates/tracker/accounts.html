@@ -3,12 +3,26 @@
 {% block content %}
 
 	<body>
-		<h1>Tracker &#8212; {{ name }}</h1>
+		{% if customer %}
+			<h1>Tracker &#8212; {{ account_name }}</h1>
+		{% else %}
+			<h1>Tracker &#8212; Accounts</h1>
+		{% endif %}
 		<nav>
 			<a href="/">Home</a>
 			<a href="/about">About</a>
 			<a href="/inventory">Inventory</a>
 		</nav>
+
+		{% if customer %}
+			<ul>
+				<li>Name: {{ account_name }}</li>
+				<li>Account: {{ account_acct }}</li>
+				<li>Email: {{ account_email }}</li>
+			</ul>
+		{% endif %}
+
+		<a href="/add_account.html">Add new account</a>
 	</body>
 
 {% endblock %}
