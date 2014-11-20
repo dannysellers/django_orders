@@ -55,3 +55,4 @@ target/
 
 # Account list
 account_list.csv
+tracker.db
