@@ -6,5 +6,13 @@
 {% endblock header %}
 
 {% block content %}
-
+	{% if inventory_list %}
+		<ul>
+			{% for item in inventory_list %}
+				<li>Item: {{ item_item }}</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		{{ error_message }}
+	{% endif %}
 {% endblock %}

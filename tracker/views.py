@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
-from models import Customer
+from models import Customer, Inventory, Operation
 import forms
 
 
@@ -30,25 +30,31 @@ def about (request):
 
 def accounts (request):
 	context = RequestContext(request)
+	context_dict = {}
 
-	customer_list = Customer.objects.order_by('acct')[:10]
+	try:
+		# only display accounts whose status is 1 (active)
+		customer_list = Customer.objects.order_by('acct').filter(status__exact=1)[:10]
 
-	# Replace spaces with underscores to retrieve URL
-	for customer in customer_list:
-		customer.url = encode_url(customer.name)
+		# Replace spaces with underscores to retrieve URL
+		for customer in customer_list:
+			customer.url = encode_url(customer.name)
 
-	context_dict = {'customer_list': customer_list}
+		context_dict['customer_list'] = customer_list
+
+	except Customer.DoesNotExist:
+		context_dict['error_message'] = "No accounts found."
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
 
-def accountpage (request, account_name_url):
+def account_page (request, account_name_url):
 	context = RequestContext(request)
 
 	# Change underscores in the account name to spaces
 	# The URL will have an underscore, which replaced
 	# with a space corresponds to the customer
-	account_name = decode_url(account_name_url)
+	account_name = encode_url(account_name_url)
 	context_dict = {'account_name': account_name,
 					'account_name_url': account_name_url}
 
@@ -60,8 +66,7 @@ def accountpage (request, account_name_url):
 		context_dict['account_email'] = _customer.email
 
 	except Customer.DoesNotExist:
-		"""If no customer's found, return an error to populate the template"""
-		pass
+		context_dict['error_message'] = "Sorry, I couldn't find that account."
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
@@ -83,7 +88,29 @@ def add_account (request):
 		form = forms.CustomerForm()
 
 	context_dict['form'] = form
+	print("Acct added: {} -- {}".format(form.acct, form.name))
 	return render_to_response('tracker/add_account.html', context_dict, context)
+
+
+def remove_account(request, account_name_url):
+	"""	Method to 'remove' an account (really just deactivating it)
+	This isn't right--I copied from the add_account, but I'm not sure
+	it'll actually need a form... """
+	context = RequestContext(request)
+
+	account_name = decode_url(account_name_url)
+	account_name_url = decode_url(account_name_url)
+	context_dict = {'account_name': account_name,
+					'account_name_url': account_name_url}
+
+	if request.method == 'POST':
+		_customer = Customer.objects.get(name__iexact=context_dict['account_name'])
+		_customer.status = 0
+	else:
+		form = forms.CustomerForm()
+
+	context_dict['form'] = form
+	return render_to_response('tracker/accounts.html', context_dict, context)
 
 
 def add_item (request, account_name_url):
@@ -93,6 +120,13 @@ def add_item (request, account_name_url):
 
 def inventory (request):
 	context = RequestContext(request)
-	context_dict = {'name': 'Inventory'}
+	context_dict = {}
+	context_dict['name'] = 'All Inventory'
+
+	inventory_list = Inventory.objects.all().filter(status = 1)
+	if inventory_list:
+		context_dict['inventory_list'] = inventory_list
+	else:
+		context_dict['error_message'] = "No items found."
 
 	return render_to_response('tracker/inventory.html', context_dict, context)

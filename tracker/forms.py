@@ -7,6 +7,7 @@ class CustomerForm(forms.ModelForm):
 	name = forms.CharField(max_length=128, help_text="Customer's name: ")
 	acct = forms.CharField(max_length=5, help_text="Account number: ")
 	email = forms.EmailField(help_text="Email address: ")
+	status = forms.CharField(widget=forms.HiddenInput(), initial=1)
 
 	# An inline class that provides additional info on the form
 	class Meta:

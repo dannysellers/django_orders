@@ -17,18 +17,17 @@
 			<li><a href="{{ customer.url }}">{{ customer.acct }}</a>: {{ customer.name }}</li>
 		{% endfor %}
 		</ul>
-	{% else %}
-		No accounts received.
-	{% endif %}
-
-	{% if customer %}
+	{% elif customer %}
 		<ul>
 			<li>Name: {{ account_name }}</li>
 			<li>Account: {{ account_acct }}</li>
 			<li>Email: {{ account_email }}</li>
 		</ul>
+		<br/><a href="/accounts/{{ account_name }}/remove_account/">Remove account</a>
+	{% else %}
+		{{ error_message }}<br/>
 	{% endif %}
 
-	<br/><a href="/add_account.html">Add new account</a>
+	<br/><a href="/add_account">Add new account</a>
 
 {% endblock %}
