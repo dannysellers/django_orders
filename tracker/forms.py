@@ -9,6 +9,10 @@ class CustomerForm(forms.ModelForm):
 	email = forms.EmailField(help_text="Email address: ")
 	status = forms.CharField(widget=forms.HiddenInput(), initial=1)
 	createdate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
+	closedate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
+	# Set closedate to today so it has a value, but the status will indicate 
+activity
+
 
 	# An inline class that provides additional info on the form
 	class Meta:

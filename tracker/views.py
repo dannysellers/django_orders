@@ -86,6 +86,8 @@ def add_account (request):
 
 		if form.is_valid():
 			form.save(commit = True)
+			print("Acct added: {} -- {}".format(form.acct, 
+form.name))
 
 			return index(request)
 		else:
@@ -94,7 +96,6 @@ def add_account (request):
 		form = forms.CustomerForm()
 
 	context_dict['form'] = form
-	print("Acct added: {} -- {}".format(form.acct, form.name))
 	return render_to_response('tracker/add_account.html', context_dict, context)
 
 
