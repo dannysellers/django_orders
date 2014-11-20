@@ -8,6 +8,7 @@ class CustomerForm(forms.ModelForm):
 	acct = forms.CharField(max_length=5, help_text="Account number: ")
 	email = forms.EmailField(help_text="Email address: ")
 	status = forms.CharField(widget=forms.HiddenInput(), initial=1)
+	createdate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
 
 	# An inline class that provides additional info on the form
 	class Meta:

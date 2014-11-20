@@ -11,13 +11,15 @@ def load_db(filename):
 			for row in _dictreader:
 				name = row['Names']
 				acct = row['Acct']
-				add_customer(name=name, acct=acct)
+				createdate = row['Date Created']
+				add_customer(name=name, acct=acct, createdate=createdate)
 		from tracker.models import Customer
 		print("{} accounts loaded.".format(len(Customer.objects.all())))
 
 
 def add_customer(name, acct, email='address@domain.com'):
-	c = Customer.objects.get_or_create(name=name, acct=acct, email=email, status=1)
+	c = Customer.objects.get_or_create(name=name, acct=acct, email=email,
+									   status=1, createdate=createdate)
 	return c
 
 
@@ -25,5 +27,5 @@ if __name__ == '__main__':
 	filename = 'account_list.csv'
 	print("Loading accounts from {}".format(filename))
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'order_tracker.settings')
-	from tracker.models import Customer, Inventory
+	from tracker.models import Customer
 	load_db(filename)

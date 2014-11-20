@@ -98,8 +98,7 @@ def remove_account(request, account_name_url):
 	it'll actually need a form... """
 	context = RequestContext(request)
 
-	account_name = decode_url(account_name_url)
-	account_name_url = decode_url(account_name_url)
+	account_name = encode_url(account_name_url)
 	context_dict = {'account_name': account_name,
 					'account_name_url': account_name_url}
 

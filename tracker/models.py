@@ -20,6 +20,8 @@ class Customer(models.Model):
 	acct = models.IntegerField(max_length=5, primary_key=True, unique=True)
 	email = models.EmailField()
 	status = models.CharField(max_length=1, choices=CUSTOMER_STATUS_CODES)
+	createdate = models.DateField()
+	closedate = models.DateField(null=True,blank=True)
 
 	def __unicode__(self):
 		return '{}: {}'.format(self.acct, self.name)
