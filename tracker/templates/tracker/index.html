@@ -1,14 +1,26 @@
-{% extends 'tracker/base.html' %}
+<!DOCTYPE html>
+
 {% load static %}
-{% block content %}
+
+<html>
+
+	<head>
+		<title>Inventory&#8212;Order Tracker</title>
+		<link rel="stylesheet" href="{% static "css/base.css" %}" />
+	</head>
 
 	<body>
-		<h1>Order / Inventory Tracker</h1>
+		{% block header %}
+			<h1>Order / Inventory Tracker</h1>
+		{% endblock header %}
 		<nav>
+			<a href="/">Home</a>
 			<a href="/about">About</a>
 			<a href="/accounts">Accounts</a>
 			<a href="/inventory">Inventory</a>
 		</nav>
-	</body>
 
-{% endblock %}
+	{% block content %}{% endblock %}
+
+	</body>
+</html>

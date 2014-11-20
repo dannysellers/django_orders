@@ -1,38 +1,34 @@
-{% extends 'tracker/base.html' %}
+{% extends 'tracker/index.html' %}
 {% load static %}
-{% block content %}
 
-	<body>
+{% block header %}
 		{% if customer %}
 			<h1>Tracker &#8212; {{ account_name }}</h1>
 		{% else %}
 			<h1>Tracker &#8212; Accounts</h1>
 		{% endif %}
-		<nav>
-			<a href="/">Home</a>
-			<a href="/about">About</a>
-			<a href="/inventory">Inventory</a>
-		</nav>
+{% endblock header %}
 
-		{% if customer_list %}
-			<ul>
-			{% for customer in customer_list %}
-				<li><a href="{{ customer.url }}">{{ customer.acct }}</a>: {{ customer.name }}</li>
-			{% endfor %}
-			</ul>
-		{% else %}
-			No accounts received.
-		{% endif %}
+{% block content %}
 
-		{% if customer %}
-			<ul>
-				<li>Name: {{ account_name }}</li>
-				<li>Account: {{ account_acct }}</li>
-				<li>Email: {{ account_email }}</li>
-			</ul>
-		{% endif %}
+	{% if customer_list %}
+		<ul>
+		{% for customer in customer_list %}
+			<li><a href="{{ customer.url }}">{{ customer.acct }}</a>: {{ customer.name }}</li>
+		{% endfor %}
+		</ul>
+	{% else %}
+		No accounts received.
+	{% endif %}
 
-		<br/><a href="/add_account.html">Add new account</a>
-	</body>
+	{% if customer %}
+		<ul>
+			<li>Name: {{ account_name }}</li>
+			<li>Account: {{ account_acct }}</li>
+			<li>Email: {{ account_email }}</li>
+		</ul>
+	{% endif %}
+
+	<br/><a href="/add_account.html">Add new account</a>
 
 {% endblock %}
