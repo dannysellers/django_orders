@@ -2,24 +2,35 @@ import os
 import csv
 
 
-def load_db(filename):
+def fix_date(datestr):
+	"""
+	Dates in the account_list are MM/DD/YYYY, but Django's DateField
+	requires YYYY-MM-DD format
+	"""
+	_createdate = datestr.split('/')
+	_createdate = [_createdate[2], _createdate[0], _createdate[1]]
+	_createdate = '-'.join(_createdate)
+	return _createdate
+
+
+def load_db (filename):
 	with open(filename, 'r') as f:
 		_reader = csv.reader(f)
 		_fieldnames = _reader.next()
 		if _fieldnames:
-			_dictreader = csv.DictReader(f, fieldnames=_fieldnames)
+			_dictreader = csv.DictReader(f, fieldnames = _fieldnames)
+			_dictreader.next()  # don't parse the first row again
 			for row in _dictreader:
 				name = row['Names']
 				acct = row['Acct']
-				createdate = row['Date Created']
+				createdate = fix_date(row['Date Created'])
 				add_customer(name=name, acct=acct, createdate=createdate)
-		from tracker.models import Customer
-		print("{} accounts loaded.".format(len(Customer.objects.all())))
+			print("{} accounts loaded.".format(len(Customer.objects.all())))
 
 
-def add_customer(name, acct, email='address@domain.com'):
-	c = Customer.objects.get_or_create(name=name, acct=acct, email=email,
-									   status=1, createdate=createdate)
+def add_customer (name, acct, createdate, email='address@domain.com'):
+	c = Customer.objects.get_or_create(name = name, acct = acct, email = email,
+									   status = 1, createdate = createdate)
 	return c
 
 
