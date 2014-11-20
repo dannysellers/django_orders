@@ -21,7 +21,7 @@ class Customer(models.Model):
 	email = models.EmailField()
 	status = models.CharField(max_length=1, choices=CUSTOMER_STATUS_CODES)
 	createdate = models.DateField()
-	closedate = models.DateField(null=True,blank=True)
+	closedate = models.DateField(null=True, blank=True)  # blank makes optional at init
 
 	def __unicode__(self):
 		return '{}: {}'.format(self.acct, self.name)

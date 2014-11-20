@@ -36,6 +36,10 @@ def accounts (request):
 		# only display accounts whose status is 1 (active)
 		customer_list = Customer.objects.order_by('acct').filter(status__exact=1)[:10]
 
+		# header_list = Customer._meta.get_all_field_names()
+		header_list = ['Account', 'Name']
+		context_dict['headers'] = header_list
+
 		# Replace spaces with underscores to retrieve URL
 		for customer in customer_list:
 			customer.url = encode_url(customer.name)
@@ -57,6 +61,8 @@ def account_page (request, account_name_url):
 	account_name = encode_url(account_name_url)
 	context_dict = {'account_name': account_name,
 					'account_name_url': account_name_url}
+
+	context_dict['headers'] = ['Name', 'Account', 'Email']
 
 	try:
 		_customer = Customer.objects.get(name__iexact = account_name)

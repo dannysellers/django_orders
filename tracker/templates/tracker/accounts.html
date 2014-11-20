@@ -12,18 +12,35 @@
 {% block content %}
 
 	{% if customer_list %}
-		<ul>
+		<table>
+			<tr>
+				{% for item in headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+			</tr>
 		{% for customer in customer_list %}
-			<li><a href="{{ customer.url }}">{{ customer.acct }}</a>: {{ customer.name }}</li>
+			<tr>
+				<td><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
+				<td>{{ customer.name }}</td>
+			</tr>
 		{% endfor %}
-		</ul>
+		</table>
 	{% elif customer %}
-		<ul>
-			<li>Name: {{ account_name }}</li>
-			<li>Account: {{ account_acct }}</li>
-			<li>Email: {{ account_email }}</li>
-		</ul>
+		<table>
+			<tr>
+				{% for item in headers %}
+					<th>{{ item }}</th>
+				{% endfor %]
+			</tr>
+			<tr>
+				<td>{{ account_name }}</td>
+				<td>{{ account_acct }}</td>
+				<td>{{ account_email }}</td>
+			</tr>
+		</table>
 		<br/><a href="/accounts/{{ account_name }}/remove_account/">Remove account</a>
+		<!--I'm not sure what this endfor is ending, but it's needed-->
+		{% endfor %}
 	{% else %}
 		{{ error_message }}<br/>
 	{% endif %}

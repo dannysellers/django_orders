@@ -7,11 +7,13 @@
 
 {% block content %}
 	{% if inventory_list %}
-		<ul>
+		<table>
+		<tr>
 			{% for item in inventory_list %}
-				<li>Item: {{ item_item }}</li>
+				<td>Item: {{ item_item }}</td>
 			{% endfor %}
-		</ul>
+		</tr>
+		</table>
 	{% else %}
 		{{ error_message }}
 	{% endif %}
