@@ -20,3 +20,8 @@ def inventory(request):
 		context_dict['error_message'] = "No items found."
 
 	return render_to_response('tracker/inventory.html', context_dict, context)
+
+
+def add_item (request, account_name_url):
+	print account_name_url
+	return HttpResponse("This page is for adding items to a customer's inventory.")

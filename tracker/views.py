@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 # from datetime import date
@@ -20,8 +20,3 @@ def about (request):
 	context_dict = {'name': 'About'}
 
 	return render_to_response('tracker/about.html', context_dict, context)
-
-
-def add_item (request, account_name_url):
-	print account_name_url
-	return HttpResponse("This page is for adding items to a customer's inventory.")
