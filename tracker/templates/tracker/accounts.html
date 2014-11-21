@@ -15,8 +15,10 @@
 		{{ message }}
 	{% endif %}
 
-	<a href="/add_account">Add new account</a><br/><br/>
 	{% if customer_list %}
+		<a href="/accounts/all">All accounts</a> | <a href="/accounts/active">Active
+	accounts</a><br/>
+		<a href="/add_account">Add new account</a><br/><br/>
 		<table>
 			<tr>
 				{% for item in headers %}
@@ -27,10 +29,13 @@
 			<tr>
 				<td><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
 				<td>{{ customer.name }}</td>
+				<td>{{ customer.status }}</td>
 			</tr>
 		{% endfor %}
 		</table>
 	{% elif customer %}
+		<!--<a href="/inventory/{{ account_acct }}/add_inventory">Add Inventory</a>-->
+		<a href="/accounts/{{ account_acct }}/remove_account">Remove account</a><br/><br/>
 		<table>
 			<tr>
 				{% for item in headers %}
@@ -43,7 +48,6 @@
 				<td>{{ account_email }}</td>
 			</tr>
 		</table>
-		<br/><a href="/accounts/{{ account_name_url }}/remove_account">Remove account</a>
 	{% else %}
 		{{ error_message }}<br/>
 	{% endif %}
