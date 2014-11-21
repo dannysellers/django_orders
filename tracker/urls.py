@@ -5,6 +5,7 @@ urlpatterns = patterns('',
    url(r'^$', views.index, name='index'),
    url(r'^about/$', views.about, name='about'),
    url(r'^accounts/$', views.accounts, name='accounts'),  # account list
+   url(r'^accounts/(?P<account_num_url>\d+)/$', views.account_num_page, name='account_num_page'),  # acct number
    url(r'^accounts/(?P<account_name_url>\S+)/$', views.account_page, name='account_page'),  # individual acct
    url(r'^add_account/$', views.add_account, name='add_account'),
    url(r'^accounts/(?P<account_name_url>\S+)/remove_account$', views.remove_account, name='remove_account'),

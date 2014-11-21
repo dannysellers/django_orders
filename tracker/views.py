@@ -1,8 +1,10 @@
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
+from datetime import date
+# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from models import Customer, Inventory, Operation
+from models import Customer, Inventory
 import forms
 
 
@@ -34,9 +36,11 @@ def accounts (request):
 
 	try:
 		# only display accounts whose status is 1 (active)
-		customer_list = Customer.objects.order_by('acct').filter(status__exact=1)[:10]
+		customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)
+		# paginator = Paginator(customer_list, 15)  # show 15 customers per page
 
-		# header_list = Customer._meta.get_all_field_names()
+		# page = request.GET.get('page')
+
 		header_list = ['Account', 'Name']
 		context_dict['headers'] = header_list
 
@@ -49,20 +53,31 @@ def accounts (request):
 	except Customer.DoesNotExist:
 		context_dict['error_message'] = "No accounts found."
 
+	# try:
+	# 	customers = paginator.page(page)
+	# except PageNotAnInteger:
+	# 	If page isn't an integer, deliver first page
+		# customers = paginator.page(1)
+	# except EmptyPage:
+	# 	If page is out of range, deliver last page
+	# 	customers = paginator.page(paginator.num_pages)
+
+	# context_dict['customers'] = customers
+
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
 
 def account_page (request, account_name_url):
+	# TODO: Indicate status of account
 	context = RequestContext(request)
 
 	# Change underscores in the account name to spaces
 	# The URL will have an underscore, which replaced
 	# with a space corresponds to the customer
-	account_name = encode_url(account_name_url)
-	context_dict = {'account_name': account_name,
-					'account_name_url': account_name_url}
+	account_name = decode_url(account_name_url)
+	context_dict = dict(account_name = account_name, account_name_url = account_name_url)
 
-	context_dict['headers'] = ['Name', 'Account', 'Email']
+	context_dict['headers'] = ['Account', 'Name', 'Email']
 
 	try:
 		_customer = Customer.objects.get(name__iexact = account_name)
@@ -72,7 +87,29 @@ def account_page (request, account_name_url):
 		context_dict['account_email'] = _customer.email
 
 	except Customer.DoesNotExist:
-		context_dict['error_message'] = "Sorry, I couldn't find that account."
+		context_dict['error_message'] = "Sorry, I couldn't find {}'s account.".format(account_name)
+
+	return render_to_response('tracker/accounts.html', context_dict, context)
+
+
+def account_num_page (request, account_num_url):
+	# TODO: Indicate status of account
+	context = RequestContext(request)
+
+	account_num = account_num_url
+	context_dict = {'account_acct': account_num}
+
+	context_dict['headers'] = ['Account', 'Name', 'Email']
+
+	try:
+		_customer = Customer.objects.get(acct__exact = account_num)
+		context_dict['customer'] = _customer
+
+		context_dict['account_name'] = _customer.name
+		context_dict['account_email'] = _customer.email
+
+	except Customer.DoesNotExist:
+		context_dict['error_message'] = "Sorry, I couldn't find account #{}.".format(account_num)
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
@@ -86,10 +123,9 @@ def add_account (request):
 
 		if form.is_valid():
 			form.save(commit = True)
-			print("Acct added: {} -- {}".format(form.acct, 
-form.name))
+			# print("Acct added: {} -- {}".format(form.acct, form.name))
 
-			return index(request)
+			return accounts(request)
 		else:
 			print form.errors
 	else:
@@ -99,23 +135,26 @@ form.name))
 	return render_to_response('tracker/add_account.html', context_dict, context)
 
 
-def remove_account(request, account_name_url):
+def remove_account (request, account_name_url):
 	"""	Method to 'remove' an account (really just deactivating it)
 	This isn't right--I copied from the add_account, but I'm not sure
 	it'll actually need a form... """
 	context = RequestContext(request)
 
-	account_name = encode_url(account_name_url)
+	# account_name = decode_url(account_name_url)
+	account_name = account_name_url.replace(' ', '_')
 	context_dict = {'account_name': account_name,
 					'account_name_url': account_name_url}
 
-	if request.method == 'POST':
-		_customer = Customer.objects.get(name__iexact=context_dict['account_name'])
+	if request.method == 'GET':
+		_customer = Customer.objects.get(name = account_name)
+		_customer.closedate = date.today()
 		_customer.status = 0
-	else:
-		form = forms.CustomerForm()
+		_customer.save()
+		context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
-	context_dict['form'] = form
+		return accounts(request, context_dict, context)
+
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
 

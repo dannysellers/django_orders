@@ -11,6 +11,11 @@
 
 {% block content %}
 
+	{% if message %}
+		{{ message }}
+	{% endif %}
+
+	<a href="/add_account">Add new account</a><br/><br/>
 	{% if customer_list %}
 		<table>
 			<tr>
@@ -30,21 +35,31 @@
 			<tr>
 				{% for item in headers %}
 					<th>{{ item }}</th>
-				{% endfor %]
+				{% endfor item %}
 			</tr>
 			<tr>
-				<td>{{ account_name }}</td>
 				<td>{{ account_acct }}</td>
+				<td>{{ account_name }}</td>
 				<td>{{ account_email }}</td>
 			</tr>
 		</table>
-		<br/><a href="/accounts/{{ account_name }}/remove_account/">Remove account</a>
-		<!--I'm not sure what this endfor is ending, but it's needed-->
-		{% endfor %}
+		<br/><a href="/accounts/{{ account_name_url }}/remove_account">Remove account</a>
 	{% else %}
 		{{ error_message }}<br/>
 	{% endif %}
 
-	<br/><a href="/add_account">Add new account</a>
+{#	{% if customers %}#}
+{#		<div class="pagination">#}
+{#			{% if customers.has_previous %}#}
+{#				<a href="?page={{ customers.previous_page_number }}">Previous</a>#}
+{#			{% endif %}#}
+{#			<span class="current">#}
+{#				Page {{ customers.number }} of {{ customers.paginator.num_pages }}#}
+{#			</span>#}
+{#			{% if customers.has_next %}#}
+{#				<a href="?page={{ customers.next_page_number }}">Next</a>#}
+{#			{% endif %}#}
+{#		</div>#}
+{#	{% endif customers %}#}
 
-{% endblock %}
+{% endblock content %}
