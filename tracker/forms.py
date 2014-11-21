@@ -9,7 +9,7 @@ class CustomerForm(forms.ModelForm):
 	email = forms.EmailField(help_text="Email address: ")
 	status = forms.CharField(widget=forms.HiddenInput(), initial=1)
 	createdate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
-	closedate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
+	closedate = forms.DateField(widget=forms.HiddenInput(), required=False)
 	# Set closedate to today so it has a value, but the status will indicate activity
 
 	# An inline class that provides additional info on the form
@@ -25,7 +25,9 @@ class InventoryForm(forms.ModelForm):
 	palletized = forms.BooleanField(initial=False, help_text="Palletized?:")
 	palletweight = forms.CharField(help_text="Pallet weight:")
 	arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
+	departure = forms.DateField(widget=forms.HiddenInput(), required=False)
 	status = forms.CharField(widget=forms.HiddenInput(), initial=0)  # choices?
+	storage_fees = forms.IntegerField(widget=forms.HiddenInput(), required=False)
 
 	class Meta:
 		model = models.Inventory
