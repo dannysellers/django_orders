@@ -23,22 +23,5 @@ def inventory(request):
 
 
 def add_item (request, account_name_url):
-	context = RequestContext(request)
-	context_dict = {}
-
-	if request.method == 'POST':
-		form = forms.InventoryForm(request.POST)
-
-		if form.is_valid():
-			form.save(commit = True)
-			# print("Item added: {}--{}x {} lbs".format(form.itemid, form.quantity, form.weight))
-
-			return render_to_response('tracker/accounts.html', context)
-			# return accounts(context)
-		else:
-			print form.errors
-	else:
-		form = forms.InventoryForm()
-
-	context_dict['form'] = form
-	return render_to_response('tracker/add_item.html', context_dict, context)
+	print account_name_url
+	return HttpResponse("This page is for adding items to a customer's inventory.")
