@@ -15,11 +15,11 @@
 		{{ message }}
 	{% endif %}
 
+	<a href="/accounts?accts=all">All accounts</a> | <a href="/accounts?accts=active">Active
+	accounts</a> | <a href="/accounts?accts=inactive">Inactive accounts</a> |
+	<a href="/add_account">Add new account</a>
 	{% if customer_list %}
-		<a href="/accounts/all">All accounts</a> | <a href="/accounts/active">Active
-	accounts</a><br/>
-		<a href="/add_account">Add new account</a><br/><br/>
-		<table>
+		<br/><br/><table>
 			<tr>
 				{% for item in headers %}
 					<th>{{ item }}</th>
@@ -34,8 +34,11 @@
 		{% endfor %}
 		</table>
 	{% elif customer %}
-		<!--<a href="/inventory/{{ account_acct }}/add_inventory">Add Inventory</a>-->
-		<a href="/accounts/{{ account_acct }}/remove_account">Remove account</a><br/><br/>
+		{% if account_status == '1' %}
+			<!--<a href="/inventory/{{ account_acct }}/add_inventory">Add Inventory</a>-->
+			| <a href="/accounts?remove={{ account_acct }}">Remove account</a>
+		{% endif %}
+		<br/><br/>
 		<table>
 			<tr>
 				{% for item in headers %}
@@ -46,24 +49,11 @@
 				<td>{{ account_acct }}</td>
 				<td>{{ account_name }}</td>
 				<td>{{ account_email }}</td>
+				<td>{{ account_status }}</td>
 			</tr>
 		</table>
 	{% else %}
 		{{ error_message }}<br/>
 	{% endif %}
-
-{#	{% if customers %}#}
-{#		<div class="pagination">#}
-{#			{% if customers.has_previous %}#}
-{#				<a href="?page={{ customers.previous_page_number }}">Previous</a>#}
-{#			{% endif %}#}
-{#			<span class="current">#}
-{#				Page {{ customers.number }} of {{ customers.paginator.num_pages }}#}
-{#			</span>#}
-{#			{% if customers.has_next %}#}
-{#				<a href="?page={{ customers.next_page_number }}">Next</a>#}
-{#			{% endif %}#}
-{#		</div>#}
-{#	{% endif customers %}#}
 
 {% endblock content %}
