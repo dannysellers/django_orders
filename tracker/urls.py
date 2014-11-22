@@ -22,4 +22,5 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
     url(r'^inventory/$', inv_views.inventory, name='inventory'),
     url(r'^accounts/(?P<account_name_url>\S+)/add_item/$', inv_views.add_item, name='add_item'),
+    url(r'^accounts/(?P<account_name_url>\S+)/add_inventory/$', inv_views.add_item, name='add_item'),
 )
