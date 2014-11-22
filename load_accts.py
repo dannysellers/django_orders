@@ -1,13 +1,6 @@
 import os
 import csv
 
-"""
-This script is largely specific to my account_list, which has Excel-formatted date codes
-and Customer and Business names comma-separated within the same cell
-
-For a general csv, remove fix_date call from line ## and fix_cust_names from line ##
-"""
-
 
 def fix_date(datestr):
 	"""
@@ -20,22 +13,6 @@ def fix_date(datestr):
 	return _createdate
 
 
-def fix_cust_names(namestr):
-	"""
-	Some customers have "Business, FirstName LastName" as their 'Names' field.
-	Rather than trying to allow punctuation in URLs, I've split those up into
-	distinct model attributes
-	"""
-	if ',' in namestr:
-		namelist = namestr.split(', ')
-		# bizname = namelist[0]
-		# custname = namelist[1]
-		# return [custname, bizname]
-		return namelist
-	else:
-		return namestr
-
-
 def load_db (filename):
 	with open(filename, 'r') as f:
 		_reader = csv.reader(f)
@@ -44,21 +21,16 @@ def load_db (filename):
 			_dictreader = csv.DictReader(f, fieldnames = _fieldnames)
 			_dictreader.next()  # don't parse the first row again
 			for row in _dictreader:
-				namelist = fix_cust_names(row['Names'])
-				name = namelist[1]
-				if len(namelist) == 2:
-					bizname = namelist[0]
-				else:
-					bizname = 'N/A'
+				name = row['Names']
 				acct = row['Acct']
 				createdate = fix_date(row['Date Created'])
-				add_customer(name=name, bizname=bizname, acct=acct, createdate=createdate)
+				add_customer(name=name, acct=acct, createdate=createdate)
 			print("{} accounts loaded.".format(len(Customer.objects.all())))
 
 
-def add_customer (name, bizname, acct, createdate, email='address@domain.com'):
-	c = Customer.objects.get_or_create(name = name, bizname = bizname, acct = acct,
-									   email = email, status = 1, createdate = createdate)
+def add_customer (name, acct, createdate, email='address@domain.com'):
+	c = Customer.objects.get_or_create(name = name, acct = acct, email = email,
+									   status = 1, createdate = createdate)
 	return c
 
 

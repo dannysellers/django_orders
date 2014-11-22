@@ -29,7 +29,7 @@ def accounts (request, bool_active='active'):
 
 		# page = request.GET.get('page')
 
-		header_list = ['Account', 'Name', 'Business Name', 'Status']
+		header_list = ['Account', 'Name', 'Status']
 		context_dict['headers'] = header_list
 
 		# Replace spaces with underscores to retrieve URL
@@ -63,7 +63,7 @@ def accounts (request, bool_active='active'):
 def account_page (request, account_url):
 	# TODO: Handle customers with multiple accounts
 	context = RequestContext(request)
-	context_dict = {'Headers': ['Account', 'Name', 'Business Name', 'Email']}
+	context_dict = {'Headers': ['Account', 'Name', 'Email']}
 
 	# Change underscores in the account name to spaces
 	# The URL will have an underscore, which replaced
