@@ -17,6 +17,7 @@ INVENTORY_STATUS_CODES = (
 
 class Customer(models.Model):
 	name = models.CharField(max_length=128, unique=False)
+	bizname = models.CharField(max_length=128, unique=False)
 	acct = models.IntegerField(max_length=5, primary_key=True, unique=True)
 	email = models.EmailField()
 	status = models.CharField(max_length=1, choices=CUSTOMER_STATUS_CODES)
