@@ -1,7 +1,7 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
-from django.core.urlresolvers import reverse
+# from django.core.urlresolvers import reverse
 
 from datetime import date
 
@@ -28,22 +28,30 @@ def accounts (request):
 		redirect(remove_account(account_num=remove))
 
 	try:
+		header_list = ['Account', 'Name', 'Status']
+
 		if accts == "active":
 			customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)[:10]
 		elif accts == "all":
 			customer_list = Customer.objects.all()[:10]
 		elif accts == "inactive":
 			customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
+			header_list += ['Close Date']
 		else:
 			customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)[:10]
 
-		header_list = ['Account', 'Name', 'Status']
 		context_dict['headers'] = header_list
 
 		# Replace spaces with underscores to retrieve URL
 		for customer in customer_list:
-			# customer.url = encode_url(customer.acct)
 			customer.url = 'accounts/' + str(customer.acct)
+			if str(customer.status) == '0':
+				context_dict['account_status'] = 'Inactive'
+				context_dict['close_date'] = str(customer.closedate)
+			elif str(customer.status) == '1':
+				context_dict['account_status'] = 'Active'
+			else:
+				context_dict['account_status'] = str(customer.status)
 			# TODO: How to use enumerated choices?
 
 		context_dict['customer_list'] = customer_list
@@ -55,7 +63,6 @@ def accounts (request):
 
 
 def account_page (request, account_url):
-	# TODO: Handle customers with multiple accounts
 	context = RequestContext(request)
 	context_dict = {}
 	header_list = ['Account', 'Name', 'Email', 'Status']
@@ -64,19 +71,23 @@ def account_page (request, account_url):
 	account_acct = account_url
 	context_dict['account_url'] = account_url
 	try:
-		_customer = Customer.objects.get(acct = account_acct)
+		customer = Customer.objects.get(acct = account_acct)
 	except Customer.DoesNotExist:
 		context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(
 			account_acct)
 
 	# _customer = Customer.objects.get(name__iexact = account_name)
-	context_dict['customer'] = _customer
+	context_dict['customer'] = customer
 
 	# Table cells
-	context_dict['account_name'] = _customer.name
-	context_dict['account_acct'] = _customer.acct
-	context_dict['account_email'] = _customer.email
-	context_dict['account_status'] = str(_customer.status)
+	if str(customer.status) == '0':
+		context_dict['account_status'] = 'Inactive'
+		context_dict['headers'].append('Date Closed')
+		context_dict['close_date'] = str(customer.closedate)
+	elif str(customer.status) == '1':
+		context_dict['account_status'] = 'Active'
+	else:
+		context_dict['account_status'] = str(customer.status)
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
@@ -122,6 +133,6 @@ def remove_account (account_num):
 		context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
 		# return context_dict  # certainly doesn't work atm
-		return HttpResponseRedirect(reverse('tracker:accounts'))  # seems to have the possibility of working
+		return HttpResponseRedirect('/accounts?accts=active')
 	except Customer.DoesNotExist:
 		return dict(message="Account {} not found. No changes made.".format(account_num))

@@ -19,6 +19,12 @@ th {
 	padding: 3px;
 	vertical-align: top;
 }
+#account_cell {
+	padding-left: 0.5em;
+}
+#name_cell, #email_cell, #status_cell {
+	padding-left: 1.0em;
+}
 table tr:nth-child(even) {
 	background-color: #ffffff;
 }

@@ -21,7 +21,7 @@ class Customer(models.Model):
 	email = models.EmailField()
 	status = models.CharField(max_length=1, choices=CUSTOMER_STATUS_CODES)
 	createdate = models.DateField()
-	closedate = models.DateField(null=True, blank=True)  # blank makes optional at init
+	closedate = models.DateField()
 
 	def __unicode__(self):
 		return '{}: {}'.format(self.acct, self.name)
@@ -38,6 +38,9 @@ class Inventory(models.Model):
 	departure = models.DateField()
 	status = models.CharField(max_length=1, choices=INVENTORY_STATUS_CODES)
 	storage_fees = models.IntegerField()
+
+	def __init__(self):
+		self.storage_fees = self.weight * self.quantity
 
 	def __unicode__(self):
 		return '<Item {}>'.format(self.itemid)

@@ -3,7 +3,7 @@
 
 {% block header %}
 		{% if customer %}
-			<h1>Tracker &#8212; {{ account_name }}</h1>
+			<h1>Tracker &#8212; {{ customer.name }}</h1>
 		{% else %}
 			<h1>Tracker &#8212; Accounts</h1>
 		{% endif %}
@@ -27,16 +27,19 @@
 			</tr>
 		{% for customer in customer_list %}
 			<tr>
-				<td><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
-				<td>{{ customer.name }}</td>
-				<td>{{ customer.status }}</td>
+				<td id="account_cell"><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
+				<td id="name_cell">{{ customer.name }}</td>
+				<td id="status_cell">{{ account_status }}</td>
+				{% if account_status == 'Inactive' %}
+					<td id="close_date">{{ close_date }}</td>
+				{% endif %}
 			</tr>
 		{% endfor %}
 		</table>
 	{% elif customer %}
-		{% if account_status == '1' %}
-			<!--<a href="/inventory/{{ account_acct }}/add_inventory">Add Inventory</a>-->
-			| <a href="/accounts?remove={{ account_acct }}">Remove account</a>
+		{% if account_status == 'Active' %}
+			| <a href="/inventory?acct={{ customer.acct }}">Manage Inventory</a>
+			| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
 		{% endif %}
 		<br/><br/>
 		<table>
@@ -46,10 +49,13 @@
 				{% endfor item %}
 			</tr>
 			<tr>
-				<td>{{ account_acct }}</td>
-				<td>{{ account_name }}</td>
-				<td>{{ account_email }}</td>
-				<td>{{ account_status }}</td>
+				<td id="account_cell">{{ customer.acct }}</td>
+				<td id="name_cell">{{ customer.name }}</td>
+				<td id="email_cell">{{ customer.email }}</td>
+				<td id="status_cell">{{ account_status }}</td>
+				{% if account_status == 'Inactive' %}
+					<td id="close_date">{{ close_date }}</td>
+				{% endif %}
 			</tr>
 		</table>
 	{% else %}
