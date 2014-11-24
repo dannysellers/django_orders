@@ -39,17 +39,21 @@ class Inventory(models.Model):
 	status = models.CharField(max_length=1, choices=INVENTORY_STATUS_CODES)
 	storage_fees = models.IntegerField()
 
-	def __init__(self):
-		self.storage_fees = self.weight * self.quantity
+	# Handle operations as properties of items? Or vice-versa
+
+	# def __init__(self):
+	# 	self.storage_fees = self.weight * self.quantity
 
 	def __unicode__(self):
-		return '<Item {}>'.format(self.itemid)
+		return 'Item {}'.format(self.itemid)
 
 
 class Operation(models.Model):
+	# TODO: Add way to distinguish types of operations
+	# TODO: Settle list of types of ops
 	item = models.ForeignKey(Inventory)
 	start = models.DateTimeField()
 	finish = models.DateTimeField()
 
 	def __unicode__(self):
-		return '<Op started {}>'.format(self.start)
+		return 'Op started {}'.format(self.start)

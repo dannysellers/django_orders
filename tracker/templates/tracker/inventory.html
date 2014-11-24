@@ -2,7 +2,11 @@
 {% load static %}
 
 {% block header %}
-		<h1>Tracker &#8212; {{ name }}</h1>
+{#	{% if customer %}#}
+{#		<h1>Inventory &#8212; {{ customer.name }}</h1>#}
+{#	{% else %}#}
+		<h1>Inventory &#8212; {{ filter }}</h1>
+{#	{% endif customer %}#}
 {% endblock header %}
 
 {% block content %}
@@ -10,7 +14,7 @@
 		<table>
 		<tr>
 			{% for item in inventory_list %}
-				<td>Item: {{ item_item }}</td>
+				<td>Item: {{ item.itemid }}</td>
 			{% endfor %}
 		</tr>
 		</table>

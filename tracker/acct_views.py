@@ -30,10 +30,12 @@ def accounts (request):
 	try:
 		header_list = ['Account', 'Name', 'Status']
 
+		# Parse accts argument
 		if accts == "active":
 			customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)[:10]
 		elif accts == "all":
 			customer_list = Customer.objects.all()[:10]
+			header_list += ['Close Date']
 		elif accts == "inactive":
 			customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
 			header_list += ['Close Date']
