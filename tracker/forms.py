@@ -4,9 +4,9 @@ from datetime import date
 
 
 class CustomerForm(forms.ModelForm):
-	name = forms.CharField(max_length=128, label="Customer's name: ")
-	acct = forms.CharField(max_length=5, label="Account number: ")
-	email = forms.EmailField(label="Email address: ")
+	name = forms.CharField(max_length=128, help_text="Customer's name: ")
+	acct = forms.CharField(max_length=5, help_text="Account number: ")
+	email = forms.EmailField(help_text="Email address: ")
 	status = forms.CharField(widget=forms.HiddenInput(), initial=1)
 	createdate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
 	closedate = forms.DateField(widget=forms.HiddenInput(), required=False)
@@ -18,13 +18,16 @@ class CustomerForm(forms.ModelForm):
 
 
 class InventoryForm(forms.ModelForm):
-	itemid = forms.CharField(label="Item ID:")
-	quantity = forms.CharField(max_length=5, label="Quantity:")
-	weight = forms.CharField(max_length=4, label="Weight")
-	palletized = forms.BooleanField(initial=False, label="Palletized?:")
-	palletweight = forms.CharField(label="Pallet weight:")
+	itemid = forms.CharField(help_text="Item ID:")
+	quantity = forms.CharField(max_length=5, help_text="Quantity:")
+	weight = forms.CharField(max_length=4, help_text="Weight")
+	palletized = forms.BooleanField(initial=False, help_text="Palletized?:")
+	palletweight = forms.CharField(help_text="Pallet weight:")
 	arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
 	status = forms.CharField(widget=forms.HiddenInput(), initial=0)  # choices?
+	storage_fees = forms.IntegerField(widget=forms.HiddenInput())
 
 	class Meta:
 		model = models.Inventory
+
+		# fields = ('quantity', 'weight', 'palletized', 'palletweight')

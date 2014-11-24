@@ -2,21 +2,34 @@
 {% load static %}
 
 {% block header %}
-{#	{% if customer %}#}
-{#		<h1>Inventory &#8212; {{ customer.name }}</h1>#}
-{#	{% else %}#}
+	{% if customer %}
+		<h1>Inventory &#8212; {{ customer.name }}</h1>
+	{% else %}
 		<h1>Inventory &#8212; {{ filter }}</h1>
-{#	{% endif customer %}#}
+	{% endif %}
 {% endblock header %}
 
 {% block content %}
+	<a href="/inventory?status=stored">Items currently in storage</a>
+	| <a href="/inventory?add">Add Inventory</a>
 	{% if inventory_list %}
-		<table>
-		<tr>
-			{% for item in inventory_list %}
-				<td>Item: {{ item.itemid }}</td>
-			{% endfor %}
-		</tr>
+		<br/><br/><table>
+			<tr>
+				{% for item in headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+			</tr>
+			<tr>
+				{% for item in inventory_list %}
+					<td id="item_id">{{ item.itemid }}</td>
+					<td id="item_owner">
+						<a href="accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+					</td>
+					<td id="item_quantity">{{ item.quantity }}</td>
+					<td id="item_weight">{{ item.weight }}</td>
+					<td id="item_storage_fees">{{ item.storage_fees }}</td>
+				{% endfor %}
+			</tr>
 		</table>
 	{% else %}
 		{{ error_message }}
