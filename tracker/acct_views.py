@@ -25,7 +25,12 @@ def accounts (request):
 
 	# Capture /accounts?remove=<acct>
 	if remove:
-		redirect(remove_account(account_num=remove))
+		try:
+			remove_account(account_num=remove)
+		except Customer.DoesNotExist:
+			context_dict['error_message'] = "Account {} not found. No changes made.".format(remove)
+		finally:
+			context_dict['message'] = "Account {} deactivated successfully.".format(remove)
 
 	try:
 		header_list = ['Account', 'Name', 'Status']
@@ -77,8 +82,9 @@ def account_page (request, account_url):
 	try:
 		customer = Customer.objects.get(acct = account_acct)
 	except Customer.DoesNotExist:
-		context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(
+		context_dict['error_message'] = "Account {} not found.".format(
 			account_acct)
+		return render_to_response('tracker/accounts.html', context_dict, context)
 
 	context_dict['customer'] = customer
 
@@ -139,9 +145,9 @@ def remove_account (account_num):
 		_customer.closedate = date.today()
 		_customer.status = 0
 		_customer.save()
-		context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
+		# context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
-		# TODO: Fix redirect after deactivate account
-		return HttpResponseRedirect('/accounts?accts=active')
+		return HttpResponseRedirect('/accounts?accts=active', context_dict)
 	except Customer.DoesNotExist:
+		# TODO: Fix error return message
 		return dict(message="Account {} not found. No changes made.".format(account_num))

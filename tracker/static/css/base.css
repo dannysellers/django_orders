@@ -8,6 +8,11 @@ ul.errorlist {
 	list-style: none;
 	color: red;
 }
+#error_message {
+	color: red;
+	font-weight: bold;
+	margin-top: 10px;
+}
 table {
 	border: 1px solid gray;
 	width: 75%;

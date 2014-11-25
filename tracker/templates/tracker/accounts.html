@@ -12,7 +12,7 @@
 {% block content %}
 
 	{% if message %}
-		{{ message }}
+		{{ message }}<br/>
 	{% endif %}
 
 	<a href="/accounts?accts=all">All accounts</a> | <a href="/accounts?accts=active">Active
@@ -58,10 +58,7 @@
 				{% endif %}
 			</tr>
 		</table>
-	{% else %}
-		{{ error_message }}<br/>
 	{% endif %}
-
 	{% if inventory_list %}
 		<h2>Inventory</h2>
 		<table>
@@ -80,8 +77,10 @@
 				</tr>
 			{% endfor %}
 		</table>
-	{% else %}
-		{{ error_message }}<br/>
+	{% endif %}
+
+	{% if error_message %}
+		<p id="error_message">{{ error_message }}</p>
 	{% endif %}
 
 {% endblock content %}
