@@ -4,22 +4,29 @@ from random import randrange, randint, random
 from datetime import date
 
 
-def load_names(filename):
+def load_names(filename, numnames):
+	print("Loading {}".format(filename))
 	with open(filename, 'rU') as f:
 		reader = csv.reader(f)
 		first_names = reader.next()
 		last_names = reader.next()
 
+	if numnames:
+		_numnames = numnames
+	else:
+		_numnames = 30
+
 	# Generate a number of random pairs
 	namecount = 0
 	namelist = []
 
-	while namecount < 30:
+	while namecount < _numnames:
 		i = randrange(0, len(first_names))
 		j = randrange(0, len(last_names))
 		namelist.append(first_names[i] + " " + last_names[j])
 		namecount += 1
-
+	
+	print("{} customers generated.".format(len(namelist)))
 	return namelist
 
 
@@ -59,21 +66,46 @@ def populate(namelist):
 		email = str(name.split(' ')[0] + "@domain.com")
 		customer = add_customer(name=name, acct=acct, email=email, status=1)
 		customerlist.append(customer)
+	print("{} customers added to db.".format(len(customerlist)))
 
-		itemid = len(Inventory.objects.all())  # itemid has to be unique, so we just iterate at creation
-		for i in range(randint(0, 3)):  # number of separate items to add per customer
+
+def populate_items(numitems):
+	customerlist = Customer.objects.all()
+	if not customerlist:
+		_namelist = raw_input('No customers found. Add how many?:\t')
+		populate(_namelist)
+
+	itemid = len(Inventory.objects.all())  # itemid has to be unique, so just iterate at creation
+	itemcount = 0
+	for customer in customerlist:
+		for i in range(randint(0, int(numitems))):
 			quantity = randint(0, 10)
 			weight = randint(0, 50)
 			weight += random()  # random gives decimal [0.0, 1.0)
 			itemid += 1
 			status = randint(0, 4)
-			item = add_item(owner=customer, itemid=itemid, quantity=quantity, weight=weight, status=status)
+			item = add_item(owner=customer, itemid=itemid, quantity=quantity,
+							weight=weight, status=status)
 			add_op(item, str(date.today()), str(date.today()))
+			itemcount += 1
+	print("{} items added to db.".format(itemcount))
 
 
 if __name__ == '__main__':
 	print("Starting Customer/Inventory population script...")
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'order_tracker.settings')
 	from tracker.models import Customer, Inventory, Operation
-	_namelist = load_names('names.csv')
+
+	# Options
+	_namelist = raw_input('CSV of names to load? (default names.csv):\t\t')
+	_numnames = raw_input('Number of customers to add (default 30)?:\t')
+	_numitems = raw_input('Max number of items to add per customer?:\t')
+	if not isinstance(_numitems, int):
+		_numitems = int(_numitems)
+
+	if not _namelist:
+		_namelist = 'names.csv'
+	
+	_namelist = load_names(_namelist, _numnames)
 	populate(_namelist)
+	populate_items(_numitems)

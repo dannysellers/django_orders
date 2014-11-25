@@ -29,7 +29,7 @@
 			<tr>
 				<td id="account_cell"><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
 				<td id="name_cell">{{ customer.name }}</td>
-				<td id="status_cell">{{ account_status }}</td>
+				<td id="status_cell">{{ customer.status }}</td>
 				{% if account_status == 'Inactive' %}
 					<td id="close_date">{{ customer.closedate }}</td>
 				{% endif %}

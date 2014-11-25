@@ -37,7 +37,10 @@ def add_customer (name, acct, createdate, email='address@domain.com'):
 
 
 if __name__ == '__main__':
-	filename = 'account_list.csv'
+	filename = raw_input('Account list to load? (default account_list.csv):\t')
+	if not filename:
+		filename = 'account_list.csv'
+
 	print("Loading accounts from {}".format(filename))
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'order_tracker.settings')
 	from tracker.models import Customer

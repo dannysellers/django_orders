@@ -30,7 +30,7 @@ def accounts (request):
 	try:
 		header_list = ['Account', 'Name', 'Status']
 
-		# Parse accts argument
+		# Parse accts argument, retrieve list of customers
 		if accts == "active":
 			customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)[:10]
 		elif accts == "all":
@@ -47,13 +47,15 @@ def accounts (request):
 		# Replace spaces with underscores to retrieve URL
 		for customer in customer_list:
 			customer.url = 'accounts/' + str(customer.acct)
+			# Replace 0 and 1 with account status
+			# This seems to show Active or Inactive for all people in the list
 			if str(customer.status) == '0':
 				context_dict['account_status'] = 'Inactive'
-				# context_dict['close_date'] = str(customer.closedate)
 			elif str(customer.status) == '1':
 				context_dict['account_status'] = 'Active'
 			else:
 				context_dict['account_status'] = str(customer.status)
+			
 			# TODO: How to use enumerated choices?
 
 		context_dict['customer_list'] = customer_list

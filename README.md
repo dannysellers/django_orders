@@ -8,13 +8,14 @@ Order tracker (see flask_orders and order_tracker repos) implemented in Django.
 
 Usage
 -----
-On first run, run
-    
-    python manage.py syncdb
+To create a database, run
 
-to create a database. After that, you can use load_accts to load a .csv (account_list.csv) containing Name (str), Acct (5-digit int), and Date Created (MM/DD/YYYY) columns. 
+    python managey.py syncdb
 
-To start the server, run
+Afterwards, you can use load_accts.py or populate.py to load accounts from a .csv (account_list.csv
+by default) and / or populate the database with randomly generated accounts and items.
+
+After populating the database, start the server with
 
     python manage.py runserver
 
