@@ -10,8 +10,14 @@
 {% endblock header %}
 
 {% block content %}
-	<a href="/inventory?status=stored">Items currently in storage</a>
+
+	{% if message %}
+		{{ message }}
+	{% endif %}
+
+	<a href="/inventory?status=stored">Stored Items</a>
 	| <a href="/inventory?add">Add Inventory</a>
+
 	{% if inventory_list %}
 		<br/><br/><table>
 			<tr>
@@ -28,10 +34,13 @@
 					<td id="item_quantity">{{ item.quantity }}</td>
 					<td id="item_weight">{{ item.weight }}</td>
 					<td id="item_storage_fees">{{ item.storage_fees }}</td>
+					<td id="item_status">{{ item.status }}</td>
 				</tr>
 			{% endfor %}
 		</table>
+
 	{% else %}
 		{{ error_message }}
 	{% endif %}
+
 {% endblock %}

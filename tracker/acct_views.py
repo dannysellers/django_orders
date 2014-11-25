@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, redirect
 
 from datetime import date
 
-from models import Customer
+from models import Customer, Inventory
 import forms
 
 
@@ -23,7 +23,7 @@ def accounts (request):
 	accts = request.GET.get('accts')
 	remove = request.GET.get('remove')
 
-	# capture /accounts?remove=<acct>
+	# Capture /accounts?remove=<acct>
 	if remove:
 		redirect(remove_account(account_num=remove))
 
@@ -49,7 +49,7 @@ def accounts (request):
 			customer.url = 'accounts/' + str(customer.acct)
 			if str(customer.status) == '0':
 				context_dict['account_status'] = 'Inactive'
-				context_dict['close_date'] = str(customer.closedate)
+				# context_dict['close_date'] = str(customer.closedate)
 			elif str(customer.status) == '1':
 				context_dict['account_status'] = 'Active'
 			else:
@@ -78,7 +78,6 @@ def account_page (request, account_url):
 		context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(
 			account_acct)
 
-	# _customer = Customer.objects.get(name__iexact = account_name)
 	context_dict['customer'] = customer
 
 	# Table cells
@@ -90,6 +89,12 @@ def account_page (request, account_url):
 		context_dict['account_status'] = 'Active'
 	else:
 		context_dict['account_status'] = str(customer.status)
+
+	# Inventory table
+	context_dict['inv_headers'] = ['ID', 'Quantity', 'Weight', 'Storage Fees', 'Status']
+	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer)
+	if cust_items:
+		context_dict['inventory_list'] = cust_items
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
@@ -134,7 +139,7 @@ def remove_account (account_num):
 		_customer.save()
 		context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
-		# return context_dict  # certainly doesn't work atm
+		# TODO: Fix redirect after deactivate account
 		return HttpResponseRedirect('/accounts?accts=active')
 	except Customer.DoesNotExist:
 		return dict(message="Account {} not found. No changes made.".format(account_num))

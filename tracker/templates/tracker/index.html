@@ -21,7 +21,11 @@
 		</nav>
 		<br/>
 
-	{% block content %}{% endblock %}
+	{% block content %}
+		Active customers: {{ cust_act_count }}<br />
+		Total customers: {{ cust_count }}<br />
+		Items currently in storage: {{ item_count }}
+	{% endblock %}
 
 	</body>
 </html>

@@ -31,7 +31,7 @@
 				<td id="name_cell">{{ customer.name }}</td>
 				<td id="status_cell">{{ account_status }}</td>
 				{% if account_status == 'Inactive' %}
-					<td id="close_date">{{ close_date }}</td>
+					<td id="close_date">{{ customer.closedate }}</td>
 				{% endif %}
 			</tr>
 		{% endfor %}
@@ -54,11 +54,32 @@
 				<td id="email_cell">{{ customer.email }}</td>
 				<td id="status_cell">{{ account_status }}</td>
 				{% if account_status == 'Inactive' %}
-					<td id="close_date">{{ close_date }}</td>
+					<td id="close_date">{{ customer.closedate }}</td>
 				{% endif %}
 			</tr>
 		</table>
-		{{ customer.name }}'s inventory goes here.
+	{% else %}
+		{{ error_message }}<br/>
+	{% endif %}
+
+	{% if inventory_list %}
+		<h2>Inventory</h2>
+		<table>
+			<tr>
+				{% for item in inv_headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+			</tr>
+			{% for item in inventory_list %}
+				<tr>
+					<td id="item_id">{{ item.itemid }}</td>
+					<td id="item_quantity">{{ item.quantity }}</td>
+					<td id="item_weight">{{ item.weight }}</td>
+					<td id="item_storage_fees">{{ item.storage_fees }}</td>
+					<td id="item_status">{{ item.status }}</td>
+				</tr>
+			{% endfor %}
+		</table>
 	{% else %}
 		{{ error_message }}<br/>
 	{% endif %}

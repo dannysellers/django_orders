@@ -31,13 +31,13 @@ class Inventory(models.Model):
 	owner = models.ForeignKey(Customer)
 	itemid = models.IntegerField(unique=True)
 	quantity = models.IntegerField(default=1)
-	weight = models.IntegerField(default=1)
+	weight = models.DecimalField(max_digits=7, decimal_places=2, default=1.00)
 	palletized = models.BooleanField(default=False)
 	palletweight = models.IntegerField(default=0)
 	arrival = models.DateField()
 	departure = models.DateField()
-	status = models.CharField(max_length=1, choices=INVENTORY_STATUS_CODES)
-	storage_fees = models.IntegerField()
+	status = models.CharField(max_length=1, choices=INVENTORY_STATUS_CODES, default=0)
+	storage_fees = models.DecimalField(max_digits=7, decimal_places=2)
 
 	# Handle operations as properties of items? Or vice-versa
 
