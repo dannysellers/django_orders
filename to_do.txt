@@ -1,0 +1,6 @@
+storage fees reporting, with by date
+filter shipped items
+show inventory dates
+operation list (from ops)
+view / manage item operations
+storage fees by volume, not weight

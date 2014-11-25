@@ -38,12 +38,13 @@ def add_customer(name, acct, email, status):
 	return c
 
 
-def add_item(owner, itemid, quantity, weight, status):
-	storage_fees = quantity * (weight * 0.05)
+def add_item(owner, itemid, quantity, length, width, height, status):
+	volume = length * width * height
+	storage_fees = quantity * (float(volume) * 0.05)
 	i = Inventory.objects.get_or_create(owner=owner, itemid=itemid, quantity=quantity,
-										weight=weight, arrival=str(date.today()),
-										departure=str(date.today()), storage_fees=storage_fees,
-										status=status)[0]
+										length=length, width=width, height=height, volume=volume,
+										arrival=str(date.today()), departure=str(date.today()),
+										storage_fees=storage_fees, status=status)[0]
 	return i
 
 
@@ -79,13 +80,17 @@ def populate_items(numitems):
 	itemcount = 0
 	for customer in customerlist:
 		for i in range(randint(0, int(numitems))):
-			quantity = randint(0, 10)
-			weight = randint(0, 50)
-			weight += random()  # random gives decimal [0.0, 1.0)
+			quantity = randint(1, 10)
+			length = randint(1, 10)
+			width = randint(1, 15)
+			height = randint(1, 10)
+			length += random()  # random gives decimal [0.0, 1.0)
+			width += random()
+			height += random()
 			itemid += 1
 			status = randint(0, 4)
 			item = add_item(owner=customer, itemid=itemid, quantity=quantity,
-							weight=weight, status=status)
+							status=status, length=length, width=width, height=height)
 			add_op(item, str(date.today()), str(date.today()))
 			itemcount += 1
 	print("{} items added to db.".format(itemcount))

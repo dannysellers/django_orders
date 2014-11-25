@@ -8,28 +8,6 @@ from utils import int_to_status_code, code_to_status_int
 import forms
 
 
-# def get_items_by_status(status_bound):
-# 	"""
-# 	Creates a list of inventory items that have not yet reached status_bound
-# 	(i.e. are not yet shipped, or whose orders are still in progresss).
-#
-# 	INVENTORY_STATUS_CODES = (
-# 		('0', 'inventory_received'),
-# 		('1', 'order_received'),
-# 		('2', 'order_begun'),
-# 		('3', 'order_completed'),
-# 		('4', 'shipped'),
-# 	)
-# 	"""
-# 	status = 0
-# 	itemlist = []
-# 	while status < status_bound:
-# 		itemlist.append(Inventory.objects.all().filter(status = status))
-# 		status += 1
-#
-# 	return itemlist
-
-
 def inventory(request):
 	context = RequestContext(request)
 	context_dict = {}
@@ -39,7 +17,7 @@ def inventory(request):
 	# status_filter = int(request.GET.get('status'))
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
-	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Weight', 'Storage Fees', 'Status']
+	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Volume', 'Storage Fees', 'Status']
 
 	try:
 		if acct:
@@ -97,7 +75,8 @@ def add_item (request, account_name_url):
 										  context_dict,
 										  context)
 
-			item.storage_fees = item.quantity * item.weight
+			item.volume = item.length * item.width * item.height
+			item.storage_fees = item.quantity * item.volume
 			item.save()
 
 			return redirect(inventory, permanent=True)
