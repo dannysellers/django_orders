@@ -1,6 +1,6 @@
 import os
 import csv
-from random import randrange, randint
+from random import randrange, randint, random
 from datetime import date
 
 
@@ -31,11 +31,12 @@ def add_customer(name, acct, email, status):
 	return c
 
 
-def add_item(owner, itemid, quantity, weight):
-	storage_fees = quantity * weight
+def add_item(owner, itemid, quantity, weight, status):
+	storage_fees = quantity * (weight * 0.05)
 	i = Inventory.objects.get_or_create(owner=owner, itemid=itemid, quantity=quantity,
 										weight=weight, arrival=str(date.today()),
-										departure=str(date.today()), storage_fees=storage_fees)[0]
+										departure=str(date.today()), storage_fees=storage_fees,
+										status=status)[0]
 	return i
 
 
@@ -47,7 +48,14 @@ def add_op(item, start, finish):
 def populate(namelist):
 	customerlist = []
 	for name in namelist:
+		# Account number has to be unique, so roll once, check against the list, roll again
 		acct = randint(10000, 99999)
+		acctlist = []
+		for cust in Customer.objects.all():
+			acctlist.append(cust.acct)
+		if acct in acctlist:
+			acct = randint(10000, 99999)
+
 		email = str(name.split(' ')[0] + "@domain.com")
 		customer = add_customer(name=name, acct=acct, email=email, status=1)
 		customerlist.append(customer)
@@ -56,8 +64,10 @@ def populate(namelist):
 		for i in range(randint(0, 3)):  # number of separate items to add per customer
 			quantity = randint(0, 10)
 			weight = randint(0, 50)
+			weight += random()  # random gives decimal [0.0, 1.0)
 			itemid += 1
-			item = add_item(owner=customer, itemid=itemid, quantity=quantity, weight=weight)
+			status = randint(0, 4)
+			item = add_item(owner=customer, itemid=itemid, quantity=quantity, weight=weight, status=status)
 			add_op(item, str(date.today()), str(date.today()))
 
 
