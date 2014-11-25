@@ -19,8 +19,8 @@
 					<th>{{ item }}</th>
 				{% endfor %}
 			</tr>
-			<tr>
-				{% for item in inventory_list %}
+			{% for item in inventory_list %}
+				<tr>
 					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_owner">
 						<a href="accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
@@ -28,8 +28,8 @@
 					<td id="item_quantity">{{ item.quantity }}</td>
 					<td id="item_weight">{{ item.weight }}</td>
 					<td id="item_storage_fees">{{ item.storage_fees }}</td>
-				{% endfor %}
-			</tr>
+				</tr>
+			{% endfor %}
 		</table>
 	{% else %}
 		{{ error_message }}
