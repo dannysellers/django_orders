@@ -41,9 +41,10 @@ def add_customer(name, acct, email, status):
 def add_item(owner, itemid, quantity, length, width, height, status):
 	volume = length * width * height
 	storage_fees = quantity * (float(volume) * 0.05)
+	arrival = date(2014, randint(1, 11), randint(1, 28))
 	i = Inventory.objects.get_or_create(owner=owner, itemid=itemid, quantity=quantity,
 										length=length, width=width, height=height, volume=volume,
-										arrival=str(date.today()), departure=str(date.today()),
+										arrival=arrival, departure=str(date.today()),
 										storage_fees=storage_fees, status=status)[0]
 	return i
 
@@ -80,13 +81,10 @@ def populate_items(numitems):
 	itemcount = 0
 	for customer in customerlist:
 		for i in range(randint(0, int(numitems))):
-			quantity = randint(1, 10)
-			length = randint(1, 10)
-			width = randint(1, 15)
-			height = randint(1, 10)
-			length += random()  # random gives decimal [0.0, 1.0)
-			width += random()
-			height += random()
+			quantity = randint(1, 10) + random()  # random gives decimal [0.0, 1.0)
+			length = randint(1, 10) + random()
+			width = randint(1, 15) + random()
+			height = randint(1, 10) + random()
 			itemid += 1
 			status = randint(0, 4)
 			item = add_item(owner=customer, itemid=itemid, quantity=quantity,

@@ -3,3 +3,8 @@ filter shipped items
 show inventory dates
 operation list (from ops)
 view / manage item operations
+
+Are cartons (for storage fee purposes) measured in inches or feet?
+
+Reports:
+Items stored per customer
