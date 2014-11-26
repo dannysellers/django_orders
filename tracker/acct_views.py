@@ -23,7 +23,7 @@ def accounts (request):
 	accts = request.GET.get('accts')
 	remove = request.GET.get('remove')
 
-	# Capture /accounts?remove=<acct>
+	""" Capture /accounts?remove=<acct> """
 	if remove:
 		try:
 			remove_account(account_num=remove)
@@ -32,21 +32,36 @@ def accounts (request):
 		finally:
 			context_dict['message'] = "Account {} deactivated successfully.".format(remove)
 
-	try:
+	else:
 		header_list = ['Account', 'Name', 'Status']
+		if accts:
+			try:
 
-		# Parse accts argument, retrieve list of customers
-		if accts == "active":
-			customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)[:10]
-		elif accts == "all":
-			customer_list = Customer.objects.all()[:10]
-			header_list += ['Close Date']
-		elif accts == "inactive":
-			customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
-			header_list += ['Close Date']
+				# Parse accts argument, retrieve list of customers
+				if accts == "active":
+					customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)
+				elif accts == "all":
+					customer_list = Customer.objects.all()
+					header_list += ['Close Date']
+				elif accts == "inactive":
+					customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
+					header_list += ['Close Date']
+				else:
+					customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)
+
+			except Customer.DoesNotExist:
+				context_dict['error_message'] = "No accounts found."
+				customer_list = []
+			""" If no arguments, return all active accounts """
 		else:
-			customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)[:10]
+			try:
+				customer_list = Customer.objects.order_by('acct').filter(status__iexact = 1)
 
+			except Customer.DoesNotExist:
+				context_dict['error_message'] = "No accounts found."
+				customer_list = []
+
+		# Prepare data for template
 		context_dict['headers'] = header_list
 
 		# Replace spaces with underscores to retrieve URL
@@ -56,19 +71,17 @@ def accounts (request):
 			# This seems to show Active or Inactive for all people in the list
 			if str(customer.status) == '0':
 				context_dict['account_status'] = 'Inactive'
+			# context_dict['close_date'] = str(customer.closedate)
 			elif str(customer.status) == '1':
 				context_dict['account_status'] = 'Active'
 			else:
 				context_dict['account_status'] = str(customer.status)
-			
+
 			# TODO: How to use enumerated choices?
 
 		context_dict['customer_list'] = customer_list
 
-	except Customer.DoesNotExist:
-		context_dict['error_message'] = "No accounts found."
-
-	return render_to_response('tracker/accounts.html', context_dict, context)
+		return render_to_response('tracker/accounts.html', context_dict, context)
 
 
 def account_page (request, account_url):
@@ -77,6 +90,7 @@ def account_page (request, account_url):
 	header_list = ['Account', 'Name', 'Email', 'Status']
 	context_dict['headers'] = header_list
 
+	# Get account
 	account_acct = account_url
 	context_dict['account_url'] = account_url
 	try:
@@ -99,7 +113,7 @@ def account_page (request, account_url):
 		context_dict['account_status'] = str(customer.status)
 
 	# Inventory table
-	context_dict['inv_headers'] = ['ID', 'Quantity', 'Weight', 'Storage Fees', 'Status']
+	context_dict['inv_headers'] = ['ID', 'Quantity', 'Volume', 'Storage Fees', 'Status']
 	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer)
 	if cust_items:
 		context_dict['inventory_list'] = cust_items
@@ -129,10 +143,6 @@ def add_account (request):
 
 
 def remove_account (account_num):
-	"""
-	Method to remove (deactivate) an account. There's no form or page here,
-	so I'm thinking it might make more sense as just a (AJAX?) request?
-	"""
 	print("Account to remove: {}".format(account_num))
 
 	try:
@@ -147,7 +157,6 @@ def remove_account (account_num):
 		_customer.save()
 		# context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
-		return HttpResponseRedirect('/accounts?accts=active', context_dict)
+		return HttpResponseRedirect('/accounts?accts=active')
 	except Customer.DoesNotExist:
-		# TODO: Fix error return message
 		return dict(message="Account {} not found. No changes made.".format(account_num))

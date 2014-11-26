@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response, redirect
 from datetime import date
 
 from models import Customer, Inventory
-from utils import int_to_status_code, code_to_status_int
+import utils
 import forms
 
 
@@ -14,20 +14,25 @@ def inventory(request):
 
 	# URL keywords
 	acct = request.GET.get('acct')
-	# status_filter = int(request.GET.get('status'))
+	status_filter = request.GET.get('status')
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
-	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Volume', 'Storage Fees', 'Status']
+	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Volume',
+							   'Storage Fees', 'Status', 'Arrival']
 
 	try:
-		if acct:
+		if acct:  # retrieve inventory by account
 			try:
 				acct = int(acct)
 				customer = Customer.objects.get(acct = acct)
 				context_dict['customer'] = customer
-				context_dict['inventory_list'] = Inventory.objects.order_by('itemid').filter(
+				inventory_list = Inventory.objects.order_by('itemid').filter(
 					owner = customer)
-				pass
+				context_dict['inventory_list'] = inventory_list
+
+				_date = date.today()
+				context_dict['date'] = _date
+				context_dict['storage_fees'] = utils.calc_storage_fees(inventory_list, _date)[0]
 			except Customer.DoesNotExist:
 				context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(acct)
 				return render_to_response('tracker/inventory.html', context_dict, context)
@@ -35,13 +40,25 @@ def inventory(request):
 				context_dict['error_message'] = "No inventory found."
 				return render_to_response('tracker/inventory.html', context_dict, context)
 
-		# elif status_filter:
-		# 	item_list = []
-			# assert isinstance(status_filter, int)
-			# for i in range(0, status_filter):
-			# 	for item in Inventory.objects.all().filter(status = i):
-			# 		item_list.append(item)
-			# context_dict['inventory_list'] = item_list
+		elif status_filter:
+			if status_filter == 'stored':  # retrieve all but shipped (4)
+				inventory_list = Inventory.objects.all().exclude(status=4)
+				context_dict['filter'] = 'Stored'
+			elif 'order' in status_filter:
+				context_dict['filter'] = 'Order '
+				if 'received' in status_filter:  # 1
+					inventory_list = Inventory.objects.all().filter(status=1)
+					context_dict['filter'] += 'received'
+				elif 'begun' in status_filter:  # 2
+					inventory_list = Inventory.objects.all().filter(status=2)
+					context_dict['filter'] += 'begun'
+				elif 'completed' in status_filter:  # 3
+					inventory_list = Inventory.objects.all().filter(status=3)
+					context_dict['filter'] += 'completed'
+			else:
+				inventory_list = Inventory.objects.all()
+				context_dict['filter'] = 'All'
+			context_dict['inventory_list'] = inventory_list
 
 		else:
 			context_dict['filter'] = 'All'

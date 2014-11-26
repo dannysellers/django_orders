@@ -7,7 +7,7 @@ CUSTOMER_STATUS_CODES = (
 )
 
 INVENTORY_STATUS_CODES = (
-	('0', 'inventory_received'),
+	('0', 'inducted'),
 	('1', 'order_received'),
 	('2', 'order_begun'),
 	('3', 'order_completed'),
@@ -31,12 +31,15 @@ class Inventory(models.Model):
 	owner = models.ForeignKey(Customer)
 	itemid = models.IntegerField(unique=True)
 	quantity = models.IntegerField(default=1)
-	length = models.FloatField(default=1.00)
-	width = models.FloatField(default=1.00)
-	height = models.FloatField(default=1.00)
-	volume = models.FloatField(default=1.00)
+	length = models.FloatField(default=1.00, max_length=5)
+	width = models.FloatField(default=1.00, max_length=5)
+	height = models.FloatField(default=1.00, max_length=5)
+	volume = models.FloatField(default=1.00, max_length=5)
 	palletized = models.BooleanField(default=False)
-	palletweight = models.IntegerField(default=0)
+	# palletweight = models.IntegerField(default=0)
+	# This may not be the best implementation (necessary?),
+	# cause each item does not have its own pallet / tracking
+	# pallets is silly
 	arrival = models.DateField()
 	departure = models.DateField()
 	status = models.CharField(max_length=1, choices=INVENTORY_STATUS_CODES, default=0)
