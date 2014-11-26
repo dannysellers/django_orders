@@ -7,7 +7,7 @@
 
 {% block content %}
 
-    <form id="inventory_form" method="post" action="/add_inventory/">
+    <form id="inventory_form" method="post" action="/accounts/{{ owner }}/add_inventory/">
 
         {% csrf_token %}
         {% for hidden in form.hidden_field %}

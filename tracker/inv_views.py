@@ -15,6 +15,7 @@ def inventory(request):
 	# URL keywords
 	acct = request.GET.get('acct')
 	status_filter = request.GET.get('status')
+	# add = request.GET.get('add')
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
 	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Volume',
@@ -73,6 +74,10 @@ def inventory(request):
 
 
 def add_item (request, account_name_url):
+	"""
+	Form to add item. Intended behavior: Either receive account # within
+	URL, or allow for selection of customer if no param is passed
+	"""
 	context = RequestContext(request)
 	context_dict = {}
 
@@ -103,4 +108,5 @@ def add_item (request, account_name_url):
 		form = forms.InventoryForm()
 
 	context_dict['form'] = form
+	context_dict['owner'] = owner
 	return render_to_response('tracker/add_item.html', context_dict, context)

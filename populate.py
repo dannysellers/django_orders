@@ -81,7 +81,7 @@ def populate_items(numitems):
 	itemid = len(Inventory.objects.all())  # itemid has to be unique, so just iterate at creation
 	itemcount = 0
 	for customer in customerlist:
-		for i in range(randint(0, int(numitems))):
+		for i in range(randint(1, int(numitems))):
 			quantity = randint(1, 10) + random()  # random gives decimal [0.0, 1.0)
 			length = randint(1, 10) + random()
 			width = randint(1, 15) + random()

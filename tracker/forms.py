@@ -18,19 +18,19 @@ class CustomerForm(forms.ModelForm):
 
 
 class InventoryForm(forms.ModelForm):
-	itemid = forms.CharField(help_text="Item ID:")
-	quantity = forms.CharField(max_length=5, help_text="Quantity:")
-	length = forms.DecimalField(max_digits=6, initial=1.00, help_text="Length (in.):")
-	width = forms.DecimalField(max_digits=6, initial=1.00, help_text="Width (in.):")
-	height = forms.DecimalField(max_digits=6, initial=1.00, help_text="Height (in.):")
+	itemid = forms.CharField(widget=forms.HiddenInput())
+	quantity = forms.CharField(max_length=5, help_text="Quantity: ")
+	length = forms.DecimalField(max_digits=6, initial=1.00, help_text="Length (in.): ")
+	width = forms.DecimalField(max_digits=6, initial=1.00, help_text="Width (in.): ")
+	height = forms.DecimalField(max_digits=6, initial=1.00, help_text="Height (in.): ")
 	volume = forms.DecimalField(widget=forms.HiddenInput())
-	palletized = forms.BooleanField(initial=False, help_text="Palletized?:")
-	palletweight = forms.CharField(help_text="Pallet weight:")
+	palletized = forms.BooleanField(initial=False, help_text="Palletized? :")
+	palletweight = forms.CharField(help_text="Pallet weight: ", required=False)
 	arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
-	status = forms.CharField(widget=forms.HiddenInput(), initial=0)  # choices?
+	status = forms.CharField(widget=forms.HiddenInput(), initial=0)
 	storage_fees = forms.IntegerField(widget=forms.HiddenInput())
 
 	class Meta:
 		model = models.Inventory
 
-		# fields = ('quantity', 'weight', 'palletized', 'palletweight')
+		# fields = ('quantity', 'length', 'width', 'height', 'palletized', 'palletweight')
