@@ -31,8 +31,9 @@ def load_names(filename, numnames):
 
 
 def add_customer(name, acct, email, status):
+	createdate = date(2014, randint(1, date.today().month), randint(1, date.today().day))
 	c = Customer.objects.get_or_create(name=name, acct=acct, email=email,
-									   status=status, createdate=str(date.today()),
+									   status=status, createdate=createdate,
 									   closedate=str(date.today()))[0]
 	""" get_or_create returns (object, created)	"""
 	return c
@@ -41,7 +42,7 @@ def add_customer(name, acct, email, status):
 def add_item(owner, itemid, quantity, length, width, height, status):
 	volume = length * width * height
 	storage_fees = quantity * (float(volume) * 0.05)
-	arrival = date(2014, randint(1, 11), randint(1, 28))
+	arrival = date(2014, randint(1, date.today().month), randint(1, date.today().day))
 	i = Inventory.objects.get_or_create(owner=owner, itemid=itemid, quantity=quantity,
 										length=length, width=width, height=height, volume=volume,
 										arrival=arrival, departure=str(date.today()),

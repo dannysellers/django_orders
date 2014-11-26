@@ -31,23 +31,29 @@ def accounts (request):
 			context_dict['error_message'] = "Account {} not found. No changes made.".format(remove)
 		finally:
 			context_dict['message'] = "Account {} deactivated successfully.".format(remove)
+			return HttpResponseRedirect('/accounts?accts=active')
 
 	else:
-		header_list = ['Account', 'Name', 'Status']
+		header_list = ['Account', 'Name', 'Status', 'Create Date']
 		if accts:
 			try:
-
 				# Parse accts argument, retrieve list of customers
 				if accts == "active":
 					customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)
+					context_dict['head_text'] = 'Active '
 				elif accts == "all":
 					customer_list = Customer.objects.all()
 					header_list += ['Close Date']
+					context_dict['head_text'] = 'All '
 				elif accts == "inactive":
 					customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
 					header_list += ['Close Date']
+					context_dict['head_text'] = 'Inactive '
 				else:
 					customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)
+					context_dict['head_text'] = 'Active '
+
+				context_dict['head_text'] += 'accounts'
 
 			except Customer.DoesNotExist:
 				context_dict['error_message'] = "No accounts found."
@@ -71,7 +77,6 @@ def accounts (request):
 			# This seems to show Active or Inactive for all people in the list
 			if str(customer.status) == '0':
 				context_dict['account_status'] = 'Inactive'
-			# context_dict['close_date'] = str(customer.closedate)
 			elif str(customer.status) == '1':
 				context_dict['account_status'] = 'Active'
 			else:
@@ -81,13 +86,13 @@ def accounts (request):
 
 		context_dict['customer_list'] = customer_list
 
-		return render_to_response('tracker/accounts.html', context_dict, context)
+	return render_to_response('tracker/accounts.html', context_dict, context)
 
 
 def account_page (request, account_url):
 	context = RequestContext(request)
 	context_dict = {}
-	header_list = ['Account', 'Name', 'Email', 'Status']
+	header_list = ['Account', 'Name', 'Email', 'Status', 'Create Date']
 	context_dict['headers'] = header_list
 
 	# Get account
@@ -125,6 +130,7 @@ def add_account (request):
 	context = RequestContext(request)
 	context_dict = {}
 
+	context_dict['head_text'] = 'Add Account'
 	if request.method == 'POST':
 		form = forms.CustomerForm(request.POST)
 
@@ -157,6 +163,6 @@ def remove_account (account_num):
 		_customer.save()
 		# context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
-		return HttpResponseRedirect('/accounts?accts=active')
+		# return HttpResponseRedirect('/accounts?accts=active')
 	except Customer.DoesNotExist:
 		return dict(message="Account {} not found. No changes made.".format(account_num))

@@ -54,7 +54,7 @@ def inventory(request):
 					context_dict['filter'] += 'begun'
 				elif 'completed' in status_filter:  # 3
 					inventory_list = Inventory.objects.all().filter(status=3)
-					context_dict['filter'] += 'completed'
+					context_dict['filter'] += 'completed (not yet shipped)'
 			else:
 				inventory_list = Inventory.objects.all()
 				context_dict['filter'] = 'All'
