@@ -118,7 +118,7 @@ def account_page (request, account_url):
 		context_dict['account_status'] = str(customer.status)
 
 	# Inventory table
-	context_dict['inv_headers'] = ['ID', 'Quantity', 'Volume', 'Storage Fees', 'Status']
+	context_dict['inv_headers'] = ['ID', 'Quantity', 'Volume', 'Storage Fees', 'Status', 'Arrival']
 	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer)
 	if cust_items:
 		context_dict['inventory_list'] = cust_items
@@ -155,8 +155,8 @@ def remove_account (account_num):
 		_customer = Customer.objects.get(acct = account_num)
 		account_name = _customer.name
 
-		context_dict = {'account_name': account_name,
-						'account_num': account_num}
+		# context_dict = {'account_name': account_name,
+		# 				'account_num': account_num}
 
 		_customer.closedate = date.today()
 		_customer.status = 0

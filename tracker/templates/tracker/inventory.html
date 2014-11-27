@@ -41,7 +41,7 @@
 					<td id="item_volume">{{ item.volume }}</td>
 					<td id="item_storage_fees">{{ item.storage_fees }}</td>
 					<td id="item_status">{{ item.status }}</td>
-					<td id="item_arrival">{{ item.arrival }}</td>
+					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 				</tr>
 			{% endfor %}
 		</table>

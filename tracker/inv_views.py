@@ -15,6 +15,7 @@ def inventory(request):
 	# URL keywords
 	acct = request.GET.get('acct')
 	status_filter = request.GET.get('status')
+	storage_fees = request.GET.get('storage_fees')
 	# add = request.GET.get('add')
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
@@ -22,18 +23,18 @@ def inventory(request):
 							   'Storage Fees', 'Status', 'Arrival']
 
 	try:
-		if acct:  # retrieve inventory by account
+		if acct:  # Retrieve inventory by account
 			try:
 				acct = int(acct)
 				customer = Customer.objects.get(acct = acct)
 				context_dict['customer'] = customer
 				inventory_list = Inventory.objects.order_by('itemid').filter(
 					owner = customer)
-				context_dict['inventory_list'] = inventory_list
 
 				_date = date.today()
 				context_dict['date'] = _date
-				context_dict['storage_fees'] = utils.calc_storage_fees(inventory_list, _date)[0]
+				# context_dict['storage_fees'] = utils.calc_storage_fees(inventory_list, _date)[0]
+
 			except Customer.DoesNotExist:
 				context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(acct)
 				return render_to_response('tracker/inventory.html', context_dict, context)
@@ -41,8 +42,8 @@ def inventory(request):
 				context_dict['error_message'] = "No inventory found."
 				return render_to_response('tracker/inventory.html', context_dict, context)
 
-		elif status_filter:
-			if status_filter == 'stored':  # retrieve all but shipped (4)
+		elif status_filter:  # Retrieve inventory by status
+			if status_filter == 'stored':  # Retrieve all but shipped (4)
 				inventory_list = Inventory.objects.all().exclude(status=4)
 				context_dict['filter'] = 'Stored'
 			elif 'order' in status_filter:
@@ -59,14 +60,22 @@ def inventory(request):
 			else:
 				inventory_list = Inventory.objects.all()
 				context_dict['filter'] = 'All'
-			context_dict['inventory_list'] = inventory_list
+
 			# for item in inventory_list:
 			# 	item.owner.url = '/accounts/' + str(item.owner.acct)
 
+		elif storage_fees:  # Retrieve items currently incurring storage fees
+			context_dict['filter'] = 'Currently incurring storage fees'
+			inventory_list = []
+			for item in Inventory.objects.all():
+				if abs((item.arrival - date.today()).days) > 7:
+					inventory_list.append(item)
+
 		else:
 			context_dict['filter'] = 'All'
-			ilist = Inventory.objects.all()
-			context_dict['inventory_list'] = ilist
+			inventory_list = Inventory.objects.all()
+
+		context_dict['inventory_list'] = inventory_list
 
 	except Inventory.DoesNotExist:
 		context_dict['inventory_list'] = []

@@ -3,7 +3,7 @@
 
 {% block header %}
 		{% if customer %}
-			<h1>Tracker &#8212; {{ customer.name }}</h1>
+			<h1>Tracker &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
 		{% else %}
 			<h1>Tracker &#8212; {{ head_text }}</h1>
 		{% endif %}
@@ -30,9 +30,9 @@
 				<td id="account_cell"><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
 				<td id="name_cell">{{ customer.name }}</td>
 				<td id="status_cell">{{ customer.status }}</td>
-				<td id="open_date">{{ customer.createdate }}</td>
+				<td id="open_date">{{ customer.createdate|date:"m-d-Y" }}</td>
 				{% if account_status == "0" %}
-					<td id="close_date">{{ customer.closedate }}</td>
+					<td id="close_date">{{ customer.closedate|date:"m-d-Y" }}</td>
 				{% endif %}
 			</tr>
 		{% endfor %}
@@ -54,13 +54,14 @@
 				<td id="name_cell">{{ customer.name }}</td>
 				<td id="email_cell">{{ customer.email }}</td>
 				<td id="status_cell">{{ account_status }}</td>
-				<td id="open_date">{{ customer.createdate }}</td>
+				<td id="open_date">{{ customer.createdate|date:"m-d-Y" }}</td>
 				{% if account_status == 'inactive' %}
-					<td id="close_date">{{ customer.closedate }}</td>
+					<td id="close_date">{{ customer.closedate|date:"m-d-Y" }}</td>
 				{% endif %}
 			</tr>
 		</table>
 	{% endif %}
+
 	{% if inventory_list %}
 		<h2>Inventory</h2>
 		<table>
@@ -76,6 +77,7 @@
 					<td id="item_volume">{{ item.volume }}</td>
 					<td id="item_storage_fees">{{ item.storage_fees }}</td>
 					<td id="item_status">{{ item.status }}</td>
+					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 				</tr>
 			{% endfor %}
 		</table>

@@ -1,19 +1,16 @@
 storage fees reporting, with by date
-show inventory dates
 operation list (from ops)
 view / manage item operations
 
 notes on account pages
 table overview on account page
 
-number of items incurring storage fees on index
-filter items by if incurring storage fees
+custom filter (pg. 454) for truncating # values
 
 format text fields in account / inventory pages
 display status number as code
 
 tables sort by value
-display account number on account page
 
 filter individual customer's items by status
 

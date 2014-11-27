@@ -25,7 +25,7 @@ class InventoryForm(forms.ModelForm):
 	height = forms.DecimalField(max_digits=6, initial=1.00, help_text="Height (in.): ")
 	volume = forms.DecimalField(widget=forms.HiddenInput())
 	palletized = forms.BooleanField(initial=False, help_text="Palletized? :")
-	palletweight = forms.CharField(help_text="Pallet weight: ", required=False)
+	# palletweight = forms.CharField(help_text="Pallet weight: ", required=False)
 	arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
 	status = forms.CharField(widget=forms.HiddenInput(), initial=0)
 	storage_fees = forms.IntegerField(widget=forms.HiddenInput())
