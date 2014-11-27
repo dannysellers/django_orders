@@ -60,6 +60,8 @@ def inventory(request):
 				inventory_list = Inventory.objects.all()
 				context_dict['filter'] = 'All'
 			context_dict['inventory_list'] = inventory_list
+			# for item in inventory_list:
+			# 	item.owner.url = '/accounts/' + str(item.owner.acct)
 
 		else:
 			context_dict['filter'] = 'All'
@@ -92,14 +94,17 @@ def add_item (request, account_name_url):
 			try:
 				cust = Customer.objects.get(acct = owner)
 				item.owner = cust
+
+				item.length = form.length / 12  # storage fees are per ft^3
+				item.width = form.width / 12
+				item.height = form.height / 12
+				item.volume = item.length * item.width * item.height
+				item.storage_fees = item.quantity * item.volume
+				item.save()
 			except Customer.DoesNotExist:
 				return render_to_response('tracker/add_customer.html',
 										  context_dict,
 										  context)
-
-			item.volume = item.length * item.width * item.height
-			item.storage_fees = item.quantity * item.volume
-			item.save()
 
 			return redirect(inventory, permanent=True)
 		else:

@@ -83,9 +83,9 @@ def populate_items(numitems):
 	for customer in customerlist:
 		for i in range(randint(1, int(numitems))):
 			quantity = randint(1, 10) + random()  # random gives decimal [0.0, 1.0)
-			length = randint(1, 10) + random()
-			width = randint(1, 15) + random()
-			height = randint(1, 10) + random()
+			length = (randint(1, 36) + random()) / 12  # storage fees are in ft^3
+			width = (randint(1, 36) + random()) / 12
+			height = (randint(1, 36) + random()) / 12
 			itemid += 1
 			status = randint(0, 4)
 			item = add_item(owner=customer, itemid=itemid, quantity=quantity,

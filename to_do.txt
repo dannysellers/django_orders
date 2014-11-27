@@ -1,10 +1,23 @@
 storage fees reporting, with by date
-filter shipped items
 show inventory dates
 operation list (from ops)
 view / manage item operations
 
-Are cartons (for storage fee purposes) measured in inches or feet?
+notes on account pages
+table overview on account page
+
+number of items incurring storage fees on index
+filter items by if incurring storage fees
+
+format text fields in account / inventory pages
+display status number as code
+
+tables sort by value
+display account number on account page
+
+filter individual customer's items by status
 
 Reports:
 Items stored per customer
+items stored/processed over time
+

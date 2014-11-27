@@ -15,7 +15,7 @@ PROJECT_PATH = os.path.join(SETTINGS_DIR, os.pardir)
 PROJECT_PATH = os.path.abspath(PROJECT_PATH)
 # This is needed for the absolute path, which Django uses for routing
 
-DATABASE_PATH = os.path.join(PROJECT_PATH, 'tracker.db')
+DATABASE_PATH = os.path.join(PROJECT_PATH, 'order_tracker.db')
 
 DATABASES = {
     'default': {
