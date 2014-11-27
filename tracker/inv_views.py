@@ -19,7 +19,7 @@ def inventory(request):
 	# add = request.GET.get('add')
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
-	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Volume',
+	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Volume (ft.^3)',
 							   'Storage Fees', 'Status', 'Arrival']
 
 	try:

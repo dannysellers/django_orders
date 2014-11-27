@@ -1,5 +1,6 @@
 {% extends 'tracker/index.html' %}
 {% load static %}
+{% load num_filters %}
 
 {% block header %}
 		{% if customer %}
@@ -76,8 +77,8 @@
 				<tr>
 					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_quantity">{{ item.quantity }}</td>
-					<td id="item_volume">{{ item.volume }}</td>
-					<td id="item_storage_fees">{{ item.storage_fees }}</td>
+					<td id="item_volume">{{ item.volume|length:"2" }}</td>
+					<td id="item_storage_fees">{{ item.storage_fees|cost_length:"2" }}</td>
 					<td id="item_status">{{ item.status }}</td>
 					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 				</tr>
