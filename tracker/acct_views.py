@@ -34,21 +34,26 @@ def accounts (request):
 			return HttpResponseRedirect('/accounts?accts=active')
 
 	else:
-		header_list = ['Account', 'Name', 'Status', 'Create Date']
+		header_list = ['Account', 'Name', 'Create Date']
 		if accts:
 			try:
 				# Parse accts argument, retrieve list of customers
 				if accts == "active":
 					customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)
 					context_dict['head_text'] = 'Active '
+
 				elif accts == "all":
 					customer_list = Customer.objects.all()
+					context_dict['status_column'] = True  # flag
+					header_list.insert(2, 'Status')
 					header_list += ['Close Date']
 					context_dict['head_text'] = 'All '
+
 				elif accts == "inactive":
 					customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
 					header_list += ['Close Date']
 					context_dict['head_text'] = 'Inactive '
+
 				else:
 					customer_list = Customer.objects.order_by('acct').filter(status__exact = 1)
 					context_dict['head_text'] = 'Active '

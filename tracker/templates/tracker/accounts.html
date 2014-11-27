@@ -29,10 +29,12 @@
 			<tr>
 				<td id="account_cell"><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
 				<td id="name_cell">{{ customer.name }}</td>
-				<td id="status_cell">{{ customer.status }}</td>
-				<td id="open_date">{{ customer.createdate|date:"m-d-Y" }}</td>
+				{% if status_column %}
+					<td id="status_cell">{{ customer.status }}</td>
+				{% endif %}
+				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
 				{% if account_status == "0" %}
-					<td id="close_date">{{ customer.closedate|date:"m-d-Y" }}</td>
+					<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
 				{% endif %}
 			</tr>
 		{% endfor %}
@@ -54,9 +56,9 @@
 				<td id="name_cell">{{ customer.name }}</td>
 				<td id="email_cell">{{ customer.email }}</td>
 				<td id="status_cell">{{ account_status }}</td>
-				<td id="open_date">{{ customer.createdate|date:"m-d-Y" }}</td>
+				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
 				{% if account_status == 'inactive' %}
-					<td id="close_date">{{ customer.closedate|date:"m-d-Y" }}</td>
+					<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
 				{% endif %}
 			</tr>
 		</table>
