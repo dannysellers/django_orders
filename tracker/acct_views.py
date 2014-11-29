@@ -59,6 +59,7 @@ def accounts (request):
 					context_dict['head_text'] = 'Active '
 
 				context_dict['head_text'] += 'accounts'
+				context_dict['num_accts'] = len(customer_list)
 
 			except Customer.DoesNotExist:
 				context_dict['error_message'] = "No accounts found."

@@ -14,6 +14,10 @@ tables sort by value
 
 filter individual customer's items by status
 
+add confirmation / warning on remove acct with stored inventory
+
+totals row for (customer-specific) inventory tables
+
 Reports:
 Items stored per customer
 items stored/processed over time

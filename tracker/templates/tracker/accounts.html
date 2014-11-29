@@ -6,7 +6,7 @@
 		{% if customer %}
 			<h1>Tracker &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
 		{% else %}
-			<h1>Tracker &#8212; {{ head_text }}</h1>
+			<h1>Tracker &#8212; {{ head_text }} ({{ num_accts }})</h1>
 		{% endif %}
 {% endblock header %}
 
