@@ -26,7 +26,12 @@ def accounts (request):
 	""" Capture /accounts?remove=<acct> """
 	if remove:
 		try:
-			remove_account(account_num=remove)
+			_inv = Inventory.objects.filter(owner=remove).exclude(status=4)
+			if not _inv:  # If the customer has no items currently in storage, deactivate
+				remove_account(account_num=remove)
+			else:
+				# Seek confirmation
+				pass
 		except Customer.DoesNotExist:
 			context_dict['error_message'] = "Account {} not found. No changes made.".format(remove)
 		finally:
@@ -125,9 +130,13 @@ def account_page (request, account_url):
 
 	# Inventory table
 	context_dict['inv_headers'] = ['ID', 'Quantity', 'Volume', 'Storage Fees', 'Status', 'Arrival']
-	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer)
+
+	# Show only items still in inventory
+	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status=4)
 	if cust_items:
 		context_dict['inventory_list'] = cust_items
+	else:
+		context_dict['inv_message'] = "This customer has no items stored in inventory."
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
@@ -159,8 +168,7 @@ def remove_account (account_num):
 
 	try:
 		_customer = Customer.objects.get(acct = account_num)
-		account_name = _customer.name
-
+		# account_name = _customer.name
 		# context_dict = {'account_name': account_name,
 		# 				'account_num': account_num}
 

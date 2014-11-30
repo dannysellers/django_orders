@@ -1,10 +1,10 @@
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from datetime import date
 
 from models import Customer, Inventory
-import utils
+# import utils
 import forms
 
 
@@ -29,7 +29,9 @@ def inventory(request):
 				customer = Customer.objects.get(acct = acct)
 				context_dict['customer'] = customer
 				inventory_list = Inventory.objects.order_by('itemid').filter(
-					owner = customer)
+					owner = customer).exclude(status=4)  # Show only stored items
+				if not inventory_list:
+					context_dict['message'] = "This customer has no items stored in inventory."
 
 				_date = date.today()
 				context_dict['date'] = _date
@@ -79,12 +81,12 @@ def inventory(request):
 
 	except Inventory.DoesNotExist:
 		context_dict['inventory_list'] = []
-		context_dict['error_message'] = "No inventory found."
+		context_dict['error_message'] = "No items found in database."
 
 	return render_to_response('tracker/inventory.html', context_dict, context)
 
 
-def add_item (request, account_name_url):
+def add_item (request, account_url):
 	"""
 	Form to add item. Intended behavior: Either receive account # within
 	URL, or allow for selection of customer if no param is passed
@@ -92,7 +94,7 @@ def add_item (request, account_name_url):
 	context = RequestContext(request)
 	context_dict = {}
 
-	owner = account_name_url
+	owner = account_url
 
 	if request.method == 'POST':
 		form = forms.InventoryForm(request.POST)
@@ -104,9 +106,12 @@ def add_item (request, account_name_url):
 				cust = Customer.objects.get(acct = owner)
 				item.owner = cust
 
-				item.length = form.length / 12  # storage fees are per ft^3
-				item.width = form.width / 12
-				item.height = form.height / 12
+				item.length = form.cleaned_data['length'] / 12  # storage fees are per ft^3
+				item.width = form.cleaned_data['width'] / 12
+				item.height = form.cleaned_data['height'] / 12
+				# item.length = form.length / 12
+				# item.width = form.width / 12
+				# item.height = form.height / 12
 				item.volume = item.length * item.width * item.height
 				item.storage_fees = item.quantity * item.volume
 				item.save()
@@ -124,3 +129,10 @@ def add_item (request, account_name_url):
 	context_dict['form'] = form
 	context_dict['owner'] = owner
 	return render_to_response('tracker/add_item.html', context_dict, context)
+
+# def add_item(request, account_url):
+# 	if request.method == 'POST':
+# 		form = forms.ItemForm(request.POST)
+# 		if form.is_valid:
+# 			# Process data from form.cleaned_data
+# 			return HttpResponseRedirect('')

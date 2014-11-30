@@ -12,8 +12,8 @@
 
 {% block content %}
 
-	{% if message %}
-		{{ message }}
+	{% if op_message %}
+		{{ op_message }}<br/>
 	{% endif %}
 
 	<a href="/inventory?status=stored">Stored Items</a>
@@ -49,6 +49,10 @@
 
 	{% else %}
 		<p id="error_message">{{ error_message }}</p>
+	{% endif %}
+
+	{% if message %}
+		{{ message }}
 	{% endif %}
 
 {% endblock %}

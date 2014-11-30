@@ -66,7 +66,7 @@
 	{% endif %}
 
 	{% if inventory_list %}
-		<h2>Inventory</h2>
+		<h2>Stored Inventory</h2>
 		<table>
 			<tr>
 				{% for item in inv_headers %}
@@ -84,6 +84,8 @@
 				</tr>
 			{% endfor %}
 		</table>
+	{% else %}
+		<br/>{{ inv_message }}
 	{% endif %}
 
 	{% if error_message %}
