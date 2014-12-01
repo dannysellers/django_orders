@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import ModelForm
 import models
 from datetime import date
 
@@ -18,19 +19,24 @@ class CustomerForm(forms.ModelForm):
 
 
 class InventoryForm(forms.ModelForm):
-	itemid = forms.CharField(widget=forms.HiddenInput())
+	# itemid = forms.CharField(widget=forms.HiddenInput())
 	quantity = forms.CharField(max_length=5, help_text="Quantity: ")
 	length = forms.DecimalField(max_digits=6, initial=1.00, help_text="Length (in.): ")
 	width = forms.DecimalField(max_digits=6, initial=1.00, help_text="Width (in.): ")
 	height = forms.DecimalField(max_digits=6, initial=1.00, help_text="Height (in.): ")
-	volume = forms.DecimalField(widget=forms.HiddenInput())
-	palletized = forms.BooleanField(initial=False, help_text="Palletized? :")
+	# volume = forms.DecimalField(widget=forms.HiddenInput())
+	palletized = forms.BooleanField(initial=False, help_text="Palletized? :", required=False)
 	# palletweight = forms.CharField(help_text="Pallet weight: ", required=False)
-	arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
-	status = forms.CharField(widget=forms.HiddenInput(), initial=0)
-	storage_fees = forms.IntegerField(widget=forms.HiddenInput())
+	# arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
+	# status = forms.CharField(widget=forms.HiddenInput(), initial=0)
+	# storage_fees = forms.IntegerField(widget=forms.HiddenInput(), initial=0.05)
 
 	class Meta:
 		model = models.Inventory
 
-		# fields = ('quantity', 'length', 'width', 'height', 'palletized', 'palletweight')
+		fields = ('quantity', 'length', 'width', 'height', 'palletized')
+
+
+class ItemForm(ModelForm):
+	class Meta:
+		model = models.Inventory

@@ -5,7 +5,7 @@
 	{% if customer %}
 		<h1>Inventory &#8212; {{ customer.name }}</h1>
 	{% else %}
-		<h1>Inventory &#8212; {{ filter }}</h1>
+		<h1>Inventory &#8212; {{ filter }} {% if count %}({{ count }}){% endif %}</h1>
 	{% endif %}
 {% endblock header %}
 {% load num_filters %}
@@ -23,20 +23,32 @@
 	| <a href="/inventory?status=order_completed">Order Completed</a>
 
 	{% if storage_fees %}
-		Storage fees as of {{ date }}: ${{ storage_fees }}
+		<br/><br/>Storage fees as of today: {{ storage_fees|cost_length:"2" }}
 	{% endif %}
 	{% if inventory_list %}
-		<br/><br/><table>
+		<br/><br/>
+		{% if customer %}
+			<form id="manage_inventory" method="post" action="/manage_items/">
+			{% csrf_token %}
+		{% endif %}
+		<table>
 			<tr>
+{#				{% if customer %}#}
+{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
+{#				{% endif %}#}
+{#				TODO: Enable checking all checkboxes#}
 				{% for item in headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
 			</tr>
 			{% for item in inventory_list %}
 				<tr>
+					{% if customer %}
+						<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
+					{% endif %}
 					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_owner">
-						<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+						<a href="/inventory?acct={{ item.owner.acct }}">{{ item.owner.name }}</a>
 					</td>
 					<td id="item_quantity">{{ item.quantity }}</td>
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
@@ -46,6 +58,18 @@
 				</tr>
 			{% endfor %}
 		</table>
+		{% if customer %}
+			<br/>
+			<select name="operation">
+				<option value="1">Inducted (0)</option>
+				<option value="2">Order Received (1)</option>
+				<option value="3">Order Begun (2)</option>
+				<option value="4">Order Completed (3)</option>
+				<option value="5">Shipped (4)</option>
+			</select>
+			<input type="submit" name="submit" value="Change Status" />
+			</form>
+		{% endif %}
 
 	{% else %}
 		<p id="error_message">{{ error_message }}</p>

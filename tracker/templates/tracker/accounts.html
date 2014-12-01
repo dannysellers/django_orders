@@ -34,12 +34,13 @@
 					<td id="status_cell">{{ customer.status }}</td>
 				{% endif %}
 				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-				{% if account_status == "0" %}
+				{% if customer.status == "0" %}
 					<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
 				{% endif %}
 			</tr>
 		{% endfor %}
 		</table>
+
 	{% elif customer %}
 		{% if account_status == 'Active' %}
 			| <a href="/inventory?acct={{ customer.acct }}">Manage Inventory</a>
@@ -58,7 +59,7 @@
 				<td id="email_cell">{{ customer.email }}</td>
 				<td id="status_cell">{{ account_status }}</td>
 				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-				{% if account_status == 'inactive' %}
+				{% if customer.status == '0' %}
 					<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
 				{% endif %}
 			</tr>
@@ -66,7 +67,7 @@
 	{% endif %}
 
 	{% if inventory_list %}
-		<h2>Stored Inventory</h2>
+		<h2>Stored Inventory ({{ count }})</h2>
 		<table>
 			<tr>
 				{% for item in inv_headers %}

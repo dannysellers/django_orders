@@ -1,10 +1,10 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
 from datetime import date
 
 from models import Customer, Inventory
-# import utils
+import utils
 import forms
 
 
@@ -19,11 +19,12 @@ def inventory(request):
 	# add = request.GET.get('add')
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
-	context_dict['headers'] = ['ID', 'Owner', 'Quantity', 'Volume (ft.^3)',
+	header_list = ['ID', 'Owner', 'Quantity', 'Volume (ft.^3)',
 							   'Storage Fees', 'Status', 'Arrival']
 
 	try:
-		if acct:  # Retrieve inventory by account
+		# Retrieve inventory by account
+		if acct:
 			try:
 				acct = int(acct)
 				customer = Customer.objects.get(acct = acct)
@@ -35,7 +36,7 @@ def inventory(request):
 
 				_date = date.today()
 				context_dict['date'] = _date
-				# context_dict['storage_fees'] = utils.calc_storage_fees(inventory_list, _date)[0]
+				header_list.insert(0, ' ')
 
 			except Customer.DoesNotExist:
 				context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(acct)
@@ -44,7 +45,8 @@ def inventory(request):
 				context_dict['error_message'] = "No inventory found."
 				return render_to_response('tracker/inventory.html', context_dict, context)
 
-		elif status_filter:  # Retrieve inventory by status
+		# Retrieve inventory by status
+		elif status_filter:
 			if status_filter == 'stored':  # Retrieve all but shipped (4)
 				inventory_list = Inventory.objects.all().exclude(status=4)
 				context_dict['filter'] = 'Stored'
@@ -66,18 +68,34 @@ def inventory(request):
 			# for item in inventory_list:
 			# 	item.owner.url = '/accounts/' + str(item.owner.acct)
 
-		elif storage_fees:  # Retrieve items currently incurring storage fees
-			context_dict['filter'] = 'Currently incurring storage fees'
-			inventory_list = []
-			for item in Inventory.objects.all():
-				if abs((item.arrival - date.today()).days) > 7:
-					inventory_list.append(item)
+		# Retrieve items currently incurring storage fees
+		elif storage_fees:
+			if storage_fees.lower() != 'no':
+				# TODO: How to use True / False as values, rather than yes/no
+				context_dict['filter'] = 'Currently incurring storage fees'
+				inventory_list = []
+				for item in Inventory.objects.all():
+					if abs((item.arrival - date.today()).days) > 7:
+						inventory_list.append(item)
+			elif storage_fees.lower() == 'no':
+				context_dict['filter'] = 'Items not yet incurring storage fees'
+				inventory_list = []
+				for item in Inventory.objects.all():
+					if abs((item.arrival - date.today()).days) <= 7:
+						inventory_list.append(item)
 
 		else:
 			context_dict['filter'] = 'All'
 			inventory_list = Inventory.objects.all()
 
 		context_dict['inventory_list'] = inventory_list
+		context_dict['count'] = len(inventory_list)
+		context_dict['headers'] = header_list
+		storage_fees = 0
+		for item in inventory_list:
+			if abs((item.arrival - date.today()).days) > 7:
+						storage_fees += item.storage_fees
+		context_dict['storage_fees'] = storage_fees
 
 	except Inventory.DoesNotExist:
 		context_dict['inventory_list'] = []
@@ -98,23 +116,22 @@ def add_item (request, account_url):
 
 	if request.method == 'POST':
 		form = forms.InventoryForm(request.POST)
+		form.itemid = len(Inventory.objects.all())
 
 		if form.is_valid():
-			item = form.save(commit = False)
+			form = form.save(commit = False)
 
 			try:
 				cust = Customer.objects.get(acct = owner)
-				item.owner = cust
+				form.owner = cust
 
-				item.length = form.cleaned_data['length'] / 12  # storage fees are per ft^3
-				item.width = form.cleaned_data['width'] / 12
-				item.height = form.cleaned_data['height'] / 12
-				# item.length = form.length / 12
-				# item.width = form.width / 12
-				# item.height = form.height / 12
-				item.volume = item.length * item.width * item.height
-				item.storage_fees = item.quantity * item.volume
-				item.save()
+				form.itemid = len(Inventory.objects.all())
+				form.length = form.cleaned_data['length'] / 12  # storage fees are per ft^3
+				form.width = form.cleaned_data['width'] / 12
+				form.height = form.cleaned_data['height'] / 12
+				form.volume = form.length * form.width * form.height
+				form.storage_fees = form.quantity * form.volume
+				form.save()
 			except Customer.DoesNotExist:
 				return render_to_response('tracker/add_customer.html',
 										  context_dict,
@@ -122,6 +139,7 @@ def add_item (request, account_url):
 
 			return redirect(inventory, permanent=True)
 		else:
+
 			print form.errors
 	else:
 		form = forms.InventoryForm()
@@ -136,3 +154,25 @@ def add_item (request, account_url):
 # 		if form.is_valid:
 # 			# Process data from form.cleaned_data
 # 			return HttpResponseRedirect('')
+
+
+def manage_items(request):
+	"""
+	Receives list of checked items, passes them to item manager page
+	"""
+	context = RequestContext(request)
+	itemlist = []
+
+	for key, value in request.POST.iteritems():
+		if value == 'on':  # checked checkboxes return 'on'
+			itemlist.append(Inventory.objects.get(itemid=key))
+		if key == 'operation':  # retrieve value of desired op
+			operation = utils.int_to_status_code('Inventory', value)
+
+	if request.method == 'POST':
+		return HttpResponse("You're looking to change the status of {} items to {}.".format(len(itemlist), operation))
+	else:
+		message = """No request was passed.
+		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g. /inventory?acct=#####)</a>."""
+
+		return render_to_response('tracker/inventory.html', {'message': message}, request)

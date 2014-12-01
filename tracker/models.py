@@ -48,6 +48,7 @@ class Inventory(models.Model):
 	# Handle operations as properties of items? Or vice-versa
 
 	# def __init__(self):
+	# 	self.itemid = len(Inventory.objects.all())
 	# 	self.storage_fees = self.weight * self.quantity
 
 	def __unicode__(self):

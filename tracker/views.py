@@ -12,9 +12,9 @@ def index (request):
 	context = RequestContext(request)
 	context_dict = {}
 
-	context_dict['cust_count'] = len(Customer.objects.all())
-	context_dict['cust_act_count'] = len(Customer.objects.all().filter(status__exact = 1))
-	context_dict['item_count'] = len(Inventory.objects.all())
+	context_dict['cust_count'] = Customer.objects.count()
+	context_dict['cust_act_count'] = Customer.objects.filter(status__exact = 1).count()
+	context_dict['item_count'] = Inventory.objects.count()
 
 	storage_fee_count = 0
 	for item in Inventory.objects.all():

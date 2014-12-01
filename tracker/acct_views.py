@@ -30,13 +30,14 @@ def accounts (request):
 			if not _inv:  # If the customer has no items currently in storage, deactivate
 				remove_account(account_num=remove)
 			else:
-				# Seek confirmation
+				# TODO: Seek confirmation if the customer has inventory
 				pass
 		except Customer.DoesNotExist:
 			context_dict['error_message'] = "Account {} not found. No changes made.".format(remove)
 		finally:
+			# TODO: This message isn't being passed / displayed properly
 			context_dict['message'] = "Account {} deactivated successfully.".format(remove)
-			return HttpResponseRedirect('/accounts?accts=active')
+			return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
 	else:
 		header_list = ['Account', 'Name', 'Create Date']
@@ -135,6 +136,7 @@ def account_page (request, account_url):
 	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status=4)
 	if cust_items:
 		context_dict['inventory_list'] = cust_items
+		context_dict['count'] = len(cust_items)
 	else:
 		context_dict['inv_message'] = "This customer has no items stored in inventory."
 
@@ -168,9 +170,6 @@ def remove_account (account_num):
 
 	try:
 		_customer = Customer.objects.get(acct = account_num)
-		# account_name = _customer.name
-		# context_dict = {'account_name': account_name,
-		# 				'account_num': account_num}
 
 		_customer.closedate = date.today()
 		_customer.status = 0
@@ -178,5 +177,6 @@ def remove_account (account_num):
 		# context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
 		# return HttpResponseRedirect('/accounts?accts=active')
+		return dict(message="Account {} deactivated successfully.".format(_customer.acct))
 	except Customer.DoesNotExist:
 		return dict(message="Account {} not found. No changes made.".format(account_num))

@@ -5,7 +5,7 @@ view / manage item operations
 notes on account pages
 table overview on account page
 
-custom filter (pg. 454) for truncating # values
+custom filter for truncating # status values
 
 format text fields in account / inventory pages
 display status number as code
