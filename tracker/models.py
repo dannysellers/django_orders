@@ -60,7 +60,8 @@ class Operation(models.Model):
 	# TODO: Settle list of types of ops
 	item = models.ForeignKey(Inventory)
 	start = models.DateTimeField()
-	finish = models.DateTimeField()
+	finish = models.DateTimeField()  # used for reporting
+	labor_time = models.IntegerField()  # used for billing
 
 	def __unicode__(self):
 		return 'Op started {}'.format(self.start)
