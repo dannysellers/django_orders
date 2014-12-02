@@ -52,6 +52,7 @@ def add_item (owner, itemid, quantity, length, width, height, status):
 
 def add_op (item):
 	# assert isinstance(item, Inventory)
+	# TODO: make operations only occur in sequence?
 	start = datetime(2014, randint(item.arrival.month, date.today().month),
 					 randint(item.arrival.day, date.today().day), hour = randint(9, 17),
 					 minute = randint(0, 59), second = randint(0, 59))
@@ -84,7 +85,7 @@ def populate (namelist):
 	print("{} customers added to db.".format(len(customerlist)))
 
 
-def populate_items (numitems):
+def populate_items (numitems, numops):
 	customerlist = Customer.objects.all()
 	if not customerlist:
 		_namelist = raw_input('No customers found. Add how many?:\t')
@@ -102,7 +103,8 @@ def populate_items (numitems):
 			status = randint(0, 4)
 			item = add_item(owner = customer, itemid = itemid, quantity = quantity,
 							status = status, length = length, width = width, height = height)
-			add_op(item)
+			for j in range(randint(1, int(numops))):
+				add_op(item)
 			itemcount += 1
 	print("{} items added to db.".format(itemcount))
 
@@ -115,13 +117,19 @@ if __name__ == '__main__':
 	# Options
 	_namelist = raw_input('CSV of names to load? (default names.csv):\t\t')
 	_numnames = raw_input('Number of customers to add (default 30)?:\t')
-	_numitems = raw_input('Max number of items to add per customer?:\t')
-	if not isinstance(_numitems, int):
-		_numitems = int(_numitems)
+	_numitems = raw_input('Max number of items to add per customer (default 7)?:\t')
+	_numops = raw_input('Max number of operations per item (default 5)?:\t')
+	# assert isinstance(_numitems, int)
+	# assert isinstance(_numops, int)
 
 	if not _namelist:
 		_namelist = 'names.csv'
 
 	_namelist = load_names(_namelist, _numnames)
 	populate(_namelist)
-	populate_items(_numitems)
+
+	if not _numitems:
+		_numitems = 7
+	if not _numops:
+		_numops = 5
+	populate_items(_numitems, _numops)

@@ -130,7 +130,7 @@ def account_page (request, account_url):
 		context_dict['account_status'] = str(customer.status)
 
 	# Inventory table
-	context_dict['inv_headers'] = ['ID', 'Quantity', 'Volume', 'Storage Fees', 'Status', 'Arrival']
+	context_dict['inv_headers'] = ['ID', '# of Cartons', 'Volume', 'Storage Fees', 'Status', 'Arrival']
 
 	# Show only items still in inventory
 	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status=4)

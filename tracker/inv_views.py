@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect, render
 from datetime import date
 
-from models import Customer, Inventory
+from models import Customer, Inventory, Operation
 import utils
 import forms
 
@@ -16,10 +16,11 @@ def inventory(request):
 	acct = request.GET.get('acct')
 	status_filter = request.GET.get('status')
 	storage_fees = request.GET.get('storage_fees')
+	item = request.GET.get('item')
 	# add = request.GET.get('add')
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
-	header_list = ['ID', 'Owner', 'Quantity', 'Volume (ft.^3)',
+	header_list = ['ID', 'Owner', '# of Cartons', 'Total Volume (ft.^3)',
 							   'Storage Fees', 'Status', 'Arrival']
 
 	try:
@@ -83,6 +84,19 @@ def inventory(request):
 				for item in Inventory.objects.all():
 					if abs((item.arrival - date.today()).days) <= 7:
 						inventory_list.append(item)
+
+		# Retrieve specific item and its history
+		elif item:
+			_item = Inventory.objects.get(itemid=item)
+			context_dict['item'] = _item
+			context_dict['customer'] = Customer.objects.get(acct=_item.owner.acct)
+
+			op_headers = ['Op ID', 'Start', 'Finish', 'Labor Time (mins)']
+			context_dict['op_headers'] = op_headers
+			context_dict['op_list'] = Operation.objects.all().filter(item=_item)
+
+			# for the sake of the template
+			inventory_list = []
 
 		else:
 			context_dict['filter'] = 'All'
@@ -160,6 +174,7 @@ def manage_items(request):
 	"""
 	Receives list of checked items, passes them to item manager page
 	"""
+	# TODO: Integrate this with individual item page
 	context = RequestContext(request)
 	itemlist = []
 
@@ -167,6 +182,7 @@ def manage_items(request):
 		if value == 'on':  # checked checkboxes return 'on'
 			itemlist.append(Inventory.objects.get(itemid=key))
 		if key == 'operation':  # retrieve value of desired op
+			# TODO: Remove manual int/code conversion
 			operation = utils.int_to_status_code('Inventory', value)
 
 	if request.method == 'POST':

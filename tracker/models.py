@@ -58,6 +58,7 @@ class Inventory(models.Model):
 class Operation(models.Model):
 	# TODO: Add way to distinguish types of operations
 	# TODO: Settle list of types of ops
+	# TODO: Make sure operations are sequential & non-overlapping
 	item = models.ForeignKey(Inventory)
 	start = models.DateTimeField()
 	finish = models.DateTimeField()  # used for reporting

@@ -4,7 +4,7 @@
 
 {% block header %}
 		{% if customer %}
-			<h1>Tracker &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
+			<h1>{{ customer.name }} &#8212; #{{ customer.acct }}</h1>
 		{% else %}
 			<h1>Tracker &#8212; {{ head_text }} ({{ num_accts }})</h1>
 		{% endif %}
@@ -76,10 +76,12 @@
 			</tr>
 			{% for item in inventory_list %}
 				<tr>
-					<td id="item_id">{{ item.itemid }}</td>
+					<td id="item_id">
+						<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+					</td>
 					<td id="item_quantity">{{ item.quantity }}</td>
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
-					<td id="item_storage_fees">{{ item.storage_fees|cost_length:"2" }}</td>
+					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 					<td id="item_status">{{ item.status }}</td>
 					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 				</tr>

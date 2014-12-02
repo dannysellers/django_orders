@@ -2,9 +2,11 @@
 {% load static %}
 
 {% block header %}
-	{% if customer %}
-		<h1>Inventory &#8212; {{ customer.name }}</h1>
-	{% else %}
+	{% if item %}
+		<h1>Item {{ item.itemid }} &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
+	{% elif customer %}
+		<h1>Inventory &#8212; {{ customer.name }} (#{{ customer.acct }})</h1>
+	{% elif filter %}
 		<h1>Inventory &#8212; {{ filter }} {% if count %}({{ count }}){% endif %}</h1>
 	{% endif %}
 {% endblock header %}
@@ -23,7 +25,7 @@
 	| <a href="/inventory?status=order_completed">Order Completed</a>
 
 	{% if storage_fees %}
-		<br/><br/>Storage fees as of today: {{ storage_fees|cost_length:"2" }}
+		<br/><br/>Daily storage fees as of today: ${{ storage_fees|length:"2" }}
 	{% endif %}
 	{% if inventory_list %}
 		<br/><br/>
@@ -46,13 +48,19 @@
 					{% if customer %}
 						<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
 					{% endif %}
-					<td id="item_id">{{ item.itemid }}</td>
+					{% if customer %}
+						<td id="item_id">
+							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+						</td>
+					{% else %}
+						<td id="item_id">{{ item.itemid }}</td>
+					{% endif %}
 					<td id="item_owner">
-						<a href="/inventory?acct={{ item.owner.acct }}">{{ item.owner.name }}</a>
+						<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
 					</td>
 					<td id="item_quantity">{{ item.quantity }}</td>
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
-					<td id="item_storage_fees">{{ item.storage_fees|cost_length:"2" }}</td>
+					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 					<td id="item_status">{{ item.status }}</td>
 					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 				</tr>
@@ -67,10 +75,47 @@
 				<option value="4">Order Completed (3)</option>
 				<option value="5">Shipped (4)</option>
 			</select>
+			Time elapsed (minutes): <input type="text" name="time_spent">
 			<input type="submit" name="submit" value="Change Status" />
 			</form>
 		{% endif %}
 
+	{% elif item %}
+		<br/><br/><table>
+			<tr>
+				{% for item in headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+			</tr>
+			<tr>
+				<td id="item_id">{{ item.itemid }}</td>
+				<td id="item_owner">
+					<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+				</td>
+				<td id="item_quantity">{{ item.quantity }}</td>
+				<td id="item_volume">{{ item.volume|length:"2" }}</td>
+				<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+				<td id="item_status">{{ item.status }}</td>
+				<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+			</tr>
+		</table><br/>
+
+		<table>
+			<tr>
+				{% for item in op_headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+				{% for operation in op_list %}
+					<tr>
+						<td id="op_id">{{ operation.id }}</td>
+						<td id="op_start">{{ operation.start }}</td>
+						<td id="op_finish">{{ operation.finish }}</td>
+						<td id="op_labor_time">{{ operation.labor_time }}</td>
+{#						Field for additional expenses / notes? #}
+					</tr>
+				{% endfor %}
+			</tr>
+		</table>
 	{% else %}
 		<p id="error_message">{{ error_message }}</p>
 	{% endif %}
