@@ -39,6 +39,8 @@ def inventory(request):
 				context_dict['date'] = _date
 				header_list.insert(0, ' ')
 
+				storage_fees = utils.calc_storage_fees(customer.acct)
+
 			except Customer.DoesNotExist:
 				context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(acct)
 				return render_to_response('tracker/inventory.html', context_dict, context)
@@ -48,7 +50,10 @@ def inventory(request):
 
 		# Retrieve inventory by status
 		elif status_filter:
-			if status_filter == 'stored':  # Retrieve all but shipped (4)
+			if status_filter == 'inducted':
+				inventory_list = Inventory.objects.all().filter(status=0)
+				context_dict['filter'] = 'Inducted'
+			elif status_filter == 'stored':  # Retrieve all but shipped (4)
 				inventory_list = Inventory.objects.all().exclude(status=4)
 				context_dict['filter'] = 'Stored'
 			elif 'order' in status_filter:
@@ -89,7 +94,8 @@ def inventory(request):
 		elif item:
 			_item = Inventory.objects.get(itemid=item)
 			context_dict['item'] = _item
-			context_dict['customer'] = Customer.objects.get(acct=_item.owner.acct)
+			customer = Customer.objects.get(acct=_item.owner.acct)
+			context_dict['customer'] = customer
 
 			op_headers = ['Op ID', 'Start', 'Finish', 'Labor Time (mins)']
 			context_dict['op_headers'] = op_headers
@@ -105,10 +111,6 @@ def inventory(request):
 		context_dict['inventory_list'] = inventory_list
 		context_dict['count'] = len(inventory_list)
 		context_dict['headers'] = header_list
-		storage_fees = 0
-		for item in inventory_list:
-			if abs((item.arrival - date.today()).days) > 7:
-						storage_fees += item.storage_fees
 		context_dict['storage_fees'] = storage_fees
 
 	except Inventory.DoesNotExist:

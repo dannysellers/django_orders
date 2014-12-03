@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response, redirect
 # from django.core.urlresolvers import reverse
 
 from datetime import date
-
+import utils
 from models import Customer, Inventory
 import forms
 
@@ -112,6 +112,14 @@ def account_page (request, account_url):
 	context_dict['account_url'] = account_url
 	try:
 		customer = Customer.objects.get(acct = account_acct)
+		# Show only items still in inventory
+		cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status=4)
+		if cust_items:
+			context_dict['inventory_list'] = cust_items
+			context_dict['count'] = len(cust_items)
+			context_dict['storage_fees'] = utils.calc_storage_fees(customer.acct)
+		else:
+			context_dict['inv_message'] = "This customer has no items stored in inventory."
 	except Customer.DoesNotExist:
 		context_dict['error_message'] = "Account {} not found.".format(
 			account_acct)
@@ -131,14 +139,6 @@ def account_page (request, account_url):
 
 	# Inventory table
 	context_dict['inv_headers'] = ['ID', '# of Cartons', 'Volume', 'Storage Fees', 'Status', 'Arrival']
-
-	# Show only items still in inventory
-	cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status=4)
-	if cust_items:
-		context_dict['inventory_list'] = cust_items
-		context_dict['count'] = len(cust_items)
-	else:
-		context_dict['inv_message'] = "This customer has no items stored in inventory."
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 

@@ -26,7 +26,8 @@
 		Active customers: {{ cust_act_count }}<br />
 		Total customers: {{ cust_count }}<br />
 		Items currently in storage: {{ item_count }}<br />
-		<a href="/inventory?storage_fees=True">Items currently incurring storage fees: {{ item_storage_count }}</a>
+		<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
+		<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
 
 	{% endblock %}
 

@@ -43,7 +43,6 @@
 
 	{% elif customer %}
 		{% if account_status == 'Active' %}
-			| <a href="/inventory?acct={{ customer.acct }}">Manage Inventory</a>
 			| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
 		{% endif %}
 		<br/><br/>
@@ -68,6 +67,10 @@
 
 	{% if inventory_list %}
 		<h2>Stored Inventory ({{ count }})</h2>
+		{% if storage_fees %}
+			<a href="/inventory?acct={{ customer.acct }}">Manage Inventory</a>
+			| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/><br/>
+		{% endif %}
 		<table>
 			<tr>
 				{% for item in inv_headers %}

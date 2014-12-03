@@ -63,6 +63,10 @@ class Operation(models.Model):
 	start = models.DateTimeField()
 	finish = models.DateTimeField()  # used for reporting
 	labor_time = models.IntegerField()  # used for billing
+	op_code = models.CharField(max_length=1, choices=INVENTORY_STATUS_CODES, default=0)
+	# Each operation includes a status code (preliminarily the same as the inventory codes)
+	# indicating what was done during that work period. The list will likely change as billing
+	# becomes more granular
 
 	def __unicode__(self):
 		return 'Op started {}'.format(self.start)

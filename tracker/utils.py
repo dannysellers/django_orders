@@ -1,6 +1,6 @@
 from models import Customer, Inventory
 from decimal import Decimal, getcontext
-import datetime
+from datetime import date
 
 
 def int_to_status_code(cls, code):
@@ -69,3 +69,14 @@ def code_to_status_int(cls, code):
 				raise TypeError('Status string not recognized')
 	else:
 		raise TypeError('Class not recognized')
+
+
+def calc_storage_fees(acct):
+	customer = Customer.objects.get(acct=acct)
+	inventory_list = Inventory.objects.all().filter(owner=customer)
+
+	storage_fees = 0
+	for item in inventory_list:
+		if abs((item.arrival - date.today()).days) > 7:
+					storage_fees += item.storage_fees
+	return storage_fees

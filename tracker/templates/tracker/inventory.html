@@ -8,6 +8,9 @@
 		<h1>Inventory &#8212; {{ customer.name }} (#{{ customer.acct }})</h1>
 	{% elif filter %}
 		<h1>Inventory &#8212; {{ filter }} {% if count %}({{ count }}){% endif %}</h1>
+	{% else %}
+{#		This last one shouldn't ever appear, but is a fallback in case I mess something up #}
+		<h1>Inventory {% if count %}({{ count }}){% endif %}</h1>
 	{% endif %}
 {% endblock header %}
 {% load num_filters %}
@@ -20,7 +23,8 @@
 
 	<a href="/inventory?status=stored">Stored Items</a>
 	| <a href="/inventory?add">Add Inventory</a><br/>
-	Status: <a href="/inventory?status=order_received">Order Received</a>
+	Status: <a href="/inventory?status=inducted">Inducted</a>
+	| <a href="/inventory?status=order_received">Order Received</a>
 	| <a href="/inventory?status=order_begun">Order Begun</a>
 	| <a href="/inventory?status=order_completed">Order Completed</a>
 
@@ -38,7 +42,8 @@
 {#				{% if customer %}#}
 {#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
 {#				{% endif %}#}
-{#				TODO: Enable checking all checkboxes#}
+{#				TODO: Enable checking all checkboxes #}
+{#				TODO: Enable sorting table by column #}
 				{% for item in headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
@@ -98,8 +103,9 @@
 				<td id="item_status">{{ item.status }}</td>
 				<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 			</tr>
-		</table><br/>
+		</table>
 
+		<h2>Operation History</h2>
 		<table>
 			<tr>
 				{% for item in op_headers %}

@@ -17,10 +17,14 @@ def index (request):
 	context_dict['item_count'] = Inventory.objects.count()
 
 	storage_fee_count = 0
+	no_storage_fee_count = 0
 	for item in Inventory.objects.all():
-		if abs((item.arrival - date.today()).days) > 7:
+		if abs((item.arrival - date.today()).days) >= 7:
 			storage_fee_count += 1
+		else:
+			no_storage_fee_count += 1
 	context_dict['item_storage_count'] = storage_fee_count
+	context_dict['item_no_storage_count'] = no_storage_fee_count
 
 	return render_to_response('tracker/index.html', context_dict, context)
 

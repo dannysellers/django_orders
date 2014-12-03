@@ -1,6 +1,7 @@
 import csv
 from random import randrange, randint, random
 from datetime import date, datetime
+from calendar import monthrange
 import os
 
 
@@ -53,18 +54,24 @@ def add_item (owner, itemid, quantity, length, width, height, status):
 def add_op (item):
 	# assert isinstance(item, Inventory)
 	# TODO: make operations only occur in sequence?
-	start = datetime(2014, randint(item.arrival.month, date.today().month),
-					 randint(item.arrival.day, date.today().day), hour = randint(9, 17),
+	_month = date.today().month
+	imonth = item.arrival.month
+	iday = item.arrival.day
+
+	start = datetime(2014, randint(imonth, _month),
+					 randint(iday, monthrange(2014, _month)[1]), hour = randint(9, 17),
 					 minute = randint(0, 59), second = randint(0, 59))
-	finish = datetime(2014, randint(start.month, date.today().month),
-					  randint(start.day, date.today().day), hour = randint(9, 17),
+	finish = datetime(2014, randint(start.month, _month),
+					  randint(start.day, monthrange(2014, _month)[1]), hour = randint(9, 17),
 					  minute = randint(0, 59), second = randint(0, 59))
 
 	""" The labor time expended isn't necessarily equal to the difference between start and
 	finish datetimes, as there could be a delay in reporting. """
 
 	labor_time = randint(1, 60)
-	o = Operation.objects.get_or_create(item = item, start = start, finish = finish, labor_time = labor_time)[0]
+	o = Operation.objects.get_or_create(item = item, start = start,
+										finish = finish, labor_time = labor_time,
+										op_code = 0)[0]
 	return o
 
 
