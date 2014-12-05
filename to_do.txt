@@ -23,5 +23,3 @@ totals row for (customer-specific) inventory tables
 Reports:
 Items stored per customer
 items stored/processed over time
-
-708351835
