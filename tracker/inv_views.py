@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect, render
-from datetime import date
+from datetime import date, datetime
 
 from models import Customer, Inventory, Operation
 import utils
@@ -188,20 +188,42 @@ def manage_items(request):
 	context = RequestContext(request)
 	itemlist = []
 	if request.GET.get('item'):  # individual item
-		itemlist.append(request.GET.get('item'))
+		_itemid = request.GET.get('item')
+		try:
+			item = Inventory.objects.get(itemid=_itemid)
+			itemlist.append(item)
+		except Inventory.DoesNotExist:
+			print("Item {} could not be found".format(_itemid))
 
 	for key, value in request.POST.iteritems():
 		if value == 'on':  # multiple items; checked checkboxes return 'on'
-			itemlist.append(Inventory.objects.get(itemid=key))
+			try:
+				item = Inventory.objects.get(itemid=key)
+				itemlist.append(item)
+			except Inventory.DoesNotExist:
+				print("Item {} could not be found".format(key))
 		if key == 'operation':  # retrieve value of desired op
-			# TODO: Remove manual int/code conversion
-			operation = utils.int_to_status_code('Inventory', value)
+			# operation = utils.int_to_status_code('Inventory', value)
+			operation = value
 		if key == 'labor_time':
-			labor_time = value
+			labor_time = int(value)
 
 	if request.method == 'POST':
-		return HttpResponse("""You're looking to change the status of {} items to {}.
-		That operation took {} minutes.""".format(len(itemlist), operation, labor_time))
+		for item in itemlist:
+			# assert isinstance(item, Inventory)
+			item.status = operation
+			td = datetime.today()
+
+			mins = labor_time % 60
+			hrs = int(labor_time / 60)
+			td2 = datetime(td.year, td.month, td.day, td.hour + hrs, td.minute + mins, 0, 0)
+
+			o = Operation.objects.get_or_create(item=item, start=datetime.now(),
+												finish=td2, labor_time=labor_time,
+												op_code = operation)
+			print o
+			item.save()
+			return dict(message="Status changed successfully to {}".format(utils.int_to_status_code('Inventory', operation)))
 	else:
 		message = """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g. /inventory?acct=#####)</a>."""

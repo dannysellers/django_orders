@@ -1,5 +1,4 @@
 from models import Customer, Inventory
-from decimal import Decimal, getcontext
 from datetime import date
 
 
@@ -77,10 +76,10 @@ def calc_storage_fees(*args):
 	returns storage fee calculation
 	"""
 	_arg = args[0]  # args is a tuple
-	if isinstance(_arg, int):
+	if isinstance(_arg, int):  # one item
 		customer = Customer.objects.get(acct=_arg)
 		inventory_list = Inventory.objects.all().filter(owner=customer)
-	elif isinstance(_arg, list):
+	elif isinstance(_arg, list):  # item list
 		inventory_list = []
 		for item in _arg:
 			if isinstance(item, Inventory):

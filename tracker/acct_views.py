@@ -31,7 +31,7 @@ def accounts (request):
 				remove_account(account_num=remove)
 			else:
 				# TODO: Seek confirmation if the customer has inventory
-				pass
+				pass  # this customer still has inventory in storage
 		except Customer.DoesNotExist:
 			context_dict['error_message'] = "Account {} not found. No changes made.".format(remove)
 		finally:
