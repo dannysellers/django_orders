@@ -51,9 +51,10 @@ def add_item (owner, itemid, quantity, length, width, height, status):
 	return i
 
 
-def add_op (item):
-	# assert isinstance(item, Inventory)
-	# TODO: make operations only occur in sequence?
+def add_op (item, op_code):
+	# TODO: make operations only occur in sequence chronologicaly?
+	# Enforcing sequentiality of operations may not be necessary, as
+	# in practice, they will only be created in sequence
 	_month = date.today().month
 	imonth = item.arrival.month
 	iday = item.arrival.day
@@ -61,6 +62,7 @@ def add_op (item):
 	start = datetime(2014, randint(imonth, _month),
 					 randint(iday, monthrange(2014, _month)[1]), hour = randint(9, 17),
 					 minute = randint(0, 59), second = randint(0, 59))
+
 	finish = datetime(2014, randint(start.month, _month),
 					  randint(start.day, monthrange(2014, _month)[1]), hour = randint(9, 17),
 					  minute = randint(0, 59), second = randint(0, 59))
@@ -71,7 +73,7 @@ def add_op (item):
 	labor_time = randint(1, 60)
 	o = Operation.objects.get_or_create(item = item, start = start,
 										finish = finish, labor_time = labor_time,
-										op_code = 0)[0]
+										op_code = op_code)[0]
 	return o
 
 
@@ -110,8 +112,8 @@ def populate_items (numitems, numops):
 			status = randint(0, 4)
 			item = add_item(owner = customer, itemid = itemid, quantity = quantity,
 							status = status, length = length, width = width, height = height)
-			for j in range(randint(1, int(numops))):
-				add_op(item)
+			for j in range(status):
+				add_op(item, j)
 			itemcount += 1
 	print("{} items added to db.".format(itemcount))
 

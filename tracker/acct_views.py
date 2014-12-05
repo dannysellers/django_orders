@@ -102,8 +102,12 @@ def accounts (request):
 
 
 def account_page (request, account_url):
+	# acct = request.GET.get('acct')
+	# if not account_url:
+	# 	account_url = acct
 	context = RequestContext(request)
 	context_dict = {}
+
 	header_list = ['Account', 'Name', 'Email', 'Status', 'Create Date']
 	context_dict['headers'] = header_list
 

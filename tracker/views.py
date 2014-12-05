@@ -13,12 +13,12 @@ def index (request):
 	context_dict = {}
 
 	context_dict['cust_count'] = Customer.objects.count()
-	context_dict['cust_act_count'] = Customer.objects.filter(status__exact = 1).count()
+	context_dict['cust_act_count'] = Customer.objects.filter(status = 1).count()
 	context_dict['item_count'] = Inventory.objects.count()
 
 	storage_fee_count = 0
 	no_storage_fee_count = 0
-	for item in Inventory.objects.all():
+	for item in Inventory.objects.all().exclude(status=4):
 		if abs((item.arrival - date.today()).days) >= 7:
 			storage_fee_count += 1
 		else:

@@ -4,6 +4,8 @@ view / manage item operations
 
 notes on account pages
 table overview on account page
+Any reason to have both /account/ page and /inventory/ page per customer? (view vs mgmt)
+form / page to edit customer information
 
 custom filter for truncating # status values
 
@@ -22,3 +24,4 @@ Reports:
 Items stored per customer
 items stored/processed over time
 
+708351835

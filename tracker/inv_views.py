@@ -15,9 +15,9 @@ def inventory(request):
 	# URL keywords
 	acct = request.GET.get('acct')
 	status_filter = request.GET.get('status')
-	storage_fees = request.GET.get('storage_fees')
+	storage_fee_arg = request.GET.get('storage_fees')
 	item = request.GET.get('item')
-	# add = request.GET.get('add')
+	add = request.GET.get('add')
 	# status_filter = code_to_status_int('Inventory', request.GET.get('status'))  # WIP
 
 	header_list = ['ID', 'Owner', '# of Cartons', 'Total Volume (ft.^3)',
@@ -71,24 +71,28 @@ def inventory(request):
 				inventory_list = Inventory.objects.all()
 				context_dict['filter'] = 'All'
 
+			storage_fees = utils.calc_storage_fees(inventory_list)
+
 			# for item in inventory_list:
 			# 	item.owner.url = '/accounts/' + str(item.owner.acct)
 
 		# Retrieve items currently incurring storage fees
-		elif storage_fees:
-			if storage_fees.lower() != 'no':
+		elif storage_fee_arg:
+			if storage_fee_arg.lower() != 'no':
 				# TODO: How to use True / False as values, rather than yes/no
 				context_dict['filter'] = 'Currently incurring storage fees'
 				inventory_list = []
-				for item in Inventory.objects.all():
-					if abs((item.arrival - date.today()).days) > 7:
+				for item in Inventory.objects.all().exclude(status=4):
+					if abs((item.arrival - date.today()).days) >= 7:
 						inventory_list.append(item)
-			elif storage_fees.lower() == 'no':
+			elif storage_fee_arg.lower() == 'no':
 				context_dict['filter'] = 'Items not yet incurring storage fees'
 				inventory_list = []
-				for item in Inventory.objects.all():
-					if abs((item.arrival - date.today()).days) <= 7:
+				for item in Inventory.objects.all().exclude(status=4):
+					if abs((item.arrival - date.today()).days) < 7:
 						inventory_list.append(item)
+
+			storage_fees = utils.calc_storage_fees(inventory_list)
 
 		# Retrieve specific item and its history
 		elif item:
@@ -97,9 +101,11 @@ def inventory(request):
 			customer = Customer.objects.get(acct=_item.owner.acct)
 			context_dict['customer'] = customer
 
-			op_headers = ['Op ID', 'Start', 'Finish', 'Labor Time (mins)']
+			op_headers = ['Op ID', 'Op Code', 'Start', 'Finish', 'Labor Time (mins)']
 			context_dict['op_headers'] = op_headers
 			context_dict['op_list'] = Operation.objects.all().filter(item=_item)
+
+			storage_fees = utils.calc_storage_fees(_item)
 
 			# for the sake of the template
 			inventory_list = []
@@ -109,7 +115,7 @@ def inventory(request):
 			inventory_list = Inventory.objects.all()
 
 		context_dict['inventory_list'] = inventory_list
-		context_dict['count'] = len(inventory_list)
+		context_dict['count'] = str(len(inventory_list))
 		context_dict['headers'] = header_list
 		context_dict['storage_fees'] = storage_fees
 
@@ -135,19 +141,19 @@ def add_item (request, account_url):
 		form.itemid = len(Inventory.objects.all())
 
 		if form.is_valid():
-			form = form.save(commit = False)
+			item = form.save(commit = False)
 
 			try:
 				cust = Customer.objects.get(acct = owner)
-				form.owner = cust
+				item.owner = cust
 
-				form.itemid = len(Inventory.objects.all())
-				form.length = form.cleaned_data['length'] / 12  # storage fees are per ft^3
-				form.width = form.cleaned_data['width'] / 12
-				form.height = form.cleaned_data['height'] / 12
-				form.volume = form.length * form.width * form.height
-				form.storage_fees = form.quantity * form.volume
-				form.save()
+				item.itemid = len(Inventory.objects.all())
+				item.length = form.length / 12  # storage fees are per ft^3
+				item.width = form.width / 12
+				item.height = form.height / 12
+				item.volume = form.length * form.width * form.height
+				item.storage_fees = form.quantity * form.volume
+				item.save()
 			except Customer.DoesNotExist:
 				return render_to_response('tracker/add_customer.html',
 										  context_dict,
@@ -177,20 +183,28 @@ def manage_items(request):
 	Receives list of checked items, passes them to item manager page
 	"""
 	# TODO: Integrate this with individual item page
+	# TODO: Enforce only one copy of induction / shipment per item
+	# TODO: Enforce triplets of order received, started, done
 	context = RequestContext(request)
 	itemlist = []
+	if request.GET.get('item'):  # individual item
+		itemlist.append(request.GET.get('item'))
 
 	for key, value in request.POST.iteritems():
-		if value == 'on':  # checked checkboxes return 'on'
+		if value == 'on':  # multiple items; checked checkboxes return 'on'
 			itemlist.append(Inventory.objects.get(itemid=key))
 		if key == 'operation':  # retrieve value of desired op
 			# TODO: Remove manual int/code conversion
 			operation = utils.int_to_status_code('Inventory', value)
+		if key == 'labor_time':
+			labor_time = value
 
 	if request.method == 'POST':
-		return HttpResponse("You're looking to change the status of {} items to {}.".format(len(itemlist), operation))
+		return HttpResponse("""You're looking to change the status of {} items to {}.
+		That operation took {} minutes.""".format(len(itemlist), operation, labor_time))
 	else:
 		message = """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g. /inventory?acct=#####)</a>."""
 
-		return render_to_response('tracker/inventory.html', {'message': message}, request)
+		# TODO: use messages framework to pass the above text
+		return HttpResponseRedirect('/inventory?status=stored')

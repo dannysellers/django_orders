@@ -71,12 +71,27 @@ def code_to_status_int(cls, code):
 		raise TypeError('Class not recognized')
 
 
-def calc_storage_fees(acct):
-	customer = Customer.objects.get(acct=acct)
-	inventory_list = Inventory.objects.all().filter(owner=customer)
+def calc_storage_fees(*args):
+	"""
+	Receives either a list of inventory items, or a customer account number;
+	returns storage fee calculation
+	"""
+	_arg = args[0]  # args is a tuple
+	if isinstance(_arg, int):
+		customer = Customer.objects.get(acct=_arg)
+		inventory_list = Inventory.objects.all().filter(owner=customer)
+	elif isinstance(_arg, list):
+		inventory_list = []
+		for item in _arg:
+			if isinstance(item, Inventory):
+				item = Inventory.objects.get(itemid=item.itemid)
+				inventory_list.append(item)
+	else:
+		inventory_list = []
 
 	storage_fees = 0
 	for item in inventory_list:
 		if abs((item.arrival - date.today()).days) > 7:
 					storage_fees += item.storage_fees
+
 	return storage_fees

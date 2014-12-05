@@ -22,8 +22,10 @@
 	{% endif %}
 
 	<a href="/inventory?status=stored">Stored Items</a>
-	| <a href="/inventory?add">Add Inventory</a><br/>
-	Status: <a href="/inventory?status=inducted">Inducted</a>
+	{% if customer %}
+		| <a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
+	{% endif %}
+	<br/>Status: <a href="/inventory?status=inducted">Inducted</a>
 	| <a href="/inventory?status=order_received">Order Received</a>
 	| <a href="/inventory?status=order_begun">Order Begun</a>
 	| <a href="/inventory?status=order_completed">Order Completed</a>
@@ -53,20 +55,16 @@
 					{% if customer %}
 						<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
 					{% endif %}
-					{% if customer %}
-						<td id="item_id">
-							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-						</td>
-					{% else %}
-						<td id="item_id">{{ item.itemid }}</td>
-					{% endif %}
+					<td id="item_id">
+						<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+					</td>
 					<td id="item_owner">
 						<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
 					</td>
 					<td id="item_quantity">{{ item.quantity }}</td>
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
 					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-					<td id="item_status">{{ item.status }}</td>
+					<td id="item_status">{{ item.status|op_code }}</td>
 					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 				</tr>
 			{% endfor %}
@@ -80,13 +78,16 @@
 				<option value="4">Order Completed (3)</option>
 				<option value="5">Shipped (4)</option>
 			</select>
-			Time elapsed (minutes): <input type="text" name="time_spent">
+			Time elapsed (minutes): <input type="text" name="labor_time">
 			<input type="submit" name="submit" value="Change Status" />
 			</form>
 		{% endif %}
 
 	{% elif item %}
-		<br/><br/><table>
+		<br/><br/>
+		<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
+		{% csrf_token %}
+		<table>
 			<tr>
 				{% for item in headers %}
 					<th>{{ item }}</th>
@@ -100,7 +101,7 @@
 				<td id="item_quantity">{{ item.quantity }}</td>
 				<td id="item_volume">{{ item.volume|length:"2" }}</td>
 				<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-				<td id="item_status">{{ item.status }}</td>
+				<td id="item_status">{{ item.status|op_code }}</td>
 				<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 			</tr>
 		</table>
@@ -114,6 +115,7 @@
 				{% for operation in op_list %}
 					<tr>
 						<td id="op_id">{{ operation.id }}</td>
+						<td id="op_code">{{ operation.op_code|op_code }}</td>
 						<td id="op_start">{{ operation.start }}</td>
 						<td id="op_finish">{{ operation.finish }}</td>
 						<td id="op_labor_time">{{ operation.labor_time }}</td>
@@ -122,6 +124,17 @@
 				{% endfor %}
 			</tr>
 		</table>
+		<br/>
+		<select name="operation">
+			<option value="0">Inducted (0)</option>
+			<option value="1">Order Received (1)</option>
+			<option value="2">Order Begun (2)</option>
+			<option value="3">Order Completed (3)</option>
+			<option value="4">Shipped (4)</option>
+		</select>
+		Time elapsed (minutes): <input type="text" name="labor_time">
+		<input type="submit" name="submit" value="Change Status" />
+		</form>
 	{% else %}
 		<p id="error_message">{{ error_message }}</p>
 	{% endif %}

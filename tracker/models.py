@@ -45,14 +45,10 @@ class Inventory(models.Model):
 	status = models.CharField(max_length=1, choices=INVENTORY_STATUS_CODES, default=0)
 	storage_fees = models.FloatField(default=0.05)
 
-	# Handle operations as properties of items? Or vice-versa
-
-	# def __init__(self):
-	# 	self.itemid = len(Inventory.objects.all())
-	# 	self.storage_fees = self.weight * self.quantity
-
 	def __unicode__(self):
 		return 'Item {}'.format(self.itemid)
+
+	# TODO: add __str__ method?
 
 
 class Operation(models.Model):
