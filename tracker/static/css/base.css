@@ -13,6 +13,9 @@ ul.errorlist {
 	font-weight: bold;
 	margin-top: 10px;
 }
+.message {
+	list-style: none;
+}
 table {
 	border: 1px solid gray;
 	width: 85%;

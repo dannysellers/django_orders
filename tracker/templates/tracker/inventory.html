@@ -21,7 +21,7 @@
 		{{ op_message }}<br/>
 	{% endif %}
 
-	<a href="/inventory?status=stored">Stored Items</a>
+	<br/><a href="/inventory?status=stored">Stored Items</a>
 	{% if customer %}
 		| <a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
 		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>

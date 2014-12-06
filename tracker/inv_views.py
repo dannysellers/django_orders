@@ -159,7 +159,7 @@ def add_item (request, account_url):
 										  context_dict,
 										  context)
 
-			return redirect(inventory, permanent=True)
+			return redirect(inventory)
 		else:
 
 			print form.errors

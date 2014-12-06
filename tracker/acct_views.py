@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 # from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 from datetime import date
 import utils
@@ -28,15 +29,16 @@ def accounts (request):
 		try:
 			_inv = Inventory.objects.filter(owner=remove).exclude(status=4)
 			if not _inv:  # If the customer has no items currently in storage, deactivate
-				remove_account(account_num=remove)
+				if not remove_account(account_num=remove):
+					messages.add_message(request, messages.WARNING, "Account {} not found. No changes made.".format(remove))
 			else:
 				# TODO: Seek confirmation if the customer has inventory
 				pass  # this customer still has inventory in storage
 		except Customer.DoesNotExist:
-			context_dict['error_message'] = "Account {} not found. No changes made.".format(remove)
+			messages.add_message(request, messages.ERROR, "Account {} not found. No changes made.".format(remove))
 		finally:
 			# TODO: This message isn't being passed / displayed properly
-			context_dict['message'] = "Account {} deactivated successfully.".format(remove)
+			messages.add_message(request, messages.SUCCESS, "Account {} deactivated successfully.".format(remove))
 			return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
 	else:
@@ -68,7 +70,7 @@ def accounts (request):
 				context_dict['num_accts'] = len(customer_list)
 
 			except Customer.DoesNotExist:
-				context_dict['error_message'] = "No accounts found."
+				messages.add_message(request, messages.WARNING, "No accounts found.")
 				customer_list = []
 			""" If no arguments, return all active accounts """
 		else:
@@ -76,7 +78,7 @@ def accounts (request):
 				customer_list = Customer.objects.order_by('acct').filter(status__iexact = 1)
 
 			except Customer.DoesNotExist:
-				context_dict['error_message'] = "No accounts found."
+				messages.add_message(request, messages.WARNING, "No accounts found.")
 				customer_list = []
 
 		# Prepare data for template
@@ -123,10 +125,9 @@ def account_page (request, account_url):
 			context_dict['count'] = len(cust_items)
 			context_dict['storage_fees'] = utils.calc_storage_fees(customer.acct)
 		else:
-			context_dict['inv_message'] = "This customer has no items stored in inventory."
+			messages.add_message(request, messages.INFO, "This customer has no items stored in inventory.")
 	except Customer.DoesNotExist:
-		context_dict['error_message'] = "Account {} not found.".format(
-			account_acct)
+		messages.add_message(request, messages.ERROR, "Account {} not found.".format(account_acct))
 		return render_to_response('tracker/accounts.html', context_dict, context)
 
 	context_dict['customer'] = customer
@@ -178,9 +179,7 @@ def remove_account (account_num):
 		_customer.closedate = date.today()
 		_customer.status = 0
 		_customer.save()
-		# context_dict['message'] = "Account {} deactivated successfully.".format(_customer.acct)
 
-		# return HttpResponseRedirect('/accounts?accts=active')
-		return dict(message="Account {} deactivated successfully.".format(_customer.acct))
+		return True
 	except Customer.DoesNotExist:
-		return dict(message="Account {} not found. No changes made.".format(account_num))
+		return False

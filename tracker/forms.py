@@ -19,7 +19,6 @@ class CustomerForm(forms.ModelForm):
 
 
 class InventoryForm(forms.ModelForm):
-	# itemid = forms.CharField(widget=forms.HiddenInput())
 	quantity = forms.CharField(max_length=5, help_text="Quantity: ")
 	length = forms.DecimalField(max_digits=6, initial=1.00, help_text="Length (in.): ")
 	width = forms.DecimalField(max_digits=6, initial=1.00, help_text="Width (in.): ")
