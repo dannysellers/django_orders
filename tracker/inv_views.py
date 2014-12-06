@@ -52,7 +52,6 @@ def inventory(request):
 					context_dict['date'] = _date
 					header_list.insert(0, ' ')
 
-					storage_fees = utils.calc_storage_fees(customer.acct)
 				except Customer.DoesNotExist:
 					context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(acct)
 					return render_to_response('tracker/inventory.html', context_dict, context)
@@ -93,13 +92,13 @@ def inventory(request):
 							_filtered_list.append(item)
 
 				inventory_list = _filtered_list
-				storage_fees = utils.calc_storage_fees(inventory_list)
 
 			if len(context_filter) > 1:
 				context_dict['filter'] = ' > '.join(context_filter)
 			else:
-				context_dict['filter'] = context_filter
+				context_dict['filter'] = context_filter[0]  # still gets passed a list
 
+			storage_fees = utils.calc_storage_fees(inventory_list)
 
 		# Retrieve specific item and its history
 		elif item:
@@ -120,6 +119,7 @@ def inventory(request):
 		else:
 			context_dict['filter'] = 'All'
 			inventory_list = Inventory.objects.all()
+			storage_fees = utils.calc_storage_fees(inventory_list.exclude(status=4))
 
 		context_dict['inventory_list'] = inventory_list
 		context_dict['count'] = str(len(inventory_list))

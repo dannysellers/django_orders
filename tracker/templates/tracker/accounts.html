@@ -20,6 +20,10 @@
 		</ul>
 	{% endif %}
 
+	{% if confirm_remove %}
+		<a href="/accounts?confirm_remove={{ customer.acct }}"
+	{% endif %}
+
 	<a href="/accounts?accts=all">All accounts</a> | <a href="/accounts?accts=active">Active
 	accounts</a> | <a href="/accounts?accts=inactive">Inactive accounts</a> |
 	<a href="/add_account">Add new account</a>
@@ -73,6 +77,7 @@
 		<h2>Stored Inventory ({{ count }})</h2>
 		{% if storage_fees %}
 			<a href="/inventory?acct={{ customer.acct }}">Manage Inventory</a>
+			| <a href="/inventory?acct={{ customer.acct }}&statusw=all">Inventory Report</a>
 			| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/><br/>
 		{% endif %}
 		<table>
