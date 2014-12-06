@@ -5,12 +5,9 @@ view / manage item operations
 notes on account pages
 table overview on account page
 Any reason to have both /account/ page and /inventory/ page per customer? (view vs mgmt)
+	/account/ page should have table overview and notes in addition
+	
 form / page to edit customer information
-
-custom filter for truncating # status values
-
-format text fields in account / inventory pages
-display status number as code
 
 tables sort by value
 

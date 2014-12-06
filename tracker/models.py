@@ -48,6 +48,9 @@ class Inventory(models.Model):
 	def __unicode__(self):
 		return 'Item {}'.format(self.itemid)
 
+	class Meta:
+		verbose_name_plural = 'inventory'
+
 	# TODO: add __str__ method?
 
 

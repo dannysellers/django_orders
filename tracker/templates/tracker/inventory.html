@@ -2,11 +2,11 @@
 {% load static %}
 
 {% block header %}
-	{% if item %}
-		<h1>Item {{ item.itemid }} &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
-	{% elif customer %}
-		<h1>Inventory &#8212; {{ customer.name }} (#{{ customer.acct }})</h1>
-	{% elif filter %}
+{#	{% if item %}#}
+{#		<h1>Item {{ item.itemid }} &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>#}
+{#	{% elif customer %}#}
+{#		<h1>Inventory &#8212; {{ customer.name }} (#{{ customer.acct }})</h1>#}
+	{% if filter %}
 		<h1>Inventory &#8212; {{ filter }} {% if count %}({{ count }}){% endif %}</h1>
 	{% else %}
 {#		This last one shouldn't ever appear, but is a fallback in case I mess something up #}
@@ -143,5 +143,7 @@
 	{% if message %}
 		{{ message }}
 	{% endif %}
+
+
 
 {% endblock %}
