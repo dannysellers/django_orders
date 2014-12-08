@@ -64,16 +64,18 @@ def inventory(request):
 					inventory_list = inventory_list.exclude(status=4)
 					context_filter.append('Stored')
 				elif 'order' in status_filter:
-					context_filter.append('Order ')
+					_context = 'Order'
+					#context_filter.append('Order ')
 					if 'received' in status_filter:  # 1
 						inventory_list = inventory_list.filter(status=1)
-						context_filter.append(' received')
+						_context += ' received'
 					elif 'begun' in status_filter:  # 2
 						inventory_list = inventory_list.filter(status=2)
-						context_filter.append(' begun')
+						_context += ' begun'
 					elif 'completed' in status_filter:  # 3
 						inventory_list = inventory_list.filter(status=3)
-						context_filter.append(' completed (not yet shipped)')
+						_context += ' completed (not yet shipped)'
+					context_filter.append(_context)
 				else:
 					context_filter.append('All')
 
@@ -82,12 +84,12 @@ def inventory(request):
 				if storage_fee_arg.lower() == 'no':
 					# TODO: How to use True / False as values, rather than yes/no
 					context_filter.append('Items not yet incurring storage fees')
-					for item in inventory_list:
+					for item in inventory_list.exclude(status=4):
 						if abs((item.arrival - date.today()).days) < 7:
 							_filtered_list.append(item)
 				else:
 					context_filter.append('Currently incurring storage fees')
-					for item in inventory_list:
+					for item in inventory_list.exclude(status=4):
 						if abs((item.arrival - date.today()).days) >= 7:
 							_filtered_list.append(item)
 
