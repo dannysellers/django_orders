@@ -3,6 +3,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect, render
 from datetime import date, datetime
 from django.contrib import messages
+from json import dumps
 
 from models import Customer, Inventory, Operation
 import utils
@@ -10,10 +11,6 @@ import forms
 
 
 def inventory(request):
-	# TODO: Make filters (acct, status, etc) chainable? I.e. support /inventory&acct=12345&status=inducted ?
-	# That could be really useful, but would involve getting a list of all items every time,
-	# which could be inefficient at scale
-
 	context = RequestContext(request)
 	context_dict = {}
 
@@ -65,7 +62,6 @@ def inventory(request):
 					context_filter.append('Stored')
 				elif 'order' in status_filter:
 					_context = 'Order'
-					#context_filter.append('Order ')
 					if 'received' in status_filter:  # 1
 						inventory_list = inventory_list.filter(status=1)
 						_context += ' received'
@@ -78,6 +74,10 @@ def inventory(request):
 					context_filter.append(_context)
 				else:
 					context_filter.append('All')
+					header_list.append('Ship Date')
+			else:
+				inventory_list = inventory_list.exclude(status=4)  # otherwise only show stored items
+				context_filter.append('Stored')
 
 			if storage_fee_arg:
 				_filtered_list = []
@@ -187,16 +187,20 @@ def add_item (request, account_url):
 # 			return HttpResponseRedirect('')
 
 
-def manage_items(request):
+def change_item_status(request):
 	"""
 	Receives list of checked items, passes them to item manager page
+	If /change_status?item=##### , manage individual item.
+	If /manage_items/, receive list of items.
 	"""
 	# TODO: Integrate this with individual item page
 	# TODO: Enforce only one copy of induction / shipment per item
 	# TODO: Enforce triplets of order received, started, done
 	context = RequestContext(request)
 	itemlist = []
-	if request.GET.get('item'):  # individual item
+
+	""" Prepare itemlist for processing by db / parsing to json """
+	if request.GET.get('item'):  # individual item passed as URL param
 		_itemid = request.GET.get('item')
 		try:
 			item = Inventory.objects.get(itemid=_itemid)
@@ -204,6 +208,7 @@ def manage_items(request):
 		except Inventory.DoesNotExist:
 			print("Item {} could not be found".format(_itemid))
 
+	# Recover operation and labor_time vals, and list of items if applicable
 	for key, value in request.POST.iteritems():
 		if value == 'on':  # multiple items; checked checkboxes return 'on'
 			try:
@@ -212,27 +217,36 @@ def manage_items(request):
 			except Inventory.DoesNotExist:
 				print("Item {} could not be found".format(key))
 		if key == 'operation':  # retrieve value of desired op
-			# operation = utils.int_to_status_code('Inventory', value)
 			operation = value
 		if key == 'labor_time':
 			labor_time = int(value)
 
+	""" Assign new operation to each item """
 	if request.method == 'POST':
+		op_list = []
 		for item in itemlist:
-			# assert isinstance(item, Inventory)
 			item.status = operation
 			td = datetime.today()
 
+			# TODO: Doesn't handle adding minutes very well...
 			mins = labor_time % 60
 			hrs = int(labor_time / 60)
-			td2 = datetime(td.year, td.month, td.day, td.hour + hrs, td.minute + mins, 0, 0)
+			td2 = datetime(td.year, td.month, td.day, td.hour + hrs, (td.minute + mins) % 60, 0, 0)
 
 			o = Operation.objects.get_or_create(item=item, start=datetime.now(),
 												finish=td2, labor_time=labor_time,
-												op_code = operation)
-			print o
+												op_code = operation)[0]
 			item.save()
-			return dict(message="Status changed successfully to {}".format(utils.int_to_status_code('Inventory', operation)))
+
+			# for op in list(Operation.objects.all().filter(item = item)):
+			# 	op_list.append({
+			# 		"op_id": op.id,
+			# 		"op_code": op.op_code,
+			# 		"start": op.start,
+			# 		"finish": op.finish,
+			# 		"labor_time": op.labor_time
+			# 	})
+		# return HttpResponse(dumps(op_list, indent=4), content_type='application/json')
 	else:
 		message = """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g. /inventory?acct=#####)</a>."""

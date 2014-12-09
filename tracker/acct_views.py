@@ -1,6 +1,6 @@
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
 # from django.core.urlresolvers import reverse
 from django.contrib import messages
 
@@ -21,25 +21,42 @@ def decode_url (url):
 def accounts (request):
 	context = RequestContext(request)
 	context_dict = {}
+
+	# URL params
 	accts = request.GET.get('accts')
 	remove = request.GET.get('remove')
+	confirm_remove = request.GET.get('confirm_remove')
 
 	""" Capture /accounts?remove=<acct> """
 	if remove:
-		try:
-			_inv = Inventory.objects.filter(owner=remove).exclude(status=4)
-			if not _inv:  # If the customer has no items currently in storage, deactivate
-				if not remove_account(account_num=remove):
-					messages.add_message(request, messages.WARNING, "Account {} not found. No changes made.".format(remove))
-			else:
-				# TODO: Seek confirmation if the customer has inventory
-				pass  # this customer still has inventory in storage
-		except Customer.DoesNotExist:
-			messages.add_message(request, messages.ERROR, "Account {} not found. No changes made.".format(remove))
-		finally:
-			# TODO: This message isn't being passed / displayed properly
-			messages.add_message(request, messages.SUCCESS, "Account {} deactivated successfully.".format(remove))
-			return HttpResponseRedirect('/accounts?accts=active', context_dict)
+		if confirm_remove:
+			messages.add_message(request, messages.WARNING,
+								 "Confirmation of deactivation")
+			if remove_account(account_num=remove):
+				messages.add_message(request, messages.SUCCESS, "Account {} deactivated successfully".format(remove))
+				return HttpResponseRedirect('/accounts?accts=active', context_dict)
+
+		else:
+			try:
+				# If the customer has no items currently in storage, deactivate
+				if not Inventory.objects.filter(owner=remove).exclude(status=4):
+					# remove_account() returns False on Customer.DoesNotExist
+					if not remove_account(account_num=remove):
+						messages.add_message(request, messages.WARNING, "Account {} not found. No changes made.".format(remove))
+						return redirect('/accounts?accts=active', context_dict)
+					else:
+						messages.add_message(request, messages.SUCCESS,
+											 "Account {} deactivated successfully".format(remove))
+						return redirect('/accounts?accts=active', context_dict)
+				else:
+					messages.add_message(request, messages.WARNING,
+										 "This customer has items in inventory. Proceed with deactivation?")
+					context_dict['confirm_remove'] = 'Confirm'
+					return render_to_response('/accounts?remove={}&confirm_remove=False'.format(remove), context_dict)
+
+			except Customer.DoesNotExist:
+				messages.add_message(request, messages.ERROR, "Account {} not found. No changes made.".format(remove))
+				return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
 	else:
 		header_list = ['Account', 'Name', 'Create Date']
@@ -171,7 +188,7 @@ def add_account (request):
 
 
 def remove_account (account_num):
-	print("Account to remove: {}".format(account_num))
+	print("remove_account(): {}".format(account_num))
 
 	try:
 		_customer = Customer.objects.get(acct = account_num)

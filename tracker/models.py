@@ -68,4 +68,4 @@ class Operation(models.Model):
 	# becomes more granular
 
 	def __unicode__(self):
-		return 'Op started {}'.format(self.start)
+		return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)

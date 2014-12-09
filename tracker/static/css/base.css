@@ -39,6 +39,6 @@ table tr:nth-child(even) {
 table tr:nth-child(odd) {
 	background-color: #f1f1f1;
 }
-#item_shipped_storage {
+.inactive {
 	background-color: #cdcdcd;
 }

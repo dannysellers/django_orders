@@ -7,6 +7,7 @@
 	<head>
 		<title>Inventory&#8212;Order Tracker</title>
 		<link rel="stylesheet" href="{% static "css/base.css" %}" />
+		<script src="{% static "js/ajax.js" %}"></script>
 	</head>
 
 	<body>
@@ -22,6 +23,7 @@
 
 	{% block content %}
 
+		<br/>
 		Active customers: {{ cust_act_count }}<br />
 		Total customers: {{ cust_count }}<br />
 		Items currently in storage: {{ item_count }}<br />

@@ -17,11 +17,7 @@
 
 {% block content %}
 
-	{% if op_message %}
-		{{ op_message }}<br/>
-	{% endif %}
-
-	<br/><a href="/inventory?status=stored">Stored Items</a>
+	<a href="/inventory?status=stored">Stored Items</a>
 	{% if customer %}
 		| <a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
 		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
@@ -30,6 +26,14 @@
 	| <a href="/inventory?status=order_received">Order Received</a>
 	| <a href="/inventory?status=order_begun">Order Begun</a>
 	| <a href="/inventory?status=order_completed">Order Completed</a>
+
+	{% if messages %}
+		<ul class="message">
+		{% for message in messages %}
+			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+		{% endfor %}
+		</ul>
+	{% endif %}
 
 	{% if storage_fees %}
 		<br/><br/>Daily storage fees as of today: ${{ storage_fees|length:"2" }}
@@ -67,10 +71,15 @@
 					{% if not item.status == '4' %}
 						<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 					{% else %}
-						<td id="item_shipped_storage"></td>
+						<td class="inactive"></td>
 					{% endif %}
 					<td id="item_status">{{ item.status|op_code }}</td>
 					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+					{% if item.status == '4' %}
+						<td>{{ item.departure|date:"m-d-Y" }}</td>
+					{% elif 'All' in filter %}
+						<td class="inactive"></td>
+					{% endif %}
 				</tr>
 			{% endfor %}
 		</table>
@@ -112,13 +121,13 @@
 		</table>
 
 		<h2>Operation History</h2>
-		<table>
+		<table id="op_history">
 			<tr>
 				{% for item in op_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
 				{% for operation in op_list %}
-					<tr>
+					<tr id="op_row">
 						<td id="op_id">{{ operation.id }}</td>
 						<td id="op_code">{{ operation.op_code|op_code }}</td>
 						<td id="op_start">{{ operation.start }}</td>

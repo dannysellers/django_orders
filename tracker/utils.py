@@ -1,5 +1,6 @@
 from models import Customer, Inventory
 from datetime import date
+from django.db.models.query import QuerySet
 
 
 def int_to_status_code(cls, code):
@@ -78,8 +79,8 @@ def calc_storage_fees(*args):
 	_arg = args[0]  # args is a tuple
 	if isinstance(_arg, int):  # one item
 		customer = Customer.objects.get(acct=_arg)
-		inventory_list = Inventory.objects.all().filter(owner=customer)
-	elif isinstance(_arg, list):  # item list
+		inventory_list = Inventory.objects.all().filter(owner=customer).exclude(status=4)
+	elif isinstance(_arg, QuerySet):  # QuerySet (list)
 		inventory_list = []
 		for item in _arg:
 			if isinstance(item, Inventory):
@@ -90,7 +91,7 @@ def calc_storage_fees(*args):
 
 	storage_fees = 0
 	for item in inventory_list:
-		if abs((item.arrival - date.today()).days) > 7:
+		if abs((item.arrival - date.today()).days) > 7 and item.status != '4':
 					storage_fees += item.storage_fees
 
 	return storage_fees
