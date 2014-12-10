@@ -124,7 +124,8 @@ def inventory(request):
 			storage_fees = utils.calc_storage_fees(inventory_list.exclude(status=4))
 
 		context_dict['inventory_list'] = inventory_list
-		context_dict['count'] = str(len(inventory_list))
+		if len(inventory_list) > 0:
+			context_dict['count'] = str(len(inventory_list))
 		context_dict['headers'] = header_list
 		context_dict['storage_fees'] = storage_fees
 
@@ -147,7 +148,7 @@ def add_item (request, account_url):
 
 	if request.method == 'POST':
 		form = forms.InventoryForm(request.POST)
-		form.itemid = len(Inventory.objects.all())
+		# form.itemid = len(Inventory.objects.all()) + 1
 
 		if form.is_valid():
 			item = form.save(commit = False)
@@ -156,21 +157,32 @@ def add_item (request, account_url):
 				cust = Customer.objects.get(acct = owner)
 				item.owner = cust
 
-				item.itemid = len(Inventory.objects.all())
-				item.length = form.length / 12  # storage fees are per ft^3
-				item.width = form.width / 12
-				item.height = form.height / 12
-				item.volume = form.length * form.width * form.height
-				item.storage_fees = form.quantity * form.volume
+				item.itemid = len(Inventory.objects.all()) + 1
+				item.length = form.cleaned_data['length'] / 12
+				item.width = form.cleaned_data['width'] / 12
+				item.height = form.cleaned_data['height'] / 12
+				item.volume = form.cleaned_data['length'] * form.cleaned_data['width'] * form.cleaned_data['height']
+				item.storage_fees = int(form.cleaned_data['quantity']) * item.volume
+
+				item.arrival = date.today()
+				item.departure = date.today()
+				item.status = 0
+
 				item.save()
+
+				Operation.objects.get_or_create(item=item, start=datetime.today(),
+												finish=datetime.today(), labor_time=0,
+												op_code=0)
+
 			except Customer.DoesNotExist:
 				return render_to_response('tracker/add_customer.html',
 										  context_dict,
 										  context)
 
-			return redirect(inventory)
+			# return render_to_response('tracker/inventory.html', context_dict, context)
+			# return inventory(request)
+			return render_to_response('tracker/inventory.html', {"acct": owner})
 		else:
-
 			print form.errors
 	else:
 		form = forms.InventoryForm()

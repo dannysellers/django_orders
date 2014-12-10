@@ -177,7 +177,7 @@ def add_account (request):
 			form.save(commit = True)
 			# print("Acct added: {} -- {}".format(form.acct, form.name))
 
-			return redirect(accounts, permanent=True)
+			return accounts(request)
 		else:
 			print form.errors
 	else:

@@ -39,7 +39,7 @@
 	{% endif %}
 
 	{% if customer_list %}
-		<br/><br/><table>
+		<table>
 			<tr>
 				{% for item in headers %}
 					<th>{{ item }}</th>
@@ -53,10 +53,12 @@
 					<td id="status_cell">{{ customer.status }}</td>
 				{% endif %}
 				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-				{% if customer.status == "0" %}
-					<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
-				{% else %}
-					<td class="inactive"></td>
+				{% if 'Active' not in filter %}
+					{% if customer.status == "0" %}
+						<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
+					{% else %}
+						<td class="inactive"></td>
+					{% endif %}
 				{% endif %}
 			</tr>
 		{% endfor %}
@@ -82,37 +84,40 @@
 		</table>
 	{% endif %}
 
-	<br/><a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
-	| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
-	{% if storage_fees %}
-		| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>
-	{% else %}
-		| Daily storage fees as of today: $0.00<br/>
-	{% endif %}
-	<br/><table>
-		<tr>
-			{% for item in inv_headers %}
-				<th>{{ item }}</th>
-			{% endfor %}
-		</tr>
-		{% if inventory_list %}
-			{% for item in inventory_list %}
-				<tr>
-					<td id="item_id">
-						<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-					</td>
-					<td id="item_quantity">{{ item.quantity }}</td>
-					<td id="item_volume">{{ item.volume|length:"2" }}</td>
-					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-					<td id="item_status">{{ item.status|op_code }}</td>
-					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
-				</tr>
-			{% endfor %}
+	{% if customer %}
+		<br/><a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
+		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
+		{% if storage_fees %}
+			| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>
+		{% else %}
+			| Daily storage fees as of today: $0.00<br/>
 		{% endif %}
-	</table>
 
-	{% if error_message %}
-		<p id="error_message">{{ error_message }}</p>
+		<br/><table>
+			<tr>
+				{% for item in inv_headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+			</tr>
+			{% if inventory_list %}
+				{% for item in inventory_list %}
+					<tr>
+						<td id="item_id">
+							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+						</td>
+						<td id="item_quantity">{{ item.quantity }}</td>
+						<td id="item_volume">{{ item.volume|length:"2" }}</td>
+						<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+						<td id="item_status">{{ item.status|op_code }}</td>
+						<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+					</tr>
+				{% endfor %}
+			{% endif %}
+		</table>
+
+		{% if error_message %}
+			<p id="error_message">{{ error_message }}</p>
+		{% endif %}
 	{% endif %}
 
 {% endblock content %}

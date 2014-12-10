@@ -10,7 +10,7 @@ class CustomerForm(forms.ModelForm):
 	email = forms.EmailField(help_text="Email address: ")
 	status = forms.CharField(widget=forms.HiddenInput(), initial=1)
 	createdate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
-	closedate = forms.DateField(widget=forms.HiddenInput(), required=False)
+	closedate = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
 
 	# An inline class that provides additional info on the form
 	class Meta:
@@ -23,12 +23,10 @@ class InventoryForm(forms.ModelForm):
 	length = forms.DecimalField(max_digits=6, initial=1.00, help_text="Length (in.): ")
 	width = forms.DecimalField(max_digits=6, initial=1.00, help_text="Width (in.): ")
 	height = forms.DecimalField(max_digits=6, initial=1.00, help_text="Height (in.): ")
-	# volume = forms.DecimalField(widget=forms.HiddenInput())
 	palletized = forms.BooleanField(initial=False, help_text="Palletized? :", required=False)
-	# palletweight = forms.CharField(help_text="Pallet weight: ", required=False)
-	# arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today())
-	# status = forms.CharField(widget=forms.HiddenInput(), initial=0)
-	# storage_fees = forms.IntegerField(widget=forms.HiddenInput(), initial=0.05)
+	arrival = forms.DateField(widget=forms.HiddenInput(), initial=date.today(), required=False)
+	departure = forms.DateField(widget=forms.HiddenInput(), initial=date.today(), required=False)
+	status = forms.CharField(widget=forms.HiddenInput(), initial=0, required=False)
 
 	class Meta:
 		model = models.Inventory

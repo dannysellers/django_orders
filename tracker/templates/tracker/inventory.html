@@ -17,15 +17,15 @@
 
 {% block content %}
 
-	<a href="/inventory?status=stored">Stored Items</a>
-	{% if customer %}
-		| <a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
-		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
-	{% endif %}
-	<br/>Status: <a href="/inventory?status=inducted">Inducted</a>
+	<a href="/inventory?status=stored">All Items</a>
+	| Status: <a href="/inventory?status=inducted">Inducted</a>
 	| <a href="/inventory?status=order_received">Order Received</a>
 	| <a href="/inventory?status=order_begun">Order Begun</a>
 	| <a href="/inventory?status=order_completed">Order Completed</a>
+	{% if customer %}
+		<br/><a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
+		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
+	{% endif %}
 
 	{% if messages %}
 		<ul class="message">
