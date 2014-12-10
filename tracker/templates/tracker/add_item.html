@@ -2,12 +2,12 @@
 {% load static %}
 
 {% block header %}
-    <h1>Add an Item</h1>
+	<h1>Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}</h1>
 {% endblock header %}
-
+	
 {% block content %}
 
-    <form id="inventory_form" method="post" action="/accounts/{{ owner }}/add_inventory/">
+    <form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
 
         {% csrf_token %}
         {% for hidden in form.hidden_field %}

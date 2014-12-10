@@ -73,6 +73,9 @@ def inventory(request):
 						_context += ' completed (not yet shipped)'
 					context_filter.append(_context)
 				else:
+					messages.add_message(request, messages.INFO, """I didn't recognize status filter '{}'.
+					You can use: <i>inducted</i>, <i>stored</i>, <i>order_received</i>, <i>order_begun,</i>
+					<i>order_completed</i>, or <i>all</i> as possible filters.""".format(status_filter))
 					context_filter.append('All')
 					header_list.append('Ship Date')
 			else:
@@ -144,17 +147,16 @@ def add_item (request, account_url):
 	context = RequestContext(request)
 	context_dict = {}
 
-	owner = account_url
+	owner = Customer.objects.get(acct = account_url)
 
 	if request.method == 'POST':
 		form = forms.InventoryForm(request.POST)
-		# form.itemid = len(Inventory.objects.all()) + 1
 
 		if form.is_valid():
 			item = form.save(commit = False)
 
 			try:
-				cust = Customer.objects.get(acct = owner)
+				cust = Customer.objects.get(acct = owner.acct)
 				item.owner = cust
 
 				item.itemid = len(Inventory.objects.all()) + 1
@@ -169,7 +171,7 @@ def add_item (request, account_url):
 				item.status = 0
 
 				item.save()
-
+				
 				Operation.objects.get_or_create(item=item, start=datetime.today(),
 												finish=datetime.today(), labor_time=0,
 												op_code=0)
@@ -181,7 +183,7 @@ def add_item (request, account_url):
 
 			# return render_to_response('tracker/inventory.html', context_dict, context)
 			# return inventory(request)
-			return render_to_response('tracker/inventory.html', {"acct": owner})
+			return render_to_response('tracker/inventory.html', {"acct": owner.acct})
 		else:
 			print form.errors
 	else:
@@ -190,13 +192,6 @@ def add_item (request, account_url):
 	context_dict['form'] = form
 	context_dict['owner'] = owner
 	return render_to_response('tracker/add_item.html', context_dict, context)
-
-# def add_item(request, account_url):
-# 	if request.method == 'POST':
-# 		form = forms.ItemForm(request.POST)
-# 		if form.is_valid:
-# 			# Process data from form.cleaned_data
-# 			return HttpResponseRedirect('')
 
 
 def change_item_status(request):
@@ -259,6 +254,7 @@ def change_item_status(request):
 			# 		"labor_time": op.labor_time
 			# 	})
 		# return HttpResponse(dumps(op_list, indent=4), content_type='application/json')
+		return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
 	else:
 		message = """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g. /inventory?acct=#####)</a>."""

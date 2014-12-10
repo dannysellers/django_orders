@@ -82,10 +82,8 @@
 				{% endif %}
 			</tr>
 		</table>
-	{% endif %}
-
-	{% if customer %}
-		<br/><a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
+		<br/>
+		<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 		{% if storage_fees %}
 			| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>

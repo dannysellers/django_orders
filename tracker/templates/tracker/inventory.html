@@ -30,13 +30,16 @@
 	{% if messages %}
 		<ul class="message">
 		{% for message in messages %}
-			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
 		{% endfor %}
 		</ul>
 	{% endif %}
 
 	{% if storage_fees %}
-		<br/><br/>Daily storage fees as of today: ${{ storage_fees|length:"2" }}
+		{% if not messages %}
+			<br/><br/>
+		{% endif %}
+		Daily storage fees as of today: ${{ storage_fees|length:"2" }}
 	{% endif %}
 	{% if inventory_list %}
 		<br/><br/>
@@ -93,6 +96,7 @@
 				<option value="5">Shipped (4)</option>
 			</select>
 			Time elapsed (minutes): <input type="text" name="labor_time">
+{#			TODO: Make submit disabled if item's status is shipped#}
 			<input type="submit" name="submit" value="Change Status" />
 			</form>
 		{% endif %}
