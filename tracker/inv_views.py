@@ -72,6 +72,10 @@ def inventory(request):
 						inventory_list = inventory_list.filter(status=3)
 						_context += ' completed (not yet shipped)'
 					context_filter.append(_context)
+				elif status_filter == 'all':
+					context_dict['b_inactive'] = '_'
+					context_filter.append('All')
+					header_list.append('Departure')
 				else:
 					messages.add_message(request, messages.INFO, """I didn't recognize status filter '{}'.
 					You can use: <i>inducted</i>, <i>stored</i>, <i>order_received</i>, <i>order_begun,</i>
@@ -203,7 +207,7 @@ def change_item_status(request):
 	# TODO: Integrate this with individual item page
 	# TODO: Enforce only one copy of induction / shipment per item
 	# TODO: Enforce triplets of order received, started, done
-	context = RequestContext(request)
+	# context = RequestContext(request)
 	itemlist = []
 
 	""" Prepare itemlist for processing by db / parsing to json """
@@ -230,7 +234,7 @@ def change_item_status(request):
 
 	""" Assign new operation to each item """
 	if request.method == 'POST':
-		op_list = []
+		# op_list = []
 		for item in itemlist:
 			item.status = operation
 			td = datetime.today()
@@ -256,8 +260,7 @@ def change_item_status(request):
 		# return HttpResponse(dumps(op_list, indent=4), content_type='application/json')
 		return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
 	else:
-		message = """No request was passed.
-		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g. /inventory?acct=#####)</a>."""
+		messages.add_message(request, messages.ERROR, """No request was passed.
+		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g. /inventory?acct=#####)</a>.""")
 
-		# TODO: use messages framework to pass the above text
 		return HttpResponseRedirect('/inventory?status=stored')

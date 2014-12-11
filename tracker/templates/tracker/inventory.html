@@ -2,11 +2,11 @@
 {% load static %}
 
 {% block header %}
-{#	{% if item %}#}
-{#		<h1>Item {{ item.itemid }} &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>#}
+	{% if item %}
+		<h1>Item {{ item.itemid }} &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
 {#	{% elif customer %}#}
 {#		<h1>Inventory &#8212; {{ customer.name }} (#{{ customer.acct }})</h1>#}
-	{% if filter %}
+	{% elif filter %}
 		<h1>Inventory &#8212; {{ filter }} {% if count %}({{ count }}){% endif %}</h1>
 	{% else %}
 {#		This last one shouldn't ever appear, but is a fallback in case I mess something up #}
@@ -41,23 +41,40 @@
 		{% endif %}
 		Daily storage fees as of today: ${{ storage_fees|length:"2" }}
 	{% endif %}
-	{% if inventory_list %}
-		<br/><br/>
-		{% if customer %}
-			<form id="manage_inventory" method="post" action="/manage_items/">
-			{% csrf_token %}
-		{% endif %}
-		<table>
+
+	<br/><br/>
+
+	{% if customer %}
+		<form id="manage_inventory" method="post" action="/manage_items/">
+		{% csrf_token %}
+	{% elif item %}
+		<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
+		{% csrf_token %}
+	{% endif %}
+	<table>
+		<tr>
+{#			{% if customer %}#}
+{#				<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
+{#			{% endif %}#}
+{#			TODO: Enable checking all checkboxes #}
+{#			TODO: Enable sorting table by column #}
+			{% for item in headers %}
+				<th>{{ item }}</th>
+			{% endfor %}
+		</tr>
+		{% if item %}
 			<tr>
-{#				{% if customer %}#}
-{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
-{#				{% endif %}#}
-{#				TODO: Enable checking all checkboxes #}
-{#				TODO: Enable sorting table by column #}
-				{% for item in headers %}
-					<th>{{ item }}</th>
-				{% endfor %}
+				<td id="item_id">{{ item.itemid }}</td>
+				<td id="item_owner">
+					<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+				</td>
+				<td id="item_quantity">{{ item.quantity }}</td>
+				<td id="item_volume">{{ item.volume|length:"2" }}</td>
+				<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+				<td id="item_status">{{ item.status|op_code }}</td>
+				<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 			</tr>
+		{% elif inventory_list %}
 			{% for item in inventory_list %}
 				<tr>
 					{% if customer %}
@@ -80,87 +97,54 @@
 					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
 					{% if item.status == '4' %}
 						<td>{{ item.departure|date:"m-d-Y" }}</td>
-					{% elif 'All' in filter %}
+					{% elif b_inactive %}
 						<td class="inactive"></td>
 					{% endif %}
 				</tr>
 			{% endfor %}
-		</table>
-		{% if customer %}
-			<br/>
-			<select name="operation">
-				<option value="1">Inducted (0)</option>
-				<option value="2">Order Received (1)</option>
-				<option value="3">Order Begun (2)</option>
-				<option value="4">Order Completed (3)</option>
-				<option value="5">Shipped (4)</option>
-			</select>
-			Time elapsed (minutes): <input type="text" name="labor_time">
-{#			TODO: Make submit disabled if item's status is shipped#}
-			<input type="submit" name="submit" value="Change Status" />
-			</form>
 		{% endif %}
-
-	{% elif item %}
-		<br/><br/>
-		<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
-		{% csrf_token %}
-		<table>
-			<tr>
-				{% for item in headers %}
-					<th>{{ item }}</th>
-				{% endfor %}
-			</tr>
-			<tr>
-				<td id="item_id">{{ item.itemid }}</td>
-				<td id="item_owner">
-					<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
-				</td>
-				<td id="item_quantity">{{ item.quantity }}</td>
-				<td id="item_volume">{{ item.volume|length:"2" }}</td>
-				<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-				<td id="item_status">{{ item.status|op_code }}</td>
-				<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
-			</tr>
-		</table>
-
+	</table>
+	{% if op_list %}
 		<h2>Operation History</h2>
 		<table id="op_history">
 			<tr>
 				{% for item in op_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
-				{% for operation in op_list %}
-					<tr id="op_row">
-						<td id="op_id">{{ operation.id }}</td>
-						<td id="op_code">{{ operation.op_code|op_code }}</td>
-						<td id="op_start">{{ operation.start }}</td>
-						<td id="op_finish">{{ operation.finish }}</td>
-						<td id="op_labor_time">{{ operation.labor_time }}</td>
-{#						Field for additional expenses / notes? #}
-					</tr>
-				{% endfor %}
 			</tr>
+			{% for operation in op_list %}
+				<tr id="op_row">
+					<td id="op_id">{{ operation.id }}</td>
+					<td id="op_code">{{ operation.op_code|op_code }}</td>
+					<td id="op_start">{{ operation.start }}</td>
+					<td id="op_finish">{{ operation.finish }}</td>
+					<td id="op_labor_time">{{ operation.labor_time }}</td>
+{#					Field for additional expenses / notes?#}
+				</tr>
+			{% endfor %}
 		</table>
+	{% endif %}
+	{% if customer or item %}
 		<br/>
 		<select name="operation">
-			<option value="0">Inducted (0)</option>
-			<option value="1">Order Received (1)</option>
-			<option value="2">Order Begun (2)</option>
-			<option value="3">Order Completed (3)</option>
-			<option value="4">Shipped (4)</option>
+			<option value="1">Inducted (0)</option>
+			<option value="2">Order Received (1)</option>
+			<option value="3">Order Begun (2)</option>
+			<option value="4">Order Completed (3)</option>
+			<option value="5">Shipped (4)</option>
 		</select>
 		Time elapsed (minutes): <input type="text" name="labor_time">
+{#		TODO: Make submit disabled if item's status is shipped#}
 		<input type="submit" name="submit" value="Change Status" />
-		</form>
-	{% else %}
+	</form>
+	{% endif %}
+
+	{% if error_message %}
 		<p id="error_message">{{ error_message }}</p>
 	{% endif %}
 
-	{% if message %}
-		{{ message }}
-	{% endif %}
-
-
+{#	{% if message %}#}
+{#		{{ message }}#}
+{#	{% endif %}#}
 
 {% endblock %}
