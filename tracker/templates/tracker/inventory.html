@@ -1,6 +1,18 @@
 {% extends 'tracker/index.html' %}
 {% load static %}
 
+{% block title %}
+	<title>
+		{% if item %}
+			Item {{ item.itemid }} - {{ customer.name }}, #{{ customer.acct }}
+		{% elif filter %}
+			Inventory {{ filter }} {% if count %}({{ count }}){% endif %}
+		{% else %}
+			Inventory {% if count %}({{ count }}){% endif %}
+		{% endif %}
+	</title>
+{% endblock title %}
+
 {% block header %}
 	{% if item %}
 		<h1>Item {{ item.itemid }} &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
@@ -44,11 +56,11 @@
 
 	<br/><br/>
 
-	{% if customer %}
-		<form id="manage_inventory" method="post" action="/manage_items/">
-		{% csrf_token %}
-	{% elif item %}
+	{% if item %}
 		<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
+		{% csrf_token %}
+	{% elif customer %}
+		<form id="manage_inventory" method="post" action="/manage_items/">
 		{% csrf_token %}
 	{% endif %}
 	<table>
@@ -127,15 +139,18 @@
 	{% if customer or item %}
 		<br/>
 		<select name="operation">
-			<option value="1">Inducted (0)</option>
-			<option value="2">Order Received (1)</option>
-			<option value="3">Order Begun (2)</option>
-			<option value="4">Order Completed (3)</option>
-			<option value="5">Shipped (4)</option>
+			<option value="0">Inducted (0)</option>
+			<option value="1">Order Received (1)</option>
+			<option value="2">Order Begun (2)</option>
+			<option value="3">Order Completed (3)</option>
+			<option value="4">Shipped (4)</option>
 		</select>
 		Time elapsed (minutes): <input type="text" name="labor_time">
-{#		TODO: Make submit disabled if item's status is shipped#}
-		<input type="submit" name="submit" value="Change Status" />
+		{% if item.status != '4' %}
+			<input type="submit" name="submit" value="Change Status" />
+		{% else %}
+			<input type="submit" value="Change Status" disabled />
+		{% endif %}
 	</form>
 	{% endif %}
 

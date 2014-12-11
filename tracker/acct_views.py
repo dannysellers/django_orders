@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect, render
 # from django.core.urlresolvers import reverse

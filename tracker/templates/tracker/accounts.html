@@ -2,6 +2,16 @@
 {% load static %}
 {% load num_filters %}
 
+{% block title %}
+	<title>
+		{% if customer %}
+			Account #{{ customer.acct }} - {{ customer.name }}
+		{% else %}
+			Tracker - {{ head_text }} ({{ num_accts }})
+		{% endif %}
+	</title>
+{% endblock %}
+
 {% block header %}
 		{% if customer %}
 			<h1>{{ customer.name }} &#8212; #{{ customer.acct }}</h1>
