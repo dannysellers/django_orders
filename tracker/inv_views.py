@@ -1,9 +1,8 @@
-from datetime import date, datetime
-from json import dumps
+from datetime import date, datetime, timedelta
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect, render
+from django.shortcuts import render_to_response
 from django.contrib import messages
 from models import Customer, Inventory, Operation
 import utils
@@ -26,7 +25,6 @@ def inventory (request):
 
 	try:
 		if acct or status_filter or storage_fee_arg:
-			# TODO: Add visual confirmation of chained queries
 			context_filter = []
 			# TODO: Add gui method to chain queries
 			try:
@@ -210,7 +208,7 @@ def change_item_status (request):
 	# context = RequestContext(request)
 	itemlist = []
 
-	""" Prepare itemlist for processing by db / parsing to json """
+	""" Prepare itemlist for processing by db / parsing to json (maybe? eventually?) """
 	if request.GET.get('item'):  # individual item passed as URL param
 		_itemid = request.GET.get('item')
 		try:
@@ -239,10 +237,10 @@ def change_item_status (request):
 			item.status = operation
 			td = datetime.today()
 
-			# TODO: Doesn't handle adding minutes very well...
 			mins = labor_time % 60
 			hrs = int(labor_time / 60)
-			td2 = datetime(td.year, td.month, td.day, td.hour + hrs, (td.minute + mins) % 60, 0, 0)
+			# TODO: Should time elapsed add to now to calculate finish, or subtract from now for start?
+			td2 = td + timedelta(hours = hrs, minutes = mins)
 
 			o = Operation.objects.get_or_create(item = item, start = datetime.now(),
 												finish = td2, labor_time = labor_time,
@@ -250,7 +248,7 @@ def change_item_status (request):
 			item.save()
 
 		# for op in list(Operation.objects.all().filter(item = item)):
-		# 	op_list.append({
+		# op_list.append({
 		# 			"op_id": op.id,
 		# 			"op_code": op.op_code,
 		# 			"start": op.start,
@@ -258,7 +256,7 @@ def change_item_status (request):
 		# 			"labor_time": op.labor_time
 		# 		})
 		# return HttpResponse(dumps(op_list, indent=4), content_type='application/json')
-		return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
+			return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
 	else:
 		messages.add_message(request, messages.ERROR, """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.

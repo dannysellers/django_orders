@@ -113,8 +113,6 @@ def accounts (request):
 			else:
 				context_dict['account_status'] = str(customer.status)
 
-			# TODO: How to use enumerated choices?
-
 		context_dict['customer_list'] = customer_list
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
@@ -175,7 +173,6 @@ def add_account (request):
 
 		if form.is_valid():
 			form.save(commit = True)
-			# print("Acct added: {} -- {}".format(form.acct, form.name))
 
 			return accounts(request)
 		else:

@@ -17,7 +17,7 @@ add confirmation / warning on remove acct with stored inventory
 
 totals row for (customer-specific) inventory tables
 
-Reports: (reportlab.com)
+Reports: (reportlab.com / sphinx-doc.org)
 Items stored per customer
 Items stored over time (w/storage fees)
 Items processed over time (and per customer)
