@@ -84,7 +84,6 @@ def accounts (request):
 					context_dict['head_text'] = 'Active '
 
 				context_dict['head_text'] += 'accounts'
-				context_dict['num_accts'] = len(customer_list)
 
 			except Customer.DoesNotExist:
 				messages.add_message(request, messages.WARNING, "No accounts found.")
@@ -93,6 +92,7 @@ def accounts (request):
 		else:
 			try:
 				customer_list = Customer.objects.order_by('acct').filter(status__iexact = 1)
+				context_dict['head_text'] = 'Active'
 
 			except Customer.DoesNotExist:
 				messages.add_message(request, messages.WARNING, "No accounts found.")
@@ -100,6 +100,7 @@ def accounts (request):
 
 		# Prepare data for template
 		context_dict['headers'] = header_list
+		context_dict['num_accts'] = len(customer_list)
 
 		# Replace spaces with underscores to retrieve URL
 		for customer in customer_list:
@@ -172,16 +173,23 @@ def add_account (request):
 		form = forms.CustomerForm(request.POST)
 
 		if form.is_valid():
-			form.save(commit = True)
+			customer = form.save(commit = False)
 
-			return accounts(request)
+			customer.status = 1
+			customer.createdate = date.today()
+			customer.closedate = date.today()
+
+			customer.save()
+
+			return HttpResponseRedirect('/accounts?accts=active')
 		else:
 			print form.errors
 	else:
 		form = forms.CustomerForm()
 
 	context_dict['form'] = form
-	return render_to_response('tracker/add_account.html', context_dict, context)
+	context_dict['customer'] = '_'  # template flag
+	return render_to_response('tracker/form.html', context_dict, context)
 
 
 def remove_account (account_num):

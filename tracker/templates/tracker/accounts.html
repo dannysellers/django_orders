@@ -65,6 +65,7 @@
 						{% if status_column %}
 							<td id="status_cell">{{ customer.status }}</td>
 						{% endif %}
+{#						TODO: Fix sorting, which uses month name#}
 						<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
 						{% if 'Active' not in filter %}
 							{% if customer.status == "0" %}

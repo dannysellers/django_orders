@@ -16,7 +16,7 @@
 	{% else %}
         <form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
 	{% endif %}
-
+		<br/>
         {% csrf_token %}
         {% for hidden in form.hidden_field %}
             {{ hidden }}

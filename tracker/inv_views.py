@@ -178,14 +178,12 @@ def add_item (request, account_url):
 												finish = datetime.today(), labor_time = 0,
 												op_code = 0)
 
+				return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
+
 			except Customer.DoesNotExist:
 				return render_to_response('tracker/add_customer.html',
 										  context_dict,
 										  context)
-
-			# return render_to_response('tracker/inventory.html', context_dict, context)
-			# return inventory(request)
-			return render_to_response('tracker/inventory.html', {"acct": owner.acct})
 		else:
 			print form.errors
 	else:
@@ -193,7 +191,7 @@ def add_item (request, account_url):
 
 	context_dict['form'] = form
 	context_dict['owner'] = owner
-	return render_to_response('tracker/add_item.html', context_dict, context)
+	return render_to_response('tracker/form.html', context_dict, context)
 
 
 def change_item_status (request):

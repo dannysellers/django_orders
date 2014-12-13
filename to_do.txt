@@ -9,8 +9,6 @@ Any reason to have both /account/ page and /inventory/ page per customer? (view 
 	
 form / page to edit customer information
 
-tables sort by value
-
 filter individual customer's items by status
 
 add confirmation / warning on remove acct with stored inventory

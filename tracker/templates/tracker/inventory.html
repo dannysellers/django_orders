@@ -37,6 +37,7 @@
 	{% if customer %}
 		<br/><a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
 		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
+		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 	{% endif %}
 
 	{% if messages %}
@@ -54,9 +55,9 @@
 		Daily storage fees as of today: ${{ storage_fees|length:"2" }}
 	{% endif %}
 
-	<br/><br/>
 
 	{% if item %}
+		<br/><br/>
 		<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
 		{% csrf_token %}
 	{% elif customer %}
@@ -143,7 +144,7 @@
 			</tbody>
 		</table>
 	{% endif %}
-	{% if customer or item %}
+	{% if item %}
 		<br/>
 		<select name="operation">
 			<option value="0">Inducted (0)</option>
