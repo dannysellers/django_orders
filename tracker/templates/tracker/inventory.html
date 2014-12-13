@@ -64,76 +64,83 @@
 		{% csrf_token %}
 	{% endif %}
 	<table>
-		<tr>
-{#			{% if customer %}#}
-{#				<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
-{#			{% endif %}#}
-{#			TODO: Enable checking all checkboxes #}
-{#			TODO: Enable sorting table by column #}
-			{% for item in headers %}
-				<th>{{ item }}</th>
-			{% endfor %}
-		</tr>
-		{% if item %}
+		<thead>
 			<tr>
-				<td id="item_id">{{ item.itemid }}</td>
-				<td id="item_owner">
-					<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
-				</td>
-				<td id="item_quantity">{{ item.quantity }}</td>
-				<td id="item_volume">{{ item.volume|length:"2" }}</td>
-				<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-				<td id="item_status">{{ item.status|op_code }}</td>
-				<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+{#				{% if customer %}#}
+{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
+{#				{% endif %}#}
+{#				TODO: Enable checking all checkboxes #}
+				{% for item in headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
 			</tr>
-		{% elif inventory_list %}
-			{% for item in inventory_list %}
+		</thead>
+		<tbody>
+			{% if item %}
 				<tr>
-					{% if customer %}
-						<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
-					{% endif %}
-					<td id="item_id">
-						<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-					</td>
+					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_owner">
 						<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
 					</td>
 					<td id="item_quantity">{{ item.quantity }}</td>
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
-					{% if not item.status == '4' %}
-						<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-					{% else %}
-						<td class="inactive"></td>
-					{% endif %}
+					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 					<td id="item_status">{{ item.status|op_code }}</td>
 					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
-					{% if item.status == '4' %}
-						<td>{{ item.departure|date:"m-d-Y" }}</td>
-					{% elif b_inactive %}
-						<td class="inactive"></td>
-					{% endif %}
 				</tr>
-			{% endfor %}
-		{% endif %}
+			{% elif inventory_list %}
+				{% for item in inventory_list %}
+					<tr>
+						{% if customer %}
+							<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
+						{% endif %}
+						<td id="item_id">
+							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+						</td>
+						<td id="item_owner">
+							<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+						</td>
+						<td id="item_quantity">{{ item.quantity }}</td>
+						<td id="item_volume">{{ item.volume|length:"2" }}</td>
+						{% if not item.status == '4' %}
+							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+						{% else %}
+							<td class="inactive"></td>
+						{% endif %}
+						<td id="item_status">{{ item.status|op_code }}</td>
+						<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+						{% if item.status == '4' %}
+							<td>{{ item.departure|date:"m-d-Y" }}</td>
+						{% elif b_inactive %}
+							<td class="inactive"></td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+			{% endif %}
+		</tbody>
 	</table>
 	{% if op_list %}
 		<h2>Operation History</h2>
 		<table id="op_history">
-			<tr>
-				{% for item in op_headers %}
-					<th>{{ item }}</th>
-				{% endfor %}
-			</tr>
-			{% for operation in op_list %}
-				<tr id="op_row">
-					<td id="op_id">{{ operation.id }}</td>
-					<td id="op_code">{{ operation.op_code|op_code }}</td>
-					<td id="op_start">{{ operation.start }}</td>
-					<td id="op_finish">{{ operation.finish }}</td>
-					<td id="op_labor_time">{{ operation.labor_time }}</td>
-{#					Field for additional expenses / notes?#}
+			<thead>
+				<tr>
+					{% for item in op_headers %}
+						<th>{{ item }}</th>
+					{% endfor %}
 				</tr>
-			{% endfor %}
+			</thead>
+			<tbody>
+				{% for operation in op_list %}
+					<tr id="op_row">
+						<td id="op_id">{{ operation.id }}</td>
+						<td id="op_code">{{ operation.op_code|op_code }}</td>
+						<td id="op_start">{{ operation.start }}</td>
+						<td id="op_finish">{{ operation.finish }}</td>
+						<td id="op_labor_time">{{ operation.labor_time }}</td>
+	{#					Field for additional expenses / notes?#}
+					</tr>
+				{% endfor %}
+			</tbody>
 		</table>
 	{% endif %}
 	{% if customer or item %}

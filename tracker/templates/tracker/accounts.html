@@ -50,47 +50,55 @@
 
 	{% if customer_list %}
 		<table>
-			<tr>
-				{% for item in headers %}
-					<th>{{ item }}</th>
+			<thead>
+				<tr>
+					{% for item in headers %}
+						<th>{{ item }}</th>
+					{% endfor %}
+				</tr>
+			</thead>
+			<tbody>
+				{% for customer in customer_list %}
+					<tr>
+						<td id="account_cell"><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
+						<td id="name_cell">{{ customer.name }}</td>
+						{% if status_column %}
+							<td id="status_cell">{{ customer.status }}</td>
+						{% endif %}
+						<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
+						{% if 'Active' not in filter %}
+							{% if customer.status == "0" %}
+								<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
+							{% else %}
+								<td class="inactive"></td>
+							{% endif %}
+						{% endif %}
+					</tr>
 				{% endfor %}
-			</tr>
-		{% for customer in customer_list %}
-			<tr>
-				<td id="account_cell"><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
-				<td id="name_cell">{{ customer.name }}</td>
-				{% if status_column %}
-					<td id="status_cell">{{ customer.status }}</td>
-				{% endif %}
-				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-				{% if 'Active' not in filter %}
-					{% if customer.status == "0" %}
-						<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
-					{% else %}
-						<td class="inactive"></td>
-					{% endif %}
-				{% endif %}
-			</tr>
-		{% endfor %}
+			</tbody>
 		</table>
 
 	{% elif customer %}
 		<table>
-			<tr>
-				{% for item in headers %}
-					<th>{{ item }}</th>
-				{% endfor item %}
-			</tr>
-			<tr>
-				<td id="account_cell">{{ customer.acct }}</td>
-				<td id="name_cell">{{ customer.name }}</td>
-				<td id="email_cell">{{ customer.email }}</td>
-				<td id="status_cell">{{ account_status }}</td>
-				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-				{% if customer.status == '0' %}
-					<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
-				{% endif %}
-			</tr>
+			<thead>
+				<tr>
+					{% for item in headers %}
+						<th>{{ item }}</th>
+					{% endfor item %}
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td id="account_cell">{{ customer.acct }}</td>
+					<td id="name_cell">{{ customer.name }}</td>
+					<td id="email_cell">{{ customer.email }}</td>
+					<td id="status_cell">{{ account_status }}</td>
+					<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
+					{% if customer.status == '0' %}
+						<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
+					{% endif %}
+				</tr>
+			</tbody>
 		</table>
 		<br/>
 		<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
@@ -102,25 +110,29 @@
 		{% endif %}
 
 		<br/><table>
-			<tr>
-				{% for item in inv_headers %}
-					<th>{{ item }}</th>
-				{% endfor %}
-			</tr>
-			{% if inventory_list %}
-				{% for item in inventory_list %}
-					<tr>
-						<td id="item_id">
-							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-						</td>
-						<td id="item_quantity">{{ item.quantity }}</td>
-						<td id="item_volume">{{ item.volume|length:"2" }}</td>
-						<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-						<td id="item_status">{{ item.status|op_code }}</td>
-						<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
-					</tr>
-				{% endfor %}
-			{% endif %}
+			<thead>
+				<tr>
+					{% for item in inv_headers %}
+						<th>{{ item }}</th>
+					{% endfor %}
+				</tr>
+			</thead>
+			<tbody>
+				{% if inventory_list %}
+					{% for item in inventory_list %}
+						<tr>
+							<td id="item_id">
+								<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+							</td>
+							<td id="item_quantity">{{ item.quantity }}</td>
+							<td id="item_volume">{{ item.volume|length:"2" }}</td>
+							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+							<td id="item_status">{{ item.status|op_code }}</td>
+							<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</tbody>
 		</table>
 
 		{% if error_message %}
