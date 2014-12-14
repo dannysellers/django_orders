@@ -1,0 +1,32 @@
+{% extends 'tracker/index.html' %}
+{% load static %}
+
+{% block title %}
+	<title>
+		Register New User
+	</title>
+{% endblock title %}
+
+{% block header %}
+	<h1>Register New User</h1>
+{% endblock header %}
+
+{% block content %}
+
+	{% if registered %}
+		Thank you for registering.
+		<a href="/">Return to homepage</a><br />
+	{% else %}
+		Create a new user.
+
+		<form id="user_form" method="post" action="/register/" enctype="multipart/form-data">
+			{% csrf_token %}
+
+			{{ user_form.as_p }}
+
+			<input type="submit" name="submit" value="Register" />
+		</form>
+
+	{% endif %}
+
+{% endblock content %}

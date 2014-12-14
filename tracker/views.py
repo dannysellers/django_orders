@@ -1,7 +1,10 @@
 # from django.http import HttpResponse
+from datetime import date
+
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from datetime import date
+from forms import UserForm
+
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from models import Customer, Inventory
@@ -18,7 +21,7 @@ def index (request):
 
 	storage_fee_count = 0
 	no_storage_fee_count = 0
-	for item in Inventory.objects.all().exclude(status=4):
+	for item in Inventory.objects.all().exclude(status = 4):
 		if abs((item.arrival - date.today()).days) >= 7:
 			storage_fee_count += 1
 		else:
@@ -34,3 +37,31 @@ def about (request):
 	context_dict = {'name': 'About'}
 
 	return render_to_response('tracker/about.html', context_dict, context)
+
+
+def register (request):
+	context = RequestContext(request)
+	context_dict = {}
+
+	# Flag for template
+	registered = False
+
+	if request.method == 'POST':
+		user_form = UserForm(data = request.POST)
+
+		if user_form.is_valid():
+			user = user_form.save()
+
+			user.set_password(user.password)
+			user.save()
+
+			registered = True
+		else:
+			print user_form.errors
+	else:
+		user_form = UserForm()
+
+	context_dict['user_form'] = user_form
+	context_dict['registered'] = registered
+
+	return render_to_response('tracker/register.html', context_dict, context)

@@ -2,7 +2,18 @@ import csv
 from random import randrange, randint, random
 from datetime import date, datetime
 from calendar import monthrange
+
 import os
+
+
+td = date.today()
+
+
+def rand_date():
+	_year = td.year
+	_month = randint(1, 12)
+	_day = randint(1, monthrange(_year, _month)[1])
+	return date(_year, _month, _day)
 
 
 def load_names (filename, numnames):
@@ -32,10 +43,10 @@ def load_names (filename, numnames):
 
 
 def add_customer (name, acct, email, status):
-	createdate = date(2014, randint(1, date.today().month), randint(1, date.today().day))
+	createdate = rand_date()
 	c = Customer.objects.get_or_create(name = name, acct = acct, email = email,
 									   status = status, createdate = createdate,
-									   closedate = str(date.today()))[0]
+									   closedate = td)[0]
 	""" get_or_create returns (object, created)	"""
 	return c
 
@@ -43,29 +54,34 @@ def add_customer (name, acct, email, status):
 def add_item (owner, itemid, quantity, length, width, height, status):
 	volume = length * width * height
 	storage_fees = quantity * (float(volume) * 0.05)
-	arrival = date(2014, randint(1, date.today().month), randint(1, date.today().day))
+
+	arrival = rand_date()
 	i = Inventory.objects.get_or_create(owner = owner, itemid = itemid, quantity = quantity,
 										length = length, width = width, height = height, volume = volume,
-										arrival = arrival, departure = str(date.today()),
+										arrival = arrival, departure = td,
 										storage_fees = storage_fees, status = status)[0]
 	return i
 
 
 def add_op (item, op_code):
-	# TODO: make operations only occur in sequence chronologicaly?
 	# Enforcing sequentiality of operations may not be necessary, as
 	# in practice, they will only be created in sequence
-	_month = date.today().month
 	imonth = item.arrival.month
 	iday = item.arrival.day
 
-	start = datetime(2014, randint(imonth, _month),
-					 randint(iday, monthrange(2014, _month)[1]), hour = randint(9, 17),
-					 minute = randint(0, 59), second = randint(0, 59))
+	try:
+		start = datetime(td.year, randint(imonth, td.month),
+						 randint(iday, monthrange(td.year, td.month)[1]), hour = randint(9, 17),
+						 minute = randint(0, 59), second = randint(0, 59))
+	except ValueError, e:
+		print e
 
-	finish = datetime(2014, randint(start.month, _month),
-					  randint(start.day, monthrange(2014, _month)[1]), hour = randint(9, 17),
-					  minute = randint(0, 59), second = randint(0, 59))
+	try:
+		finish = datetime(td.year, randint(start.month, td.month),
+						  randint(start.day, monthrange(td.year, td.month)[1]), hour = randint(9, 17),
+						  minute = randint(0, 59), second = randint(0, 59))
+	except ValueError, e:
+		print e
 
 	""" The labor time expended isn't necessarily equal to the difference between start and
 	finish datetimes, as there could be a delay in reporting. """
@@ -94,7 +110,7 @@ def populate (namelist):
 	print("{} customers added to db.".format(len(customerlist)))
 
 
-def populate_items (numitems, numops):
+def populate_items (numitems):
 	customerlist = Customer.objects.all()
 	if not customerlist:
 		_namelist = raw_input('No customers found. Add how many?:\t')
@@ -112,7 +128,7 @@ def populate_items (numitems, numops):
 			status = randint(0, 4)
 			item = add_item(owner = customer, itemid = itemid, quantity = quantity,
 							status = status, length = length, width = width, height = height)
-			for j in range(status):
+			for j in range(status + 1):
 				add_op(item, j)
 			itemcount += 1
 	print("{} items added to db.".format(itemcount))
@@ -127,9 +143,7 @@ if __name__ == '__main__':
 	_namelist = raw_input('CSV of names to load? (default names.csv):\t\t')
 	_numnames = raw_input('Number of customers to add (default 30)?:\t')
 	_numitems = raw_input('Max number of items to add per customer (default 7)?:\t')
-	_numops = raw_input('Max number of operations per item (default 5)?:\t')
 	# assert isinstance(_numitems, int)
-	# assert isinstance(_numops, int)
 
 	if not _namelist:
 		_namelist = 'names.csv'
@@ -139,6 +153,4 @@ if __name__ == '__main__':
 
 	if not _numitems:
 		_numitems = 7
-	if not _numops:
-		_numops = 5
-	populate_items(_numitems, _numops)
+	populate_items(_numitems)
