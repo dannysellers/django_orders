@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect, render
-# from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from datetime import date
@@ -192,6 +192,7 @@ def add_account (request):
 	return render_to_response('tracker/form.html', context_dict, context)
 
 
+@login_required
 def remove_account (account_num):
 	print("remove_account(): {}".format(account_num))
 

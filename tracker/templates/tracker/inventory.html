@@ -55,14 +55,15 @@
 		Daily storage fees as of today: ${{ storage_fees|length:"2" }}
 	{% endif %}
 
-
-	{% if item %}
-		<br/><br/>
-		<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
-		{% csrf_token %}
-	{% elif customer %}
-		<form id="manage_inventory" method="post" action="/manage_items/">
-		{% csrf_token %}
+	{% if user.is_authenticated %}
+		{% if item %}
+			<br/><br/>
+			<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
+			{% csrf_token %}
+		{% elif customer %}
+			<form id="manage_inventory" method="post" action="/manage_items/">
+			{% csrf_token %}
+		{% endif %}
 	{% endif %}
 	<table>
 		<thead>
@@ -71,6 +72,10 @@
 {#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
 {#				{% endif %}#}
 {#				TODO: Enable checking all checkboxes #}
+				{% if user.is_authenticated %}
+{#					Add checkbox for selection if logged in#}
+					<th></th>
+				{% endif %}
 				{% for item in headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
@@ -92,8 +97,10 @@
 			{% elif inventory_list %}
 				{% for item in inventory_list %}
 					<tr>
-						{% if customer %}
-							<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
+						{% if user.is_authenticated %}
+							{% if customer %}
+								<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
+							{% endif %}
 						{% endif %}
 						<td id="item_id">
 							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
@@ -144,22 +151,24 @@
 			</tbody>
 		</table>
 	{% endif %}
-	{% if item %}
-		<br/>
-		<select name="operation">
-			<option value="0">Inducted (0)</option>
-			<option value="1">Order Received (1)</option>
-			<option value="2">Order Begun (2)</option>
-			<option value="3">Order Completed (3)</option>
-			<option value="4">Shipped (4)</option>
-		</select>
-		Time elapsed (minutes): <input type="text" name="labor_time">
-		{% if item.status != '4' %}
-			<input type="submit" name="submit" value="Change Status" />
-		{% else %}
-			<input type="submit" value="Change Status" disabled />
+	{% if user.is_authenticated %}
+		{% if item or customer %}
+			<br/>
+			<select name="operation">
+				<option value="0">Inducted (0)</option>
+				<option value="1">Order Received (1)</option>
+				<option value="2">Order Begun (2)</option>
+				<option value="3">Order Completed (3)</option>
+				<option value="4">Shipped (4)</option>
+			</select>
+			Time elapsed (minutes): <input type="text" name="labor_time">
+			{% if item.status != '4' %}
+				<input type="submit" name="submit" value="Change Status" />
+			{% else %}
+				<input type="submit" value="Change Status" disabled />
+			{% endif %}
+		</form>
 		{% endif %}
-	</form>
 	{% endif %}
 
 	{% if error_message %}

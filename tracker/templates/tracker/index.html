@@ -22,12 +22,32 @@
 			| <a href="/about">About</a>
 			| <a href="/accounts?accts=active">Accounts</a>
 			| <a href="/inventory?status=stored">Inventory</a>
-			| <a href="/register/">Register user</a>
+			| | <a href="/register/">Register user</a>
+			{% if not user.is_authenticated %}
+				| <a href="/login/">Log in</a>
+			{% else %}
+				| <a href="/logout/">Log out</a>
+			{% endif %}
 		</nav>
 
 	{% block content %}
+		<h3>
+		{% if user.is_authenticated %}
+			Hello {{ user.username }}.
+		{% else %}
+			Hello anonymous user.
+		{% endif %}
+		</h3>
 
-		<br/>
+		{% if messages %}
+			<ul class="message">
+				{% for message in messages %}
+					<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+
+{#		<br/>#}
 		Active customers: {{ cust_act_count }}<br />
 		Total customers: {{ cust_count }}<br />
 		Items currently in storage: {{ item_count }}<br />

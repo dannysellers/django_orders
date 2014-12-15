@@ -18,7 +18,6 @@ def inventory (request):
 	status_filter = request.GET.get('status')
 	storage_fee_arg = request.GET.get('storage_fees')
 	item = request.GET.get('item')
-	add = request.GET.get('add')
 
 	header_list = ['ID', 'Owner', '# of Cartons', 'Total Volume (ft.^3)',
 				   'Storage Fees', 'Status', 'Arrival']
@@ -45,7 +44,6 @@ def inventory (request):
 
 					_date = date.today()
 					context_dict['date'] = _date
-					header_list.insert(0, ' ')
 
 				except Customer.DoesNotExist:
 					context_dict['error_message'] = "Sorry, I couldn't find account {}.".format(acct)

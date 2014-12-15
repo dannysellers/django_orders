@@ -31,10 +31,8 @@
 	| <a href="/accounts?accts=active">Active accounts</a>
 	| <a href="/accounts?accts=inactive">Inactive accounts</a>
 	| <a href="/add_account">Add new account</a>
-	{% if customer %}
-		{% if account_status == 'Active' %}
-			| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
-		{% endif %}
+	{% if user.is_authenticated and customer and account_status == 'Active' %}
+		| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
 	{% endif %}
 
 	{% if messages %}

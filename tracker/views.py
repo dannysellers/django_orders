@@ -1,5 +1,9 @@
-# from django.http import HttpResponse
 from datetime import date
+
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -56,6 +60,7 @@ def register (request):
 			user.save()
 
 			registered = True
+		# Redirection?
 		else:
 			print user_form.errors
 	else:
@@ -65,3 +70,45 @@ def register (request):
 	context_dict['registered'] = registered
 
 	return render_to_response('tracker/register.html', context_dict, context)
+
+
+def user_login (request):
+	context = RequestContext(request)
+
+	if request.method == 'POST':
+		# Login info is provided by the form
+		username = request.POST['username']
+		password = request.POST['password']
+
+		# Use Django's built-in authentication function
+		user = authenticate(username = username, password = password)
+
+		# If no user is returned, login was unsuccessful
+		if user:
+			# User could have been deactivated
+			if user.is_active:
+				# If the user is valid and active, log in and redirect to index
+				# login() is built in
+				# login(request, user)
+				login(request, user)
+				messages.add_message(request, messages.SUCCESS, "Login successful. Welcome {}".format(user))
+				return HttpResponseRedirect('/')
+			else:
+				messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")
+				return HttpResponseRedirect('/')
+
+		else:
+			messages.add_message(request, messages.ERROR, "Invalid login details: {0}, {1}".format(username, password))
+			return HttpResponseRedirect('/')
+
+	# If not a POST, display login form
+	else:
+		return render_to_response('tracker/login.html', {}, context)
+
+
+@login_required
+def user_logout (request):
+	logout(request)
+
+	messages.add_message(request, messages.SUCCESS, "Logged out successfully.")
+	return HttpResponseRedirect('/')

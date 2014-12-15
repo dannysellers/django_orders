@@ -41,9 +41,9 @@ class InventoryForm(forms.ModelForm):
 # 		model = models.Inventory
 
 class UserForm(forms.ModelForm):
-	username = forms.CharField(help_text="Username: ")
-	email = forms.CharField(help_text="Email address: ")
-	password = forms.CharField(widget = forms.PasswordInput(), help_text="Password :")
+	username = forms.CharField()
+	email = forms.CharField()
+	password = forms.CharField(widget = forms.PasswordInput())
 
 	class Meta:
 		model = User
