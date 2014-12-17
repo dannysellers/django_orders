@@ -17,6 +17,13 @@
 		{% block header %}
 			<h1>Order / Inventory Tracker</h1>
 		{% endblock header %}
+		<h3 id="user_greeting">
+		{% if user.is_authenticated %}
+			Hello {{ user.username }}.
+		{% else %}
+			Hello anonymous user.
+		{% endif %}
+		</h3>
 		<nav>
 			<a href="/">Home</a>
 			| <a href="/about">About</a>
@@ -31,13 +38,13 @@
 		</nav>
 
 	{% block content %}
-		<h3>
-		{% if user.is_authenticated %}
-			Hello {{ user.username }}.
-		{% else %}
-			Hello anonymous user.
-		{% endif %}
-		</h3>
+{#		<h3 id="user_greeting">#}
+{#		{% if user.is_authenticated %}#}
+{#			Hello {{ user.username }}.#}
+{#		{% else %}#}
+{#			Hello anonymous user.#}
+{#		{% endif %}#}
+{#		</h3>#}
 
 		{% if messages %}
 			<ul class="message">

@@ -68,13 +68,13 @@
 	<table>
 		<thead>
 			<tr>
-{#				{% if customer %}#}
-{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
-{#				{% endif %}#}
 {#				TODO: Enable checking all checkboxes #}
-				{% if user.is_authenticated %}
-{#					Add checkbox for selection if logged in#}
+				{% if user.is_authenticated and customer %}
+{#					Adds checkbox for selection if logged in#}
 					<th></th>
+	{#				{% if customer %}#}
+	{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
+	{#				{% endif %}#}
 				{% endif %}
 				{% for item in headers %}
 					<th>{{ item }}</th>

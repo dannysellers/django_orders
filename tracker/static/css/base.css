@@ -42,3 +42,8 @@ table tr:nth-child(odd) {
 .inactive {
 	background-color: #cdcdcd;
 }
+#user_greeting {
+	position: fixed;
+	right: 10rem;
+	top: 2rem;
+}
