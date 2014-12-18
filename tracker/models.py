@@ -1,17 +1,18 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 CUSTOMER_STATUS_CODES = (
-('0', 'inactive'),
-('1', 'active'),
+	('0', 'inactive'),
+	('1', 'active'),
 )
 
 INVENTORY_STATUS_CODES = (
-('0', 'inducted'),
-('1', 'order_received'),
-('2', 'order_begun'),
-('3', 'order_completed'),
-('4', 'shipped'),
+	('0', 'inducted'),
+	('1', 'order_received'),
+	('2', 'order_begun'),
+	('3', 'order_completed'),
+	('4', 'shipped'),
 )
 
 
@@ -36,10 +37,6 @@ class Inventory(models.Model):
 	height = models.FloatField(default = 1.00, max_length = 5)
 	volume = models.FloatField(default = 1.00, max_length = 5)
 	palletized = models.BooleanField(default = False)
-	# palletweight = models.IntegerField(default=0)
-	# This may not be the best implementation (necessary?),
-	# cause each item does not have its own pallet / tracking
-	# pallets is silly
 	arrival = models.DateField()
 	departure = models.DateField()
 	status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
@@ -51,23 +48,44 @@ class Inventory(models.Model):
 	class Meta:
 		verbose_name_plural = 'inventory'
 
-	# TODO: add __str__ method?
+
+class BaseOperation(models.Model):
+	item = models.ForeignKey(Inventory, primary_key = True)
+	user = models.ForeignKey(User)
+
+	class Meta:
+		abstract = True
 
 
-class Operation(models.Model):
+class Operation(BaseOperation):
 	# TODO: Add way to distinguish types of operations
-	# TODO: Settle list of types of ops
 	# TODO: Make sure operations are sequential & non-overlapping
-	item = models.ForeignKey(Inventory)
-	start = models.DateTimeField()
-	finish = models.DateTimeField()  # used for reporting
-	labor_time = models.IntegerField()  # used for billing
+	dt = models.DateTimeField()
 	op_code = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
-	# Each operation includes a status code (preliminarily the same as the inventory codes)
-	# indicating what was done during that work period. The list will likely change as billing
-	# becomes more granular
 
 	def __unicode__ (self):
 		return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
 
 
+class Shipment(BaseOperation):
+	"""	Each Inventory object has multiple Operations and one Shipment. Shipments extend
+	the Operation base class and include billing information (labor time,
+	additional costs, et cetera). """
+
+	start = models.DateTimeField()
+	finish = models.DateTimeField()
+	labor_time = models.IntegerField()
+
+	def __unicode__(self):
+		return 'Shipment {}, Item {}'.format(self.id, self.item.itemid)
+
+
+class OptExtras(models.Model):
+	shipment = models.ForeignKey(Shipment)
+	quantity = models.IntegerField(default = 1)
+	unit_cost = models.FloatField()
+	description = models.TextField()
+	# Enable choice of preselected options, or creation of new type
+
+	def __unicode__(self):
+		return '{}x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
