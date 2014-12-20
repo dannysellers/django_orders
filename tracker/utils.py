@@ -1,4 +1,4 @@
-from models import Customer, Inventory
+from models import Customer, Inventory, INVENTORY_STATUS_CODES, CUSTOMER_STATUS_CODES
 from datetime import date
 from django.db.models.query import QuerySet
 
@@ -17,7 +17,7 @@ def int_to_status_code(cls, code):
 			raise TypeError('Status code not recognized')
 	elif cls == 'Inventory':
 		if code == 0:
-			return 'Inventory received'
+			return 'Inducted'
 		elif code == 1:
 			return 'Order received'
 		elif code == 2:

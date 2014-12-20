@@ -1,5 +1,5 @@
 body {
-	width: 85%;
+	width: 75%;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	padding-left: 1em;
 	/*background-color : #95a5a6;*/
@@ -18,7 +18,7 @@ ul.errorlist {
 }
 table {
 	border: 1px solid gray;
-	width: 85%;
+	width: 75%;
 }
 th {
 	color: #ffffff;

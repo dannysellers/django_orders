@@ -69,8 +69,9 @@
 		<thead>
 			<tr>
 {#				TODO: Enable checking all checkboxes #}
-				{% if user.is_authenticated and customer %}
-{#					Adds checkbox for selection if logged in#}
+				{% if user.is_authenticated and customer and inventory_list %}
+{#					Adds checkbox for selection if logged in and looking at multiple items #}
+{#					that belong to the same customer #}
 					<th></th>
 	{#				{% if customer %}#}
 	{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
@@ -142,9 +143,8 @@
 					<tr id="op_row">
 						<td id="op_id">{{ operation.id }}</td>
 						<td id="op_code">{{ operation.op_code|op_code }}</td>
-						<td id="op_start">{{ operation.start }}</td>
-						<td id="op_finish">{{ operation.finish }}</td>
-						<td id="op_labor_time">{{ operation.labor_time }}</td>
+						<td id="op_time">{{ operation.dt }}</td>
+						<td id="op_actor">{{ operation.user }}</td>
 	{#					Field for additional expenses / notes?#}
 					</tr>
 				{% endfor %}
@@ -157,11 +157,11 @@
 			<select name="operation">
 				<option value="0">Inducted (0)</option>
 				<option value="1">Order Received (1)</option>
-				<option value="2">Order Begun (2)</option>
+				<option value="2">Order Started (2)</option>
 				<option value="3">Order Completed (3)</option>
 				<option value="4">Shipped (4)</option>
 			</select>
-			Time elapsed (minutes): <input type="text" name="labor_time">
+{#			Time elapsed (minutes): <input type="text" name="labor_time">#}
 			{% if item.status != '4' %}
 				<input type="submit" name="submit" value="Change Status" />
 			{% else %}

@@ -1,10 +1,11 @@
 from datetime import date, datetime, timedelta
 
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import messages
-from models import Customer, Inventory, Operation
+from models import Customer, Inventory, Operation, User
 import utils
 import forms
 
@@ -112,7 +113,7 @@ def inventory (request):
 			customer = Customer.objects.get(acct = _item.owner.acct)
 			context_dict['customer'] = customer
 
-			op_headers = ['Op ID', 'Op Code', 'Start', 'Finish', 'Labor Time (mins)']
+			op_headers = ['Op ID', 'Op Code', 'Time', 'User']
 			context_dict['op_headers'] = op_headers
 			context_dict['op_list'] = Operation.objects.all().filter(item = _item)
 
@@ -139,6 +140,7 @@ def inventory (request):
 	return render_to_response('tracker/inventory.html', context_dict, context)
 
 
+@login_required
 def add_item (request, account_url):
 	"""
 	Form to add item. Intended behavior: Either receive account # within
@@ -172,9 +174,7 @@ def add_item (request, account_url):
 
 				item.save()
 
-				Operation.objects.get_or_create(item = item, start = datetime.today(),
-												finish = datetime.today(), labor_time = 0,
-												op_code = 0)
+				Operation.objects.get_or_create(item = item, user = request.user, dt = datetime.now(), op_code = 0)
 
 				return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
 
@@ -192,6 +192,7 @@ def add_item (request, account_url):
 	return render_to_response('tracker/form.html', context_dict, context)
 
 
+@login_required
 def change_item_status (request):
 	"""
 	Receives list of checked items, passes them to item manager page
@@ -223,36 +224,28 @@ def change_item_status (request):
 				print("Item {} could not be found".format(key))
 		if key == 'operation':  # retrieve value of desired op
 			operation = value
-		if key == 'labor_time':
-			labor_time = int(value)
 
 	""" Assign new operation to each item """
 	if request.method == 'POST':
 		# op_list = []
 		for item in itemlist:
-			item.status = operation
-			td = datetime.today()
+			if item.status != operation:
+				# Only change the status to something it isn't already
+				item.status = operation
+				td = datetime.now()
+				user = request.user
 
-			mins = labor_time % 60
-			hrs = int(labor_time / 60)
-			# TODO: Should time elapsed add to now to calculate finish, or subtract from now for start?
-			td2 = td + timedelta(hours = hrs, minutes = mins)
+				Operation.objects.get_or_create(item = item, user = user, dt = td, op_code = operation)
+				item.save()
+			else:
+				messages.add_message(request, messages.ERROR, """Item {} already has a
+				status of '{}'""".format(item.itemid, utils.int_to_status_code("Inventory", item.status)))
+				return HttpResponseRedirect('/inventory?acct={}'.format(item.owner.acct))
 
-			o = Operation.objects.get_or_create(item = item, start = datetime.now(),
-												finish = td2, labor_time = labor_time,
-												op_code = operation)[0]
-			item.save()
-
-		# for op in list(Operation.objects.all().filter(item = item)):
-		# op_list.append({
-		# 			"op_id": op.id,
-		# 			"op_code": op.op_code,
-		# 			"start": op.start,
-		# 			"finish": op.finish,
-		# 			"labor_time": op.labor_time
-		# 		})
-		# return HttpResponse(dumps(op_list, indent=4), content_type='application/json')
+		if len(itemlist) > 1:
 			return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
+		else:
+			return HttpResponseRedirect('/inventory?item={}'.format(itemlist[0].itemid))
 	else:
 		messages.add_message(request, messages.ERROR, """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.
