@@ -3,16 +3,16 @@ from django.contrib.auth.models import User
 
 
 CUSTOMER_STATUS_CODES = (
-	('0', 'inactive'),
-	('1', 'active'),
+	('0', 'Inactive'),
+	('1', 'Active'),
 )
 
 INVENTORY_STATUS_CODES = (
-	('0', 'inducted'),
-	('1', 'order_received'),
-	('2', 'order_begun'),
-	('3', 'order_completed'),
-	('4', 'shipped'),
+	('0', 'Inducted'),
+	('1', 'Order received'),
+	('2', 'Order started'),
+	('3', 'Order completed'),
+	('4', 'Shipped'),
 )
 
 
@@ -50,16 +50,20 @@ class Inventory(models.Model):
 
 
 class BaseOperation(models.Model):
-	item = models.ForeignKey(Inventory, primary_key = True)
+	item = models.ForeignKey(Inventory)
 	user = models.ForeignKey(User)
 
 	class Meta:
 		abstract = True
 
 
-class Operation(BaseOperation):
+class Operation(models.Model):
 	# TODO: Add way to distinguish types of operations
 	# TODO: Make sure operations are sequential & non-overlapping
+	# Foreign keys weren't behaving properly when these inherited from BaseOperation.
+	# Will change this back later
+	item = models.ForeignKey(Inventory)
+	user = models.ForeignKey(User)
 	dt = models.DateTimeField()
 	op_code = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
 
@@ -67,11 +71,13 @@ class Operation(BaseOperation):
 		return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
 
 
-class Shipment(BaseOperation):
+class Shipment(models.Model):
 	"""	Each Inventory object has multiple Operations and one Shipment. Shipments extend
 	the Operation base class and include billing information (labor time,
 	additional costs, et cetera). """
 
+	item = models.ForeignKey(Inventory)
+	user = models.ForeignKey(User)
 	start = models.DateTimeField()
 	finish = models.DateTimeField()
 	labor_time = models.IntegerField()

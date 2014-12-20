@@ -39,7 +39,8 @@ class Migration(SchemaMigration):
 
         # Adding model 'Operation'
         db.create_table(u'tracker_operation', (
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Inventory'], primary_key=True)),
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Inventory'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('dt', self.gf('django.db.models.fields.DateTimeField')()),
             ('op_code', self.gf('django.db.models.fields.CharField')(default=0, max_length=1)),
@@ -48,7 +49,8 @@ class Migration(SchemaMigration):
 
         # Adding model 'Shipment'
         db.create_table(u'tracker_shipment', (
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Inventory'], primary_key=True)),
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Inventory'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('start', self.gf('django.db.models.fields.DateTimeField')()),
             ('finish', self.gf('django.db.models.fields.DateTimeField')()),
@@ -149,7 +151,8 @@ class Migration(SchemaMigration):
         u'tracker.operation': {
             'Meta': {'object_name': 'Operation'},
             'dt': ('django.db.models.fields.DateTimeField', [], {}),
-            'item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Inventory']", 'primary_key': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Inventory']"}),
             'op_code': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '1'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
@@ -164,7 +167,8 @@ class Migration(SchemaMigration):
         u'tracker.shipment': {
             'Meta': {'object_name': 'Shipment'},
             'finish': ('django.db.models.fields.DateTimeField', [], {}),
-            'item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Inventory']", 'primary_key': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Inventory']"}),
             'labor_time': ('django.db.models.fields.IntegerField', [], {}),
             'start': ('django.db.models.fields.DateTimeField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
