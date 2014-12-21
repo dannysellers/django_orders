@@ -4,6 +4,20 @@
 
 <html>
 
+<script language="javascript">
+function toggle() {
+	var ele = document.getElementById("toggleText");
+	var text = document.getElementById("displayText");
+	if (ele.style.display == "block") {
+		ele.style.display = "none";
+		text.innerHTML = "show";
+	} else {
+		ele.style.display = "block";
+		text.innerHTML = "hide";
+	}
+}
+</script>
+
 	<head>
 		{% block title %}
 			<title>Inventory&#8212;Order Tracker</title>
@@ -17,24 +31,43 @@
 		{% block header %}
 			<h1>Order / Inventory Tracker</h1>
 		{% endblock header %}
-		<h3 id="user_greeting">
-		{% if user.is_authenticated %}
-			Hello {{ user.username }}.
-		{% else %}
-			Hello anonymous user.
-		{% endif %}
-		</h3>
+		<div class="div_user-greeting">
+			<strong>
+				{% if user.is_authenticated %}
+					Hello {{ user.username }}.
+				{% else %}
+					Hello anonymous.
+				{% endif %}
+			</strong><br/>
+			<a href="/register/">Register user</a> |
+			{% if not user.is_authenticated %}
+				<a id="displayText" href="javascript:toggle();">Log in</a>
+				<div id="toggleText" style="display: none; padding-top: 0.5em;">
+					<form id="login_form" method="post" action="/login/">
+						{% csrf_token %}
+						Username: <input type="text" name="username" value="" size="12" />
+						<br />
+						Password: <input type="password" name="password" value="" size="12" />
+						<br />
+						<small>Remember me</small> <input type="checkbox" value="remember_me">
+						<input type="submit" value="submit" />
+					</form>
+				</div>
+			{% else %}
+				<a href="/logout/">Log out</a>
+			{% endif %}
+		</div>
 		<nav>
 			<a href="/">Home</a>
 			| <a href="/about">About</a>
 			| <a href="/accounts?accts=active">Accounts</a>
 			| <a href="/inventory?status=stored">Inventory</a>
-			| | <a href="/register/">Register user</a>
-			{% if not user.is_authenticated %}
-				| <a href="/login/">Log in</a>
-			{% else %}
-				| <a href="/logout/">Log out</a>
-			{% endif %}
+{#			| | <a href="/register/">Register user</a>#}
+{#			{% if not user.is_authenticated %}#}
+{#				| <a href="/login/">Log in</a>#}
+{#			{% else %}#}
+{#				| <a href="/logout/">Log out</a>#}
+{#			{% endif %}#}
 		</nav>
 
 	{% block content %}

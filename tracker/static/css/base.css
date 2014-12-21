@@ -1,49 +1,63 @@
 body {
-	width: 75%;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	padding-left: 1em;
+	width        : 75%;
+	font-family  : "Helvetica Neue", Helvetica, Arial, sans-serif;
+	padding-left : 1em;
 	/*background-color : #95a5a6;*/
 }
+
 ul.errorlist {
-	list-style: none;
-	color: red;
+	list-style : none;
+	color      : red;
 }
+
 #error_message {
-	color: red;
-	font-weight: bold;
-	margin-top: 10px;
+	color       : red;
+	font-weight : bold;
+	margin-top  : 10px;
 }
+
 .message {
-	list-style: none;
+	list-style : none;
 }
+
 table {
-	border: 1px solid gray;
-	width: 75%;
+	border : 1px solid gray;
+	width  : 85%;
 }
+
 th {
-	color: #ffffff;
-	background-color: #555555;
-	border: 1px solid #555555;
-	padding: 3px;
-	vertical-align: top;
+	color            : #ffffff;
+	background-color : #555555;
+	border           : 1px solid #555555;
+	padding          : 3px;
+	vertical-align   : top;
 }
+
 #account_cell {
-	padding-left: 0.5em;
+	padding-left : 0.5em;
 }
+
 #name_cell, #email_cell, #status_cell {
-	padding-left: 1.0em;
+	padding-left : 1.0em;
 }
+
 table tr:nth-child(even) {
-	background-color: #ffffff;
+	background-color : #ffffff;
 }
+
 table tr:nth-child(odd) {
-	background-color: #f1f1f1;
+	background-color : #f1f1f1;
 }
+
 .inactive {
-	background-color: #cdcdcd;
+	background-color : #cdcdcd;
 }
-#user_greeting {
-	position: fixed;
-	right: 10rem;
-	top: 2rem;
+
+.div_user-greeting {
+	position : fixed;
+	right    : 5%;
+	top      : 5%;
+	border   : thin solid;
+	padding  : 7px;
+	width    : 175px;
 }

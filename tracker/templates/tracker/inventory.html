@@ -35,7 +35,10 @@
 	| <a href="/inventory?status=order_begun">Order Begun</a>
 	| <a href="/inventory?status=order_completed">Order Completed</a>
 	{% if customer %}
-		<br/><a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
+		<br/>
+		{% if user.is_authenticated %}
+			<a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
+		{% endif %}
 		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 	{% endif %}
@@ -56,11 +59,11 @@
 	{% endif %}
 
 	{% if user.is_authenticated %}
+		<br/><br/>
 		{% if item %}
-			<br/><br/>
 			<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
 			{% csrf_token %}
-		{% elif customer %}
+		{% elif customer and inventory_list %}
 			<form id="manage_inventory" method="post" action="/manage_items/">
 			{% csrf_token %}
 		{% endif %}
@@ -152,7 +155,7 @@
 		</table>
 	{% endif %}
 	{% if user.is_authenticated %}
-		{% if item or customer %}
+		{% if item or customer and inventory_list %}
 			<br/>
 			<select name="operation">
 				<option value="0">Inducted (0)</option>

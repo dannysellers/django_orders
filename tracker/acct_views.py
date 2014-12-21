@@ -29,34 +29,39 @@ def accounts (request):
 
 	""" Capture /accounts?remove=<acct> """
 	if remove:
-		if confirm_remove:
-			messages.add_message(request, messages.WARNING,
-								 "Confirmation of deactivation")
-			if remove_account(account_num=remove):
-				messages.add_message(request, messages.SUCCESS, "Account {} deactivated successfully".format(remove))
-				return HttpResponseRedirect('/accounts?accts=active', context_dict)
+		if request.user.is_authenticated:
+			if confirm_remove:
+				messages.add_message(request, messages.WARNING,
+									 "Confirmation of deactivation")
+				if remove_account(account_num=remove):
+					messages.add_message(request, messages.SUCCESS, "Account {} deactivated successfully".format(remove))
+					return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
-		else:
-			try:
-				# If the customer has no items currently in storage, deactivate
-				if not Inventory.objects.filter(owner=remove).exclude(status=4):
-					# remove_account() returns False on Customer.DoesNotExist
-					if not remove_account(account_num=remove):
-						messages.add_message(request, messages.WARNING, "Account {} not found. No changes made.".format(remove))
-						return redirect('/accounts?accts=active', context_dict)
+			else:
+				try:
+					# If the customer has no items currently in storage, deactivate
+					if not Inventory.objects.filter(owner=remove).exclude(status=4):
+						# remove_account() returns False on Customer.DoesNotExist
+						if not remove_account(account_num=remove):
+							messages.add_message(request, messages.WARNING, "Account {} not found. No changes made.".format(remove))
+							return redirect('/accounts?accts=active', context_dict)
+						else:
+							messages.add_message(request, messages.SUCCESS,
+												 "Account {} deactivated successfully".format(remove))
+							return redirect('/accounts?accts=active', context_dict)
 					else:
-						messages.add_message(request, messages.SUCCESS,
-											 "Account {} deactivated successfully".format(remove))
-						return redirect('/accounts?accts=active', context_dict)
-				else:
-					messages.add_message(request, messages.WARNING,
-										 "This customer has items in inventory. Proceed with deactivation?")
-					context_dict['confirm_remove'] = 'Confirm'
-					return render_to_response('/accounts?remove={}&confirm_remove=False'.format(remove), context_dict)
+						# TODO: Do confirmation for removing customers with stored items
+						messages.add_message(request, messages.WARNING,
+											 "This customer has items in inventory. Proceed with deactivation?")
+						context_dict['confirm_remove'] = 'Confirm'
+						return render_to_response('/accounts?remove={}&confirm_remove=False'.format(remove), context_dict)
 
-			except Customer.DoesNotExist:
-				messages.add_message(request, messages.ERROR, "Account {} not found. No changes made.".format(remove))
-				return HttpResponseRedirect('/accounts?accts=active', context_dict)
+				except Customer.DoesNotExist:
+					messages.add_message(request, messages.ERROR, "Account {} not found. No changes made.".format(remove))
+					return HttpResponseRedirect('/accounts?accts=active', context_dict)
+		else:
+			messages.add_message(request, messages.ERROR, "You are not logged in.")
+			return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
 	else:
 		header_list = ['Account', 'Name', 'Create Date']
@@ -164,9 +169,10 @@ def account_page (request, account_url):
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
 
+@login_required
 def add_account (request):
 	context = RequestContext(request)
-	context_dict = {}
+	context_dict = dict()
 
 	context_dict['head_text'] = 'Add Account'
 	if request.method == 'POST':

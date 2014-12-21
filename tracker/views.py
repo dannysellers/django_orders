@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, logout, login, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -17,7 +17,7 @@ from models import Customer, Inventory
 
 def index (request):
 	context = RequestContext(request)
-	context_dict = {}
+	context_dict = dict()
 
 	context_dict['cust_count'] = Customer.objects.count()
 	context_dict['cust_act_count'] = Customer.objects.filter(status = 1).count()
@@ -72,7 +72,7 @@ def register (request):
 	return render_to_response('tracker/register.html', context_dict, context)
 
 
-def user_login (request):
+def user_login (request, *args, **kwargs):
 	context = RequestContext(request)
 
 	if request.method == 'POST':
@@ -85,11 +85,9 @@ def user_login (request):
 
 		# If no user is returned, login was unsuccessful
 		if user:
-			# User could have been deactivated
 			if user.is_active:
-				# If the user is valid and active, log in and redirect to index
-				# login() is built in
-				# login(request, user)
+				if not request.POST.get('remember_me', None):
+					request.session.set_expiry(0)
 				login(request, user)
 				messages.add_message(request, messages.SUCCESS, "Login successful. Welcome {}".format(user))
 				return HttpResponseRedirect('/')
