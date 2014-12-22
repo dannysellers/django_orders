@@ -180,3 +180,5 @@ LOGGING = {
 
 # URL to dump anonymous user who tries to access restricted page
 LOGIN_URL = '/login/'
+
+INTERNAL_IPS = tuple('192.168.1.118')

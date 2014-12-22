@@ -17,6 +17,7 @@ urlpatterns += patterns('',
 	url(r'^accounts$', acct_views.accounts, name = 'accounts'),
 	url(r'^accounts/(?P<account_url>\d+)/$', acct_views.account_page, name = 'account_page'),
 	url(r'^add_account/$', acct_views.add_account, name = 'add_account'),
+	url(r'^acct_info', acct_views.acct_info, name = 'acct_info'),
 )
 
 # Inventory patterns

@@ -1,10 +1,10 @@
+from datetime import date
+
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect, render
+from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from datetime import date
 import utils
 from models import Customer, Inventory
 import forms
@@ -20,7 +20,7 @@ def decode_url (url):
 
 def accounts (request):
 	context = RequestContext(request)
-	context_dict = {}
+	context_dict = dict()
 
 	# URL params
 	accts = request.GET.get('accts')
@@ -33,17 +33,19 @@ def accounts (request):
 			if confirm_remove:
 				messages.add_message(request, messages.WARNING,
 									 "Confirmation of deactivation")
-				if remove_account(account_num=remove):
-					messages.add_message(request, messages.SUCCESS, "Account {} deactivated successfully".format(remove))
+				if remove_account(account_num = remove):
+					messages.add_message(request, messages.SUCCESS,
+										 "Account {} deactivated successfully".format(remove))
 					return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
 			else:
 				try:
 					# If the customer has no items currently in storage, deactivate
-					if not Inventory.objects.filter(owner=remove).exclude(status=4):
+					if not Inventory.objects.filter(owner = remove).exclude(status = 4):
 						# remove_account() returns False on Customer.DoesNotExist
-						if not remove_account(account_num=remove):
-							messages.add_message(request, messages.WARNING, "Account {} not found. No changes made.".format(remove))
+						if not remove_account(account_num = remove):
+							messages.add_message(request, messages.WARNING,
+												 "Account {} not found. No changes made.".format(remove))
 							return redirect('/accounts?accts=active', context_dict)
 						else:
 							messages.add_message(request, messages.SUCCESS,
@@ -54,10 +56,12 @@ def accounts (request):
 						messages.add_message(request, messages.WARNING,
 											 "This customer has items in inventory. Proceed with deactivation?")
 						context_dict['confirm_remove'] = 'Confirm'
-						return render_to_response('/accounts?remove={}&confirm_remove=False'.format(remove), context_dict)
+						return render_to_response('/accounts?remove={}&confirm_remove=False'.format(remove),
+												  context_dict)
 
 				except Customer.DoesNotExist:
-					messages.add_message(request, messages.ERROR, "Account {} not found. No changes made.".format(remove))
+					messages.add_message(request, messages.ERROR,
+										 "Account {} not found. No changes made.".format(remove))
 					return HttpResponseRedirect('/accounts?accts=active', context_dict)
 		else:
 			messages.add_message(request, messages.ERROR, "You are not logged in.")
@@ -127,9 +131,9 @@ def accounts (request):
 def account_page (request, account_url):
 	# acct = request.GET.get('acct')
 	# if not account_url:
-	# 	account_url = acct
+	# account_url = acct
 	context = RequestContext(request)
-	context_dict = {}
+	context_dict = dict()
 
 	header_list = ['Account', 'Name', 'Email', 'Status', 'Create Date']
 	context_dict['headers'] = header_list
@@ -140,7 +144,7 @@ def account_page (request, account_url):
 	try:
 		customer = Customer.objects.get(acct = account_acct)
 		# Show only items still in inventory
-		cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status=4)
+		cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status = 4)
 		if cust_items:
 			context_dict['inventory_list'] = cust_items
 			context_dict['count'] = len(cust_items)
@@ -167,6 +171,25 @@ def account_page (request, account_url):
 	context_dict['inv_headers'] = ['ID', '# of Cartons', 'Volume', 'Storage Fees', 'Status', 'Arrival']
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
+
+
+@login_required
+def acct_info (request):
+	# context = RequestContext(request)
+	# context_dict = dict()
+
+	acct = request.GET.get('acct')
+	customer = Customer.objects.get(acct = acct)
+
+	if request.method == 'POST':
+		customer.notes = request.POST['notes']
+		customer.save()
+
+		messages.add_message(request, messages.SUCCESS, "Account information updated successfully.")
+		return HttpResponseRedirect('/accounts/{}'.format(customer.acct))
+	else:
+		messages.add_message(request, messages.ERROR, "No request was passed. Click the button instead!")
+		return HttpResponseRedirect('/accounts?acct={}'.format(customer.acct))
 
 
 @login_required

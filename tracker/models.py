@@ -23,6 +23,7 @@ class Customer(models.Model):
 	status = models.CharField(max_length = 1, choices = CUSTOMER_STATUS_CODES)
 	createdate = models.DateField()
 	closedate = models.DateField()
+	notes = models.TextField()
 
 	def __unicode__ (self):
 		return '{}: {}'.format(self.acct, self.name)

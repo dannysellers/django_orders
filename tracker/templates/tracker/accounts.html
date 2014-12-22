@@ -102,6 +102,17 @@
 			</tbody>
 		</table>
 		<br/>
+		{% if user.is_authenticated %}
+			<a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Edit Account Info</a>
+			<div id="acctForm" style="display: none;">
+				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
+					{% csrf_token %}
+					<textarea name="notes" rows="5" cols="50">{{ customer.notes }}</textarea>
+					<input type="submit" name="submit" value="Submit" />
+				</form>
+			</div>
+		{% endif %}
+		<hr width="85%" align="left">
 		<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 		{% if storage_fees %}
