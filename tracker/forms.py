@@ -42,6 +42,8 @@ class InventoryForm(forms.ModelForm):
 
 class UserForm(forms.ModelForm):
 	username = forms.CharField()
+	first_name = forms.CharField()
+	last_name = forms.CharField()
 	email = forms.CharField()
 	password = forms.CharField(widget = forms.PasswordInput())
 
