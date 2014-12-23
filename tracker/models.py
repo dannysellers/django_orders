@@ -33,8 +33,9 @@ class Shipment(models.Model):
 	owner = models.ForeignKey(Customer)
 	shipid = models.IntegerField(unique = True)
 	palletized = models.BooleanField(default = False)
-	arrival = models.DateTimeField()
-	departure = models.DateTimeField()
+	# Change arrival and departure to just DateFields()?
+	arrival = models.DateField()
+	departure = models.DateField()
 	labor_time = models.IntegerField()
 	notes = models.TextField()
 	tracking_number = models.CharField(max_length = 30)

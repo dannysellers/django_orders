@@ -144,7 +144,8 @@ def account_page (request, account_url):
 	try:
 		customer = Customer.objects.get(acct = account_acct)
 		# Show only items still in inventory
-		cust_items = Inventory.objects.order_by('itemid').filter(owner = customer).exclude(status = 4)
+		cust_items = Inventory.objects.order_by('itemid').filter(shipset__owner = customer).exclude(status = 4)
+		Inventory.objects.all()
 		if cust_items:
 			context_dict['inventory_list'] = cust_items
 			context_dict['count'] = len(cust_items)

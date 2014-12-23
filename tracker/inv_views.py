@@ -20,7 +20,7 @@ def inventory (request):
 	storage_fee_arg = request.GET.get('storage_fees')
 	item = request.GET.get('item')
 
-	header_list = ['ID', 'Owner', '# of Cartons', 'Total Volume (ft.^3)',
+	header_list = ['Ship ID', 'Item ID', 'Owner', 'Total Volume (ft.^3)',
 				   'Storage Fees', 'Status', 'Arrival']
 
 	try:
@@ -39,7 +39,7 @@ def inventory (request):
 					customer = Customer.objects.get(acct = acct)
 					context_dict['customer'] = customer
 					context_filter.append(str(customer))
-					inventory_list = inventory_list.filter(owner = customer)
+					inventory_list = inventory_list.filter(shipset__owner = customer)
 					if not inventory_list:
 						messages.add_message(request, messages.INFO, "This customer has no items.")
 
@@ -89,12 +89,12 @@ def inventory (request):
 					# TODO: How to use True / False as values, rather than yes/no
 					context_filter.append('Items not yet incurring storage fees')
 					for item in inventory_list.exclude(status = 4):
-						if abs((item.arrival - date.today()).days) < 7:
+						if abs((item.shipset.arrival - date.today()).days) < 7:
 							_filtered_list.append(item)
 				else:
 					context_filter.append('Currently incurring storage fees')
 					for item in inventory_list.exclude(status = 4):
-						if abs((item.arrival - date.today()).days) >= 7:
+						if abs((item.shipset.arrival - date.today()).days) >= 7:
 							_filtered_list.append(item)
 
 				inventory_list = _filtered_list
@@ -110,7 +110,7 @@ def inventory (request):
 		elif item:
 			_item = Inventory.objects.get(itemid = item)
 			context_dict['item'] = _item
-			customer = Customer.objects.get(acct = _item.owner.acct)
+			customer = Customer.objects.get(acct = _item.shipset.owner.acct)
 			context_dict['customer'] = customer
 
 			op_headers = ['Op ID', 'Op Code', 'Time', 'User']

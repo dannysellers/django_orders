@@ -26,7 +26,7 @@ def index (request):
 	storage_fee_count = 0
 	no_storage_fee_count = 0
 	for item in Inventory.objects.all().exclude(status = 4):
-		if abs((item.arrival - date.today()).days) >= 7:
+		if abs((item.shipset.arrival - date.today()).days) >= 7:
 			storage_fee_count += 1
 		else:
 			no_storage_fee_count += 1

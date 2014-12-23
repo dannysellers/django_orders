@@ -88,15 +88,16 @@
 		<tbody>
 			{% if item %}
 				<tr>
+					<td id="ship_id">{{ item.shipset.shipid }}</td>
 					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_owner">
-						<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+						<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
 					</td>
-					<td id="item_quantity">{{ item.quantity }}</td>
+{#					<td id="item_quantity">{{ item.quantity }}</td>#}
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
 					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 					<td id="item_status">{{ item.status|op_code }}</td>
-					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+					<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 				</tr>
 			{% elif inventory_list %}
 				{% for item in inventory_list %}
@@ -106,13 +107,16 @@
 								<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
 							{% endif %}
 						{% endif %}
+						<td id="ship_id">
+							<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
+						</td>
 						<td id="item_id">
 							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
 						</td>
 						<td id="item_owner">
-							<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+							<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
 						</td>
-						<td id="item_quantity">{{ item.quantity }}</td>
+{#						<td id="item_quantity">{{ item.quantity }}</td>#}
 						<td id="item_volume">{{ item.volume|length:"2" }}</td>
 						{% if not item.status == '4' %}
 							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
@@ -120,9 +124,9 @@
 							<td class="inactive"></td>
 						{% endif %}
 						<td id="item_status">{{ item.status|op_code }}</td>
-						<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+						<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 						{% if item.status == '4' %}
-							<td>{{ item.departure|date:"m-d-Y" }}</td>
+							<td>{{ item.shipset.departure|date:"m-d-Y" }}</td>
 						{% elif b_inactive %}
 							<td class="inactive"></td>
 						{% endif %}
