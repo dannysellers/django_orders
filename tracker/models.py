@@ -62,6 +62,7 @@ class Shipment(models.Model):
 	labor_time = models.IntegerField()
 	notes = models.TextField(null = True)
 	tracking_number = models.CharField(max_length = 30, null = True)
+	status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
 
 	objects = ShipmentManager()
 

@@ -33,19 +33,28 @@ th {
 	vertical-align   : top;
 }
 
+#td_checkbox {
+	padding-left: 0;
+	text-align: center;
+}
+
+td {
+	padding-left: 1rem;
+}
+
 #account_cell {
-	padding-left : 0.5em;
+	padding-left : 0.5rem;
 }
 
 #name_cell, #email_cell, #status_cell {
-	padding-left : 1.0em;
-}
-
-table tr:nth-child(even) {
-	background-color : #ffffff;
+	padding-left : 1.0rem;
 }
 
 table tr:nth-child(odd) {
+	background-color : #ffffff;
+}
+
+table tr:nth-child(even) {
 	background-color : #f1f1f1;
 }
 

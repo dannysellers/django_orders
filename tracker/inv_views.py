@@ -1,11 +1,11 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import messages
-from models import Customer, Inventory, Operation
+from models import *
 import utils
 import forms
 
@@ -149,7 +149,13 @@ def add_item (request, account_url):
 	context = RequestContext(request)
 	context_dict = {}
 
-	owner = Customer.objects.get(acct = account_url)
+	try:
+		owner = Customer.objects.get(acct = account_url)
+	except Customer.DoesNotExist:
+		messages.add_message(request, messages.ERROR, "Customer {} not found.".format(account_url))
+		return render_to_response('tracker/add_customer.html',
+								  context_dict,
+								  context)
 
 	if request.method == 'POST':
 		form = forms.InventoryForm(request.POST)
@@ -157,31 +163,17 @@ def add_item (request, account_url):
 		if form.is_valid():
 			item = form.save(commit = False)
 
-			try:
-				cust = Customer.objects.get(acct = owner.acct)
-				item.owner = cust
+			item.owner = owner
 
-				item.itemid = len(Inventory.objects.all()) + 1
-				item.length = form.cleaned_data['length'] / 12
-				item.width = form.cleaned_data['width'] / 12
-				item.height = form.cleaned_data['height'] / 12
-				item.volume = form.cleaned_data['length'] * form.cleaned_data['width'] * form.cleaned_data['height']
-				item.storage_fees = int(form.cleaned_data['quantity']) * item.volume
+			item.length = form.cleaned_data['length'] / 12
+			item.width = form.cleaned_data['width'] / 12
+			item.height = form.cleaned_data['height'] / 12
+			item.save()
 
-				item.arrival = date.today()
-				item.departure = date.today()
-				item.status = 0
+			Operation.objects.get_or_create(item = item, user = request.user, op_code = 0)
 
-				item.save()
+			return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
 
-				Operation.objects.get_or_create(item = item, user = request.user, dt = datetime.now(), op_code = 0)
-
-				return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
-
-			except Customer.DoesNotExist:
-				return render_to_response('tracker/add_customer.html',
-										  context_dict,
-										  context)
 		else:
 			print form.errors
 	else:
@@ -199,10 +191,9 @@ def change_item_status (request):
 	If /change_status?item=##### , manage individual item.
 	If /manage_items/, receive list of items.
 	"""
-	# TODO: Integrate this with individual item page
 	# TODO: Enforce only one copy of induction / shipment per item
 	# TODO: Enforce triplets of order received, started, done
-	# context = RequestContext(request)
+	# TODO: Add confirmation on changing individual item status without shipment status
 	itemlist = []
 
 	""" Prepare itemlist for processing by db / parsing to json (maybe? eventually?) """
@@ -244,11 +235,36 @@ def change_item_status (request):
 
 		if len(itemlist) > 1:
 			return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
-		else:
+		elif len(itemlist) == 1:
 			return HttpResponseRedirect('/inventory?item={}'.format(itemlist[0].itemid))
+		else:
+			messages.add_message(request, messages.ERROR, "No items selected.")
+			return HttpResponseRedirect('/inventory?status=stored')
 	else:
 		messages.add_message(request, messages.ERROR, """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.
 		/inventory?acct=#####)</a>.""")
 
 		return HttpResponseRedirect('/inventory?status=stored')
+
+
+def shipment (request):
+	context = RequestContext(request)
+	context_dict = {}
+
+	header_list = ['Owner', 'Ship ID', 'Palletized', 'Arrival', 'Departure',
+				   'Labor time', 'Status', 'Tracking #', 'Notes']
+	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
+
+	_shipment = Shipment.objects.get(shipid = request.GET['id'])
+	item_list = _shipment.inventory_set.all()
+
+	if int(_shipment.status) != 4:
+		header_list.remove('Arrival')
+
+	context_dict['headers'] = header_list
+	context_dict['shipment'] = _shipment
+	context_dict['item_headers'] = item_headers
+	context_dict['item_list'] = item_list
+
+	return render_to_response('tracker/shipment.html', context_dict, context)

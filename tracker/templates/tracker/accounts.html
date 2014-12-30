@@ -35,6 +35,9 @@
 	{% endif %}
 	{% if user.is_authenticated and customer and account_status == 'Active' %}
 		| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
+		| <a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Edit Account Info</a>
+	{% elif user.is_authenticated and customer and account_status != 'Active' %}
+		| <a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Display Account Info</a>
 	{% endif %}
 
 	{% if messages %}
@@ -103,12 +106,13 @@
 		</table>
 		<br/>
 		{% if user.is_authenticated %}
-			<a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Edit Account Info</a>
 			<div id="acctForm" style="display: none;">
 				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
 					{% csrf_token %}
 					<textarea name="notes" rows="5" cols="50">{{ customer.notes }}</textarea>
-					<input type="submit" name="submit" value="Submit" />
+					{% if account_status == 'Active' %}
+						<input type="submit" name="submit" value="Submit" />
+					{% endif %}
 				</form>
 			</div>
 		{% endif %}
@@ -133,14 +137,16 @@
 				{% if inventory_list %}
 					{% for item in inventory_list %}
 						<tr>
+							<td id="ship_id">
+								<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
+							</td>
 							<td id="item_id">
 								<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
 							</td>
-							<td id="item_quantity">{{ item.quantity }}</td>
 							<td id="item_volume">{{ item.volume|length:"2" }}</td>
 							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 							<td id="item_status">{{ item.status|op_code }}</td>
-							<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+							<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 						</tr>
 					{% endfor %}
 				{% endif %}

@@ -17,7 +17,9 @@ def length(value, arg):
 def op_code(value):
 	""" Receives numerical operation code, returns status """
 	value = int(value)
-	if value == 0:
+	if not value:
+		return 'Inducted'
+	elif value == 0:
 		return 'Inducted'
 	elif value == 1:
 		return 'Order received'

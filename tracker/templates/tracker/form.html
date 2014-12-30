@@ -8,13 +8,15 @@
 	    <h1>Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}</h1>
 	{% endif %}
 {% endblock header %}
-	
+
 {% block content %}
 
 	{% if customer %}
 	    <form id="account_form" method="post" action="/add_account/">
-	{% else %}
+	{% elif owner %}
         <form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
+	{% elif shipment %}
+		<form id="shipment_form" method="post" action="/accounts/{{ owner.acct }}/add_shipment/">
 	{% endif %}
 		<br/>
         {% csrf_token %}
@@ -29,11 +31,22 @@
             <br />
         {% endfor %}
 
-	    {% if customer %}
-	        <input type="submit" name="submit" value="Create Account" />
-	    {% else %}
-            <input type="submit" name="submit" value="Add Item" />
-	    {% endif %}
+{#	    {% if customer %}#}
+{#	        <input type="submit" name="submit" value="Create Account" />#}
+{#	    {% elif owner %}#}
+{#            <input type="submit" name="submit" value="Add Item" />#}
+{#		{% elif shipment %}#}
+{#			<input type="submit" name="submit" value="Add Shipment" />#}
+{#	    {% endif %}#}
+
+		<input type="submit" name="submit"
+			{% if customer %}
+			   	value="Create Account"
+			   {% elif owner %}
+			   	value="Add Item"
+			   {% elif shipment %}
+			   	value="Add Shipment"
+			{% endif %} />
 
     </form>
 

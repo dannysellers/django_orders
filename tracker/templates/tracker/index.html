@@ -4,33 +4,13 @@
 
 <html>
 
-<script language="javascript">
-function toggle(idToggleDiv, toggleLink) {
-	var curDiv = document.getElementById(idToggleDiv);
-	var objToggle = document.getElementById(toggleLink);
-
-	if (idToggleDiv == 'acctForm') {
-		var preEleText = 'Edit Account Info'
-	} else if (idToggleDiv == 'toggleDiv') {
-		var preEleText = 'Log in'
-	}
-
-	if (curDiv.style.display == "block") {
-		curDiv.style.display = "none";
-		objToggle.innerHTML = preEleText;
-	} else {
-		curDiv.style.display = "block";
-		objToggle.innerHTML = "hide";
-	}
-}
-</script>
-
 	<head>
 		{% block title %}
 			<title>Inventory&#8212;Order Tracker</title>
 		{% endblock title %}
 		<link rel="stylesheet" href="{% static "css/base.css" %}" />
 		<script src="{% static "js/tablesort.js" %}"></script>
+		<script src="{% static "js/misc.js" %}"></script>
 {#		<script src="{% static "js/ajax.js" %}"></script>#}
 	</head>
 

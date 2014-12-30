@@ -169,7 +169,7 @@ def account_page (request, account_url):
 		context_dict['account_status'] = str(customer.status)
 
 	# Inventory table
-	context_dict['inv_headers'] = ['ID', '# of Cartons', 'Volume', 'Storage Fees', 'Status', 'Arrival']
+	context_dict['inv_headers'] = ['Ship ID', 'Item ID', 'Volume', 'Storage Fees', 'Status', 'Arrival']
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
@@ -203,14 +203,7 @@ def add_account (request):
 		form = forms.CustomerForm(request.POST)
 
 		if form.is_valid():
-			customer = form.save(commit = False)
-
-			customer.status = 1
-			customer.createdate = date.today()
-			customer.closedate = date.today()
-
-			customer.save()
-
+			form.save()
 			return HttpResponseRedirect('/accounts?accts=active')
 		else:
 			print form.errors

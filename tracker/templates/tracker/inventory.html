@@ -71,14 +71,12 @@
 	<table>
 		<thead>
 			<tr>
-{#				TODO: Enable checking all checkboxes #}
 				{% if user.is_authenticated and customer and inventory_list %}
-{#					Adds checkbox for selection if logged in and looking at multiple items #}
-{#					that belong to the same customer #}
-					<th></th>
-	{#				{% if customer %}#}
-	{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
-	{#				{% endif %}#}
+					{% if customer %}
+						<th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
+					{% else %}
+						<th></th>
+					{% endif %}
 				{% endif %}
 				{% for item in headers %}
 					<th>{{ item }}</th>
@@ -88,7 +86,7 @@
 		<tbody>
 			{% if item %}
 				<tr>
-					<td id="ship_id">{{ item.shipset.shipid }}</td>
+					<td id="ship_id"><a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a></td>
 					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_owner">
 						<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
@@ -104,7 +102,7 @@
 					<tr>
 						{% if user.is_authenticated %}
 							{% if customer %}
-								<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
+								<td id="td_checkbox"><input type="checkbox" class="checkbox" name="{{ item.itemid }}"></td>
 							{% endif %}
 						{% endif %}
 						<td id="ship_id">
@@ -116,7 +114,6 @@
 						<td id="item_owner">
 							<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
 						</td>
-{#						<td id="item_quantity">{{ item.quantity }}</td>#}
 						<td id="item_volume">{{ item.volume|length:"2" }}</td>
 						{% if not item.status == '4' %}
 							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
@@ -186,4 +183,4 @@
 {#		{{ message }}#}
 {#	{% endif %}#}
 
-{% endblock %}
+{% endblock content %}

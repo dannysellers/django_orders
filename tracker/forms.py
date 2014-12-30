@@ -36,9 +36,16 @@ class InventoryForm(forms.ModelForm):
 		fields = ('quantity', 'length', 'width', 'height', 'palletized')
 
 
-# class ItemForm(forms.ModelForm):
-# class Meta:
-# 		model = models.Inventory
+class ShipmentForm(forms.ModelForm):
+	quantity = forms.CharField(max_length = 5, help_text = "Quantity: ")
+
+
+class OptExtraForm(forms.ModelForm):
+	# description = forms.TextInput(help_text = "Description: ")
+	description = forms.TextInput()
+	quantity = forms.CharField(max_length = 5, help_text = "Quantity: ")
+	unit_cost = forms.DecimalField(max_digits = 6, initial = 1.00, help_text = "Unit cost: ")
+
 
 class UserForm(forms.ModelForm):
 	username = forms.CharField()

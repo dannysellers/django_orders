@@ -1,0 +1,68 @@
+{% extends 'tracker/index.html' %}
+{% load static %}
+{% load num_filters %}
+
+{% block title %}
+	<title>
+		Shipment {{ shipment.shipid }}
+	</title>
+{% endblock title %}
+
+{% block header %}
+	<h1>Shipment {{ shipment.shipid }} &#8212; {{ shipment.owner.name }}, #{{ shipment.owner.acct }}</h1>
+{% endblock header %}
+
+{% block content %}
+	<br/>
+	<table>
+		<thead>
+			{% for item in headers %}
+				<th>{{ item }}</th>
+			{% endfor %}
+		</thead>
+		<tbody>
+			<td>{{ shipment.owner.name }}, #{{ shipment.owner.acct }}</td>
+			<td>{{ shipment.shipid }}</td>
+			<td>{{ shipment.palletized }}</td>
+			<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
+			{% if shipment.status == "Shipped" %}
+				<td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
+			{% endif %}
+			<td>{{ shipment.labor_time }}</td>
+			<td>{{ shipment.status }}</td>
+			<td>{{ shipment.tracking_number }}</td>
+			<td><a id="shipFormToggle" href="javascript:toggle('shipForm', 'shipFormToggle');">Show Notes</a>
+		</tbody>
+	</table>
+
+	<br/>
+	<table>
+		<thead>
+			{% for item in item_headers %}
+				<th>{{ item }}</th>
+			{% endfor %}
+		</thead>
+		<tbody>
+			{% for item in item_list %}
+				<tr>
+					<td id="item_id">
+						<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+					</td>
+					<td id="item_volume">{{ item.volume }}</td>
+					{% if not item.status == '4' %}
+						<td id="item_storage_fees">${{ item.storage_fees }}</td>
+					{% else %}
+						<td class="inactive"></td>
+					{% endif %}
+					<td id="item_status">{{ item.status }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<div id="shipForm" style="display: none;">
+		<br/>Shipment notes:<br/>
+		<textarea name="notes" rows="5" cols="50">{{ shipment.notes }}</textarea>
+	</div>
+
+{% endblock content %}
