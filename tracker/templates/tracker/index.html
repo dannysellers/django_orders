@@ -21,7 +21,7 @@
 		<div class="div_user-greeting">
 			<strong>
 				{% if user.is_authenticated %}
-					Hello {{ user.username }}.
+					Hi {{ user.first_name }} ({{ user.username }})!
 				{% else %}
 					Hello anonymous.
 				{% endif %}

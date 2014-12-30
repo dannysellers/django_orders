@@ -184,6 +184,10 @@ def acct_info (request):
 
 	if request.method == 'POST':
 		customer.notes = request.POST['notes']
+		customer.email = request.POST['email']
+		customer.name = request.POST['name']
+		customer.notes = request.POST['notes']
+		customer.acct = request.POST['acct']  # TODO: Confirmation on changing acct number
 		customer.save()
 
 		messages.add_message(request, messages.SUCCESS, "Account information updated successfully.")

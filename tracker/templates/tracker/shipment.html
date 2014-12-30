@@ -21,7 +21,8 @@
 			{% endfor %}
 		</thead>
 		<tbody>
-			<td>{{ shipment.owner.name }}, #{{ shipment.owner.acct }}</td>
+			<td><a href="/accounts?acct={{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
+			<td>#{{ shipment.owner.acct }}</td>
 			<td>{{ shipment.shipid }}</td>
 			<td>{{ shipment.palletized }}</td>
 			<td>{{ shipment.arrival|date:"m-d-Y" }}</td>

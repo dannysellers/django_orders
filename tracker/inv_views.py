@@ -252,7 +252,7 @@ def shipment (request):
 	context = RequestContext(request)
 	context_dict = {}
 
-	header_list = ['Owner', 'Ship ID', 'Palletized', 'Arrival', 'Departure',
+	header_list = ['Owner', 'Owner Acct', 'Ship ID', 'Palletized', 'Arrival', 'Departure',
 				   'Labor time', 'Status', 'Tracking #', 'Notes']
 	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
 

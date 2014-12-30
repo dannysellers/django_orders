@@ -5,6 +5,10 @@ body {
 	/*background-color : #95a5a6;*/
 }
 
+  /*//////////////*/
+ /*// MESSAGES //*/
+/*//////////////*/
+
 ul.errorlist {
 	list-style : none;
 	color      : red;
@@ -19,6 +23,10 @@ ul.errorlist {
 .message {
 	list-style : none;
 }
+
+  /*////////////*/
+ /*// TABLES //*/
+/*////////////*/
 
 table {
 	border : 1px solid gray;
@@ -49,6 +57,10 @@ td {
 #name_cell, #email_cell, #status_cell {
 	padding-left : 1.0rem;
 }
+
+  /*//////////////////*/
+ /*// row coloring //*/
+/*//////////////////*/
 
 table tr:nth-child(odd) {
 	background-color : #ffffff;

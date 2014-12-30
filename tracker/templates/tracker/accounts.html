@@ -106,13 +106,23 @@
 		</table>
 		<br/>
 		{% if user.is_authenticated %}
-			<div id="acctForm" style="display: none;">
+			<div id="acctForm" style="display: none; width: 80%;">
 				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
 					{% csrf_token %}
+					<div style="float:left; width:33%;">
+						Name: <input type="text" name="name" value="{{ customer.name }}" />
+						<br />
+						Account: <input type="text" name="acct" value="{{ customer.acct }}" />
+					</div>
+					<div style="float:left; width:33%;">
+						Email: <input type="text" name="email" value="{{ customer.email }}" />
+					</div>
+					<div style="float:left; width:33%;">
 					<textarea name="notes" rows="5" cols="50">{{ customer.notes }}</textarea>
 					{% if account_status == 'Active' %}
 						<input type="submit" name="submit" value="Submit" />
 					{% endif %}
+					</div>
 				</form>
 			</div>
 		{% endif %}
