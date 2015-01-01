@@ -42,12 +42,12 @@ th {
 }
 
 #td_checkbox {
-	padding-left: 0;
-	text-align: center;
+	padding-left : 0;
+	text-align   : center;
 }
 
 td {
-	padding-left: 1rem;
+	padding-left : 1rem;
 }
 
 #account_cell {

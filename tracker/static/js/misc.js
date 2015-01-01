@@ -22,7 +22,7 @@ function toggle(idToggleDiv, toggleLink) {
 	}
 }
 function checkAll(source) {
-	checkboxes = document.getElementsByClassName("checkbox");
+	var checkboxes = document.getElementsByClassName("checkbox");
 	for (var i = 0; i < checkboxes.length; i++) {
 		checkboxes[i].checked = source.checked;
 	}

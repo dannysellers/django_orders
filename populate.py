@@ -6,10 +6,16 @@ from calendar import monthrange
 import os
 
 
+############################
+#### Globals / defaults ####
+############################
 td = date.today()
+DEFAULT_CUSTOMER_NUMBER = 15
+DEFAULT_ITEM_NUMBER = 7
+DEFAULT_NAMELIST = 'names.csv'
 
 
-def rand_date():
+def rand_date ():
 	_year = td.year
 	_month = randint(1, 12)
 	_day = randint(1, monthrange(_year, _month)[1])
@@ -23,16 +29,11 @@ def load_names (filename, numnames):
 		first_names = reader.next()
 		last_names = reader.next()
 
-	if numnames:
-		_numnames = numnames
-	else:
-		_numnames = 30
-
 	# Generate a number of random pairs
 	namecount = 0
 	namelist = []
 
-	while namecount < _numnames:
+	while namecount < int(numnames):
 		i = randrange(0, len(first_names))
 		j = randrange(0, len(last_names))
 		namelist.append(first_names[i] + " " + last_names[j])
@@ -63,34 +64,51 @@ def add_item (owner, itemid, quantity, length, width, height, status):
 	return i
 
 
-def add_op (item, op_code):
+def add_op (item, op_code, user):
 	# Enforcing sequentiality of operations may not be necessary, as
 	# in practice, they will only be created in sequence
 	imonth = item.arrival.month
 	iday = item.arrival.day
 
-	try:
-		start = datetime(td.year, randint(imonth, td.month),
-						 randint(iday, monthrange(td.year, td.month)[1]), hour = randint(9, 17),
-						 minute = randint(0, 59), second = randint(0, 59))
-	except ValueError, e:
-		print e
+	dt = datetime(year = td.year, month = randint(imonth, td.month),
+				  day = randint(iday, monthrange(td.year, td.month)[1]),
+				  hour = randint(9, 17), minute = randint(0, 59), second = randint(0, 59))
 
-	try:
-		finish = datetime(td.year, randint(start.month, td.month),
-						  randint(start.day, monthrange(td.year, td.month)[1]), hour = randint(9, 17),
-						  minute = randint(0, 59), second = randint(0, 59))
-	except ValueError, e:
-		print e
-
-	""" The labor time expended isn't necessarily equal to the difference between start and
-	finish datetimes, as there could be a delay in reporting. """
-
-	labor_time = randint(1, 60)
-	o = Operation.objects.get_or_create(item = item, start = start,
-										finish = finish, labor_time = labor_time,
-										op_code = op_code)[0]
+	o = Operation.objects.get_or_create(item = item, dt = dt,
+										op_code = op_code, user = user)[0]
 	return o
+
+
+def add_shipment (item, user):
+	imonth = item.arrival.month
+	iday = item.arrival.day
+
+	start = datetime(year = td.year, month = randint(imonth, td.month),
+					 day = randint(iday, monthrange(td.year, td.month)[1]),
+					 hour = randint(9, 17), minute = randint(0, 59), second = randint(0, 59))
+
+	finish = datetime(year = td.year, month = randint(imonth, td.month),
+					  day = randint(iday, monthrange(td.year, td.month)[1]),
+					  hour = randint(9, 17), minute = randint(0, 59), second = randint(0, 59))
+
+	labor_time = randint(0, 120)
+
+	s = Shipment.objects.get_or_create(item = item, user = user, start = start,
+									   finish = finish, labor_time = labor_time)[0]
+	add_opt_extras(s)
+
+	return s
+
+
+def add_opt_extras (shipment):
+	quantity = randint(0, 5)
+	unit_cost = random() * randint(0, 10)
+	description = "Fake item x {}".format(quantity)
+
+	op = OptExtras.objects.get_or_create(shipment = shipment, quantity = quantity,
+										 unit_cost = unit_cost, description = description)[0]
+
+	return op
 
 
 def populate (namelist):
@@ -101,7 +119,7 @@ def populate (namelist):
 		acctlist = []
 		for cust in Customer.objects.all():
 			acctlist.append(cust.acct)
-		if acct in acctlist:
+		if acct in acctlist:  # roll again
 			acct = randint(10000, 99999)
 
 		email = str(name.split(' ')[0] + "@domain.com")
@@ -110,7 +128,7 @@ def populate (namelist):
 	print("{} customers added to db.".format(len(customerlist)))
 
 
-def populate_items (numitems):
+def populate_items (numitems, user):
 	customerlist = Customer.objects.all()
 	if not customerlist:
 		_namelist = raw_input('No customers found. Add how many?:\t')
@@ -127,9 +145,11 @@ def populate_items (numitems):
 			itemid += 1
 			status = randint(0, 4)
 			item = add_item(owner = customer, itemid = itemid, quantity = quantity,
-							status = status, length = length, width = width, height = height)
+							status = status, length = length, width = width,
+							height = height)
 			for j in range(status + 1):
-				add_op(item, j)
+				add_op(item, j, user)
+			add_shipment(i, user)
 			itemcount += 1
 	print("{} items added to db.".format(itemcount))
 
@@ -137,20 +157,23 @@ def populate_items (numitems):
 if __name__ == '__main__':
 	print("Starting Customer/Inventory population script...")
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'order_tracker.settings')
-	from tracker.models import Customer, Inventory, Operation
+	from tracker.models import Customer, Inventory, Operation, Shipment, OptExtras
+	from django.contrib.auth.models import User
+
+	u = User.objects.all()[0]
 
 	# Options
-	_namelist = raw_input('CSV of names to load? (default names.csv):\t\t')
-	_numnames = raw_input('Number of customers to add (default 30)?:\t')
-	_numitems = raw_input('Max number of items to add per customer (default 7)?:\t')
-	# assert isinstance(_numitems, int)
+	_namelist = raw_input('CSV of names to load? (default names.csv):  ')
+	_numnames = raw_input('Number of customers to add (default {0})?:  '.format(DEFAULT_CUSTOMER_NUMBER))
+	_numitems = raw_input('Max number of items to add per customer (default {0})?:  '.format(DEFAULT_ITEM_NUMBER))
 
 	if not _namelist:
-		_namelist = 'names.csv'
+		_namelist = DEFAULT_NAMELIST
+	if not _numnames:
+		_numnames = DEFAULT_CUSTOMER_NUMBER
+	if not _numitems:
+		_numitems = DEFAULT_ITEM_NUMBER
 
 	_namelist = load_names(_namelist, _numnames)
 	populate(_namelist)
-
-	if not _numitems:
-		_numitems = 7
-	populate_items(_numitems)
+	populate_items(_numitems, u)
