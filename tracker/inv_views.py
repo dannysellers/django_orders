@@ -1,10 +1,11 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import messages
-from models import Customer, Inventory, Operation
+from models import *
 import utils
 import forms
 
@@ -19,7 +20,7 @@ def inventory (request):
 	storage_fee_arg = request.GET.get('storage_fees')
 	item = request.GET.get('item')
 
-	header_list = ['ID', 'Owner', '# of Cartons', 'Total Volume (ft.^3)',
+	header_list = ['Ship ID', 'Item ID', 'Owner', 'Total Volume (ft.^3)',
 				   'Storage Fees', 'Status', 'Arrival']
 
 	try:
@@ -38,7 +39,7 @@ def inventory (request):
 					customer = Customer.objects.get(acct = acct)
 					context_dict['customer'] = customer
 					context_filter.append(str(customer))
-					inventory_list = inventory_list.filter(owner = customer)
+					inventory_list = inventory_list.filter(shipset__owner = customer)
 					if not inventory_list:
 						messages.add_message(request, messages.INFO, "This customer has no items.")
 
@@ -88,12 +89,12 @@ def inventory (request):
 					# TODO: How to use True / False as values, rather than yes/no
 					context_filter.append('Items not yet incurring storage fees')
 					for item in inventory_list.exclude(status = 4):
-						if abs((item.arrival - date.today()).days) < 7:
+						if abs((item.shipset.arrival - date.today()).days) < 7:
 							_filtered_list.append(item)
 				else:
 					context_filter.append('Currently incurring storage fees')
 					for item in inventory_list.exclude(status = 4):
-						if abs((item.arrival - date.today()).days) >= 7:
+						if abs((item.shipset.arrival - date.today()).days) >= 7:
 							_filtered_list.append(item)
 
 				inventory_list = _filtered_list
@@ -109,10 +110,10 @@ def inventory (request):
 		elif item:
 			_item = Inventory.objects.get(itemid = item)
 			context_dict['item'] = _item
-			customer = Customer.objects.get(acct = _item.owner.acct)
+			customer = Customer.objects.get(acct = _item.shipset.owner.acct)
 			context_dict['customer'] = customer
 
-			op_headers = ['Op ID', 'Op Code', 'Start', 'Finish', 'Labor Time (mins)']
+			op_headers = ['Op ID', 'Op Code', 'Time', 'User']
 			context_dict['op_headers'] = op_headers
 			context_dict['op_list'] = Operation.objects.all().filter(item = _item)
 
@@ -139,6 +140,7 @@ def inventory (request):
 	return render_to_response('tracker/inventory.html', context_dict, context)
 
 
+@login_required
 def add_item (request, account_url):
 	"""
 	Form to add item. Intended behavior: Either receive account # within
@@ -147,7 +149,13 @@ def add_item (request, account_url):
 	context = RequestContext(request)
 	context_dict = {}
 
-	owner = Customer.objects.get(acct = account_url)
+	try:
+		owner = Customer.objects.get(acct = account_url)
+	except Customer.DoesNotExist:
+		messages.add_message(request, messages.ERROR, "Customer {} not found.".format(account_url))
+		return render_to_response('tracker/add_customer.html',
+								  context_dict,
+								  context)
 
 	if request.method == 'POST':
 		form = forms.InventoryForm(request.POST)
@@ -155,33 +163,17 @@ def add_item (request, account_url):
 		if form.is_valid():
 			item = form.save(commit = False)
 
-			try:
-				cust = Customer.objects.get(acct = owner.acct)
-				item.owner = cust
+			item.owner = owner
 
-				item.itemid = len(Inventory.objects.all()) + 1
-				item.length = form.cleaned_data['length'] / 12
-				item.width = form.cleaned_data['width'] / 12
-				item.height = form.cleaned_data['height'] / 12
-				item.volume = form.cleaned_data['length'] * form.cleaned_data['width'] * form.cleaned_data['height']
-				item.storage_fees = int(form.cleaned_data['quantity']) * item.volume
+			item.length = form.cleaned_data['length'] / 12
+			item.width = form.cleaned_data['width'] / 12
+			item.height = form.cleaned_data['height'] / 12
+			item.save()
 
-				item.arrival = date.today()
-				item.departure = date.today()
-				item.status = 0
+			Operation.objects.get_or_create(item = item, user = request.user, op_code = 0)
 
-				item.save()
+			return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
 
-				Operation.objects.get_or_create(item = item, start = datetime.today(),
-												finish = datetime.today(), labor_time = 0,
-												op_code = 0)
-
-				return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
-
-			except Customer.DoesNotExist:
-				return render_to_response('tracker/add_customer.html',
-										  context_dict,
-										  context)
 		else:
 			print form.errors
 	else:
@@ -192,16 +184,16 @@ def add_item (request, account_url):
 	return render_to_response('tracker/form.html', context_dict, context)
 
 
+@login_required
 def change_item_status (request):
 	"""
 	Receives list of checked items, passes them to item manager page
 	If /change_status?item=##### , manage individual item.
 	If /manage_items/, receive list of items.
 	"""
-	# TODO: Integrate this with individual item page
 	# TODO: Enforce only one copy of induction / shipment per item
 	# TODO: Enforce triplets of order received, started, done
-	# context = RequestContext(request)
+	# TODO: Add confirmation on changing individual item status without shipment status
 	itemlist = []
 
 	""" Prepare itemlist for processing by db / parsing to json (maybe? eventually?) """
@@ -223,39 +215,56 @@ def change_item_status (request):
 				print("Item {} could not be found".format(key))
 		if key == 'operation':  # retrieve value of desired op
 			operation = value
-		if key == 'labor_time':
-			labor_time = int(value)
 
 	""" Assign new operation to each item """
 	if request.method == 'POST':
 		# op_list = []
 		for item in itemlist:
-			item.status = operation
-			td = datetime.today()
+			if item.status != operation:
+				# Only change the status to something it isn't already
+				item.status = operation
+				td = datetime.now()
+				user = request.user
 
-			mins = labor_time % 60
-			hrs = int(labor_time / 60)
-			# TODO: Should time elapsed add to now to calculate finish, or subtract from now for start?
-			td2 = td + timedelta(hours = hrs, minutes = mins)
+				Operation.objects.get_or_create(item = item, user = user, dt = td, op_code = operation)
+				item.save()
+			else:
+				messages.add_message(request, messages.ERROR, """Item {} already has a
+				status of '{}'""".format(item.itemid, utils.int_to_status_code("Inventory", item.status)))
+				return HttpResponseRedirect('/inventory?acct={}'.format(item.owner.acct))
 
-			o = Operation.objects.get_or_create(item = item, start = datetime.now(),
-												finish = td2, labor_time = labor_time,
-												op_code = operation)[0]
-			item.save()
-
-		# for op in list(Operation.objects.all().filter(item = item)):
-		# op_list.append({
-		# 			"op_id": op.id,
-		# 			"op_code": op.op_code,
-		# 			"start": op.start,
-		# 			"finish": op.finish,
-		# 			"labor_time": op.labor_time
-		# 		})
-		# return HttpResponse(dumps(op_list, indent=4), content_type='application/json')
+		if len(itemlist) > 1:
 			return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
+		elif len(itemlist) == 1:
+			return HttpResponseRedirect('/inventory?item={}'.format(itemlist[0].itemid))
+		else:
+			messages.add_message(request, messages.ERROR, "No items selected.")
+			return HttpResponseRedirect('/inventory?status=stored')
 	else:
 		messages.add_message(request, messages.ERROR, """No request was passed.
 		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.
 		/inventory?acct=#####)</a>.""")
 
 		return HttpResponseRedirect('/inventory?status=stored')
+
+
+def shipment (request):
+	context = RequestContext(request)
+	context_dict = {}
+
+	header_list = ['Owner', 'Owner Acct', 'Ship ID', 'Palletized', 'Arrival', 'Departure',
+				   'Labor time', 'Status', 'Tracking #', 'Notes']
+	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
+
+	_shipment = Shipment.objects.get(shipid = request.GET['id'])
+	item_list = _shipment.inventory_set.all()
+
+	if int(_shipment.status) != 4:
+		header_list.remove('Arrival')
+
+	context_dict['headers'] = header_list
+	context_dict['shipment'] = _shipment
+	context_dict['item_headers'] = item_headers
+	context_dict['item_list'] = item_list
+
+	return render_to_response('tracker/shipment.html', context_dict, context)

@@ -30,11 +30,14 @@
 	<a href="/accounts?accts=all">All accounts</a>
 	| <a href="/accounts?accts=active">Active accounts</a>
 	| <a href="/accounts?accts=inactive">Inactive accounts</a>
-	| <a href="/add_account">Add new account</a>
+	{% if user.is_authenticated %}
+		| <a href="/add_account">Add new account</a>
+	{% endif %}
 	{% if user.is_authenticated and customer and account_status == 'Active' %}
 		| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
-	{% else %}
-		| <a href="" style="pointer-events:none; cursor:default;">Remove account</a>
+		| <a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Edit Account Info</a>
+	{% elif user.is_authenticated and customer and account_status != 'Active' %}
+		| <a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Display Account Info</a>
 	{% endif %}
 
 	{% if messages %}
@@ -102,6 +105,28 @@
 			</tbody>
 		</table>
 		<br/>
+		{% if user.is_authenticated %}
+			<div id="acctForm" style="display: none; width: 80%;">
+				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
+					{% csrf_token %}
+					<div style="float:left; width:33%;">
+						Name: <input type="text" name="name" value="{{ customer.name }}" />
+						<br />
+						Account: <input type="text" name="acct" value="{{ customer.acct }}" />
+					</div>
+					<div style="float:left; width:33%;">
+						Email: <input type="text" name="email" value="{{ customer.email }}" />
+					</div>
+					<div style="float:left; width:33%;">
+					<textarea name="notes" rows="5" cols="50">{{ customer.notes }}</textarea>
+					{% if account_status == 'Active' %}
+						<input type="submit" name="submit" value="Submit" />
+					{% endif %}
+					</div>
+				</form>
+			</div>
+		{% endif %}
+		<hr width="85%" align="left">
 		<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 		{% if storage_fees %}
@@ -122,14 +147,16 @@
 				{% if inventory_list %}
 					{% for item in inventory_list %}
 						<tr>
+							<td id="ship_id">
+								<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
+							</td>
 							<td id="item_id">
 								<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
 							</td>
-							<td id="item_quantity">{{ item.quantity }}</td>
 							<td id="item_volume">{{ item.volume|length:"2" }}</td>
 							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 							<td id="item_status">{{ item.status|op_code }}</td>
-							<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+							<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 						</tr>
 					{% endfor %}
 				{% endif %}

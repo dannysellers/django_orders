@@ -17,6 +17,7 @@ urlpatterns += patterns('',
 	url(r'^accounts$', acct_views.accounts, name = 'accounts'),
 	url(r'^accounts/(?P<account_url>\d+)/$', acct_views.account_page, name = 'account_page'),
 	url(r'^add_account/$', acct_views.add_account, name = 'add_account'),
+	url(r'^acct_info', acct_views.acct_info, name = 'acct_info'),
 )
 
 # Inventory patterns
@@ -26,4 +27,5 @@ urlpatterns += patterns('',
 	url(r'^add_inventory/$', inv_views.add_item, name='add_inventory'),
 	url(r'^manage_items/$', inv_views.change_item_status, name='manage_items'),
 	url(r'^change_status', inv_views.change_item_status, name='change_status'),  # change one item's status
+	url(r'^shipment', inv_views.shipment, name='shipment'),
 )

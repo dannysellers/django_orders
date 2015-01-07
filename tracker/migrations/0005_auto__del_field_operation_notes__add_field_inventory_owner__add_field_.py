@@ -8,82 +8,39 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Customer'
-        db.create_table(u'tracker_customer', (
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('acct', self.gf('django.db.models.fields.IntegerField')(unique=True, max_length=5, primary_key=True)),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=75)),
-            ('status', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('createdate', self.gf('django.db.models.fields.DateField')()),
-            ('closedate', self.gf('django.db.models.fields.DateField')()),
-        ))
-        db.send_create_signal(u'tracker', ['Customer'])
+        # Deleting field 'Operation.notes'
+        db.delete_column(u'tracker_operation', 'notes')
 
-        # Adding model 'Inventory'
-        db.create_table(u'tracker_inventory', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Customer'])),
-            ('itemid', self.gf('django.db.models.fields.IntegerField')(unique=True)),
-            ('quantity', self.gf('django.db.models.fields.IntegerField')(default=1)),
-            ('length', self.gf('django.db.models.fields.FloatField')(default=1.0, max_length=5)),
-            ('width', self.gf('django.db.models.fields.FloatField')(default=1.0, max_length=5)),
-            ('height', self.gf('django.db.models.fields.FloatField')(default=1.0, max_length=5)),
-            ('volume', self.gf('django.db.models.fields.FloatField')(default=1.0, max_length=5)),
-            ('palletized', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('arrival', self.gf('django.db.models.fields.DateField')()),
-            ('departure', self.gf('django.db.models.fields.DateField')()),
-            ('status', self.gf('django.db.models.fields.CharField')(default=0, max_length=1)),
-            ('storage_fees', self.gf('django.db.models.fields.FloatField')(default=0.05)),
-        ))
-        db.send_create_signal(u'tracker', ['Inventory'])
+        # Adding field 'Inventory.owner'
+        db.add_column(u'tracker_inventory', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=11111, to=orm['tracker.Customer']),
+                      keep_default=False)
 
-        # Adding model 'Operation'
-        db.create_table(u'tracker_operation', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Inventory'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('dt', self.gf('django.db.models.fields.DateTimeField')()),
-            ('op_code', self.gf('django.db.models.fields.CharField')(default=0, max_length=1)),
-        ))
-        db.send_create_signal(u'tracker', ['Operation'])
+        # Adding field 'Inventory.arrival'
+        db.add_column(u'tracker_inventory', 'arrival',
+                      self.gf('django.db.models.fields.DateField')(default='2014-12-22'),
+                      keep_default=False)
 
-        # Adding model 'Shipment'
-        db.create_table(u'tracker_shipment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Inventory'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('start', self.gf('django.db.models.fields.DateTimeField')()),
-            ('finish', self.gf('django.db.models.fields.DateTimeField')()),
-            ('labor_time', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'tracker', ['Shipment'])
-
-        # Adding model 'OptExtras'
-        db.create_table(u'tracker_optextras', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('shipment', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tracker.Shipment'])),
-            ('quantity', self.gf('django.db.models.fields.IntegerField')(default=1)),
-            ('unit_cost', self.gf('django.db.models.fields.FloatField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal(u'tracker', ['OptExtras'])
+        # Adding field 'Inventory.departure'
+        db.add_column(u'tracker_inventory', 'departure',
+                      self.gf('django.db.models.fields.DateField')(default='2014-12-23'),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'Customer'
-        db.delete_table(u'tracker_customer')
+        # Adding field 'Operation.notes'
+        db.add_column(u'tracker_operation', 'notes',
+                      self.gf('django.db.models.fields.TextField')(default='this is a note'),
+                      keep_default=False)
 
-        # Deleting model 'Inventory'
-        db.delete_table(u'tracker_inventory')
+        # Deleting field 'Inventory.owner'
+        db.delete_column(u'tracker_inventory', 'owner_id')
 
-        # Deleting model 'Operation'
-        db.delete_table(u'tracker_operation')
+        # Deleting field 'Inventory.arrival'
+        db.delete_column(u'tracker_inventory', 'arrival')
 
-        # Deleting model 'Shipment'
-        db.delete_table(u'tracker_shipment')
-
-        # Deleting model 'OptExtras'
-        db.delete_table(u'tracker_optextras')
+        # Deleting field 'Inventory.departure'
+        db.delete_column(u'tracker_inventory', 'departure')
 
 
     models = {
@@ -130,6 +87,7 @@ class Migration(SchemaMigration):
             'createdate': ('django.db.models.fields.DateField', [], {}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'notes': ('django.db.models.fields.TextField', [], {}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '1'})
         },
         u'tracker.inventory': {
@@ -141,8 +99,7 @@ class Migration(SchemaMigration):
             'itemid': ('django.db.models.fields.IntegerField', [], {'unique': 'True'}),
             'length': ('django.db.models.fields.FloatField', [], {'default': '1.0', 'max_length': '5'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Customer']"}),
-            'palletized': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'quantity': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
+            'shipset': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Shipment']"}),
             'status': ('django.db.models.fields.CharField', [], {'default': '0', 'max_length': '1'}),
             'storage_fees': ('django.db.models.fields.FloatField', [], {'default': '0.05'}),
             'volume': ('django.db.models.fields.FloatField', [], {'default': '1.0', 'max_length': '5'}),
@@ -166,12 +123,15 @@ class Migration(SchemaMigration):
         },
         u'tracker.shipment': {
             'Meta': {'object_name': 'Shipment'},
-            'finish': ('django.db.models.fields.DateTimeField', [], {}),
+            'arrival': ('django.db.models.fields.DateField', [], {}),
+            'departure': ('django.db.models.fields.DateField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Inventory']"}),
             'labor_time': ('django.db.models.fields.IntegerField', [], {}),
-            'start': ('django.db.models.fields.DateTimeField', [], {}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+            'notes': ('django.db.models.fields.TextField', [], {}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['tracker.Customer']"}),
+            'palletized': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'shipid': ('django.db.models.fields.IntegerField', [], {'unique': 'True'}),
+            'tracking_number': ('django.db.models.fields.CharField', [], {'max_length': '30'})
         }
     }
 

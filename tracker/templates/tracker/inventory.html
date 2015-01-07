@@ -35,7 +35,10 @@
 	| <a href="/inventory?status=order_begun">Order Begun</a>
 	| <a href="/inventory?status=order_completed">Order Completed</a>
 	{% if customer %}
-		<br/><a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
+		<br/>
+		{% if user.is_authenticated %}
+			<a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
+		{% endif %}
 		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 	{% endif %}
@@ -56,11 +59,11 @@
 	{% endif %}
 
 	{% if user.is_authenticated %}
+		<br/><br/>
 		{% if item %}
-			<br/><br/>
 			<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
 			{% csrf_token %}
-		{% elif customer %}
+		{% elif customer and inventory_list %}
 			<form id="manage_inventory" method="post" action="/manage_items/">
 			{% csrf_token %}
 		{% endif %}
@@ -68,13 +71,12 @@
 	<table>
 		<thead>
 			<tr>
-{#				TODO: Enable checking all checkboxes #}
-				{% if user.is_authenticated and customer %}
-{#					Adds checkbox for selection if logged in#}
-					<th></th>
-	{#				{% if customer %}#}
-	{#					<th><input type="checkbox" id="checkbox" onclick="checkedAll();"></th>#}
-	{#				{% endif %}#}
+				{% if user.is_authenticated and customer and inventory_list %}
+					{% if customer %}
+						<th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
+					{% else %}
+						<th></th>
+					{% endif %}
 				{% endif %}
 				{% for item in headers %}
 					<th>{{ item }}</th>
@@ -84,31 +86,34 @@
 		<tbody>
 			{% if item %}
 				<tr>
+					<td id="ship_id"><a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a></td>
 					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_owner">
-						<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+						<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
 					</td>
-					<td id="item_quantity">{{ item.quantity }}</td>
+{#					<td id="item_quantity">{{ item.quantity }}</td>#}
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
 					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 					<td id="item_status">{{ item.status|op_code }}</td>
-					<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+					<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 				</tr>
 			{% elif inventory_list %}
 				{% for item in inventory_list %}
 					<tr>
 						{% if user.is_authenticated %}
 							{% if customer %}
-								<td><input type="checkbox" name="{{ item.itemid }}" id="checkbox"></td>
+								<td id="td_checkbox"><input type="checkbox" class="checkbox" name="{{ item.itemid }}"></td>
 							{% endif %}
 						{% endif %}
+						<td id="ship_id">
+							<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
+						</td>
 						<td id="item_id">
 							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
 						</td>
 						<td id="item_owner">
-							<a href="/accounts/{{ item.owner.acct }}">{{ item.owner.name }}</a>
+							<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
 						</td>
-						<td id="item_quantity">{{ item.quantity }}</td>
 						<td id="item_volume">{{ item.volume|length:"2" }}</td>
 						{% if not item.status == '4' %}
 							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
@@ -116,9 +121,9 @@
 							<td class="inactive"></td>
 						{% endif %}
 						<td id="item_status">{{ item.status|op_code }}</td>
-						<td id="item_arrival">{{ item.arrival|date:"m-d-Y" }}</td>
+						<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 						{% if item.status == '4' %}
-							<td>{{ item.departure|date:"m-d-Y" }}</td>
+							<td>{{ item.shipset.departure|date:"m-d-Y" }}</td>
 						{% elif b_inactive %}
 							<td class="inactive"></td>
 						{% endif %}
@@ -142,9 +147,8 @@
 					<tr id="op_row">
 						<td id="op_id">{{ operation.id }}</td>
 						<td id="op_code">{{ operation.op_code|op_code }}</td>
-						<td id="op_start">{{ operation.start }}</td>
-						<td id="op_finish">{{ operation.finish }}</td>
-						<td id="op_labor_time">{{ operation.labor_time }}</td>
+						<td id="op_time">{{ operation.dt }}</td>
+						<td id="op_actor">{{ operation.user }}</td>
 	{#					Field for additional expenses / notes?#}
 					</tr>
 				{% endfor %}
@@ -152,16 +156,16 @@
 		</table>
 	{% endif %}
 	{% if user.is_authenticated %}
-		{% if item or customer %}
+		{% if item or customer and inventory_list %}
 			<br/>
 			<select name="operation">
 				<option value="0">Inducted (0)</option>
 				<option value="1">Order Received (1)</option>
-				<option value="2">Order Begun (2)</option>
+				<option value="2">Order Started (2)</option>
 				<option value="3">Order Completed (3)</option>
 				<option value="4">Shipped (4)</option>
 			</select>
-			Time elapsed (minutes): <input type="text" name="labor_time">
+{#			Time elapsed (minutes): <input type="text" name="labor_time">#}
 			{% if item.status != '4' %}
 				<input type="submit" name="submit" value="Change Status" />
 			{% else %}
@@ -179,4 +183,4 @@
 {#		{{ message }}#}
 {#	{% endif %}#}
 
-{% endblock %}
+{% endblock content %}
