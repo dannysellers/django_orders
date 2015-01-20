@@ -5,6 +5,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.decorators.cache import cache_control
 import utils
 from models import Customer, Inventory
 import forms
@@ -18,6 +19,7 @@ def decode_url (url):
 	return url.replace('_', ' ')
 
 
+@cache_control(no_cache = True)
 def accounts (request):
 	context = RequestContext(request)
 	context_dict = dict()
@@ -73,7 +75,7 @@ def accounts (request):
 			return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
 	else:
-		header_list = ['Account', 'Name', 'Create Date']
+		header_list = ['Account', 'Name', 'Create Date', 'Stored Shipments', 'Storage Fees']
 		if accts:
 			try:
 				# Parse accts argument, retrieve list of customers
@@ -85,12 +87,13 @@ def accounts (request):
 					customer_list = Customer.objects.all()
 					context_dict['status_column'] = True  # flag
 					header_list.insert(2, 'Status')
-					header_list += ['Close Date']
+					header_list.insert(-2, 'Close Date')
 					context_dict['head_text'] = 'All '
 
 				elif accts == "inactive":
 					customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
-					header_list += ['Close Date']
+					header_list.remove('Stored Shipments')
+					header_list.insert(-1, 'Close Date')
 					context_dict['head_text'] = 'Inactive '
 
 				else:
@@ -162,26 +165,28 @@ def account_page (request, account_url):
 
 
 @login_required
+@cache_control(no_cache = True)
 def acct_info (request):
-	# context = RequestContext(request)
-	# context_dict = dict()
-
 	acct = request.GET.get('acct')
-	customer = Customer.objects.get(acct = acct)
-
-	if request.method == 'POST':
-		customer.notes = request.POST['notes']
-		customer.email = request.POST['email']
-		customer.name = request.POST['name']
-		customer.notes = request.POST['notes']
-		customer.acct = request.POST['acct']  # TODO: Confirmation on changing acct number
-		customer.save()
-
-		messages.add_message(request, messages.SUCCESS, "Account information updated successfully.")
-		return HttpResponseRedirect('/accounts/{}'.format(customer.acct))
+	if request.method != 'POST':
+		messages.add_message(request, messages.ERROR, "Improper request type. Try submitting a form instead.")
+		return HttpResponseRedirect('/accounts?acct={}'.format(acct))
 	else:
-		messages.add_message(request, messages.ERROR, "No request was passed. Click the button instead!")
-		return HttpResponseRedirect('/accounts?acct={}'.format(customer.acct))
+		try:
+			customer = Customer.objects.get(acct = acct)
+		except Customer.DoesNotExist:
+			messages.add_message(request, messages.ERROR, "Could not find customer with acct #{}".format(acct))
+			return HttpResponseRedirect('/accounts?accts=active')
+		else:
+			customer.notes = request.POST['notes']
+			customer.email = request.POST['email']
+			customer.name = request.POST['name']
+			customer.notes = request.POST['notes']
+			customer.acct = request.POST['acct']  # TODO: Confirmation on changing acct number
+		finally:
+			customer.save()
+			messages.add_message(request, messages.SUCCESS, "Account information updated successfully.")
+			return HttpResponseRedirect('/accounts/{}'.format(customer.acct))
 
 
 @login_required

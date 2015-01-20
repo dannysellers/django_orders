@@ -70,6 +70,10 @@
 								<td class="inactive"></td>
 							{% endif %}
 						{% endif %}
+						{% if 'Inactive' not in head_text %}
+							<td id="ship_count">{{ customer.shipment_set.count }}</td>
+						{% endif %}
+						<td id="storage_fees">${{ customer.inventory_set.all|storage_fee_total }}</td>
 					</tr>
 				{% endfor %}
 			</tbody>
@@ -103,18 +107,15 @@
 				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
 					{% csrf_token %}
 					<div class="col-3">
-						Name: <input type="text" name="name" value="{{ customer.name }}" />
-						<br />
-						Account: <input type="text" name="acct" value="{{ customer.acct }}" />
+						Name: <input type="text" name="name" value="{{ customer.name }}" /><br />
+						Account: <input type="text" name="acct" value="{{ customer.acct }}" /><br />
+						Email: <input type="email" name="email" value="{{ customer.email }}" />
 					</div>
 					<div class="col-3">
-						Email: <input type="text" name="email" value="{{ customer.email }}" />
+						Notes:<br/> <textarea id = "notes">{{ customer.notes }}</textarea>
 					</div>
 					<div class="col-3">
-					<textarea name="notes" rows="5" cols="50">{{ customer.notes }}</textarea>
-					{% if account_status == 'Active' %}
-						<input type="submit" name="submit" value="Submit" />
-					{% endif %}
+						<button class="btn" name="submit">Submit Information</button>
 					</div>
 				</form>
 			</div>
@@ -145,7 +146,7 @@
 							<td><a href="/shipment?id={{ shipment.id }}">{{ shipment.id }}</a> ({{ shipment.inventory_set.count }})</td>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
-							<td>&nbsp;</td>
+							<td>${{ shipment.inventory_set.all|storage_fee_total }}</td>
 							<td>{{ shipment.status|op_code }}</td>
 							<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
 						</tr>

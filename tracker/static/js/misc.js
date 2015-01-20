@@ -21,14 +21,6 @@ function togglePane(idToggleDiv, toggleLink) {
 	curDiv.style.display = styleDisplay;
 }
 
-function checkAll(source) {
-	// Check all boxes in the table (of class 'checkbox' to make things easier)
-	var checkboxes = document.getElementsByClassName("checkbox");
-	for (var i = 0; i < checkboxes.length; i++) {
-		checkboxes[i].checked = source.checked;
-	}
-}
-
 function getParent(_element, strTagName) {
 	// From http://js-code.blogspot.com/p/table-tr-td-th-border-stylesolid-border.html
 	// Get parent of _element with tag name strTagName
@@ -39,8 +31,17 @@ function getParent(_element, strTagName) {
 		return getParent(_element.parentNode, strTagName);
 }
 
-function toggleSection(lnk) {
+function checkAll(source) {
+	// Check all boxes in the table (of class 'checkbox')
+	var table = getParent(source.parentNode, 'table');
+	var checkboxes = table.getElementsByClassName('checkbox');
+	for (var i = 0; i < checkboxes.length; i++) {
+		checkboxes[i].checked = source.checked;
+	}
+}
 
+function toggleSection(lnk) {
+	// Toggles sections of a table, as for folding of shipment <tr>s
 	var th = lnk.parentNode;
 	var table = getParent(th, 'table');
 	var len = table.rows.length;

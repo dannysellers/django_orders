@@ -1,18 +1,13 @@
-from datetime import date
-
 from django.contrib import messages
-from django.contrib.auth import authenticate, logout, login, views as auth_views
+from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from forms import UserForm
 
-# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 from models import *
-# import forms
 
 
 def index (request):
@@ -48,9 +43,6 @@ def register (request):
 	context = RequestContext(request)
 	context_dict = {}
 
-	# Flag for template
-	registered = False
-
 	if request.method == 'POST':
 		user_form = UserForm(data = request.POST)
 
@@ -60,20 +52,20 @@ def register (request):
 			user.set_password(user.password)
 			user.save()
 
-			registered = True
-		# Redirection?
+			messages.add_message(request, messages.SUCCESS, "User {} registered successfully".format(user.username))
+			return HttpResponseRedirect('/', context)
 		else:
 			print user_form.errors
 	else:
 		user_form = UserForm()
 
-	context_dict['user_form'] = user_form
-	context_dict['registered'] = registered
+	context_dict['form'] = user_form
+	context_dict['register'] = True  # flag
 
-	return render_to_response('tracker/register.html', context_dict, context)
+	return render_to_response('tracker/form.html', context_dict, context)
 
 
-def user_login (request, *args, **kwargs):
+def user_login (request):
 	context = RequestContext(request)
 
 	if request.method == 'POST':
@@ -90,7 +82,7 @@ def user_login (request, *args, **kwargs):
 				if not request.POST.get('remember_me', None):
 					request.session.set_expiry(0)
 				login(request, user)
-				messages.add_message(request, messages.SUCCESS, "Login successful. Welcome {}".format(user))
+				messages.add_message(request, messages.SUCCESS, "Login successful. Welcome, {}.".format(user.first_name))
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 			else:
 				messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")
@@ -99,10 +91,8 @@ def user_login (request, *args, **kwargs):
 		else:
 			messages.add_message(request, messages.ERROR, "Invalid login details: {0}, {1}".format(username, password))
 			return HttpResponseRedirect('/')
-
-	# If not a POST, display login form
 	else:
-		return render_to_response('tracker/login.html', {}, context)
+		return render_to_response('tracker/login.html', context)
 
 
 @login_required

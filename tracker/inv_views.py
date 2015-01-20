@@ -5,11 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import messages
+from django.views.decorators.cache import cache_control
 from models import *
 import utils
 import forms
 
 
+@cache_control(no_cache = True)
 def inventory (request):
 	context = RequestContext(request)
 	context_dict = {}
@@ -248,6 +250,7 @@ def change_item_status (request):
 		return HttpResponseRedirect('/inventory?status=stored')
 
 
+@cache_control(no_cache = True)
 def shipment (request):
 	context = RequestContext(request)
 	context_dict = {}

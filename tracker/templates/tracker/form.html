@@ -1,45 +1,65 @@
 {% extends 'tracker/index.html' %}
 {% load static %}
 
+{% if register %}
+	{% block title %}
+		<title>Register New User</title>
+	{% endblock title %}
+{% endif %}
+
 {% block header %}
 	{% if customer %}
-	    <h1>Add an Account</h1>
+		<h1>Add an Account</h1>
+	{% elif register %}
+		<h1>Register New User</h1>
 	{% else %}
-	    <h1>Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}</h1>
+		<h1>Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}</h1>
 	{% endif %}
 {% endblock header %}
+
+{% block sub_nav %}
+
+{% endblock sub_nav %}
 
 {% block content %}
 
 	{% if customer %}
-	    <form id="account_form" method="post" action="/add_account/">
+		<form id = "account_form" method = "post" action = "/add_account/">
 	{% elif owner %}
-        <form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
+		<form id = "inventory_form" method = "post" action = "/accounts/{{ owner.acct }}/add_inventory/">
 	{% elif shipment %}
-		<form id="shipment_form" method="post" action="/accounts/{{ owner.acct }}/add_shipment/">
+		<form id = "shipment_form" method = "post" action = "/accounts/{{ owner.acct }}/add_shipment/">
+	{% elif register %}
+		<form id = "user_form" method = "post" action = "/register/" enctype = "multipart/form-data">
 	{% endif %}
-		<br/>
-        {% csrf_token %}
-        {% for hidden in form.hidden_field %}
-            {{ hidden }}
-        {% endfor %}
+	{% csrf_token %}
+	{% for hidden in form.hidden_fields %}
+		{{ hidden }}
+	{% endfor %}
 
-        {% for field in form.visible_fields %}
-            {{ field.errors }}
-            {{ field.help_text }}
-            {{ field }}
-            <br />
-        {% endfor %}
+	{% if not register %}
+		{% for field in form.visible_fields %}
+			{{ field.errors }}
+			{{ field.help_text }}
+			{{ field }}
+			<br />
+		{% endfor %}
+	{% else %}
+		<h4>Create a new user.</h4>
+		{{ form.as_p }}
+	{% endif %}
 
-		<input type="submit" name="submit"
+	<input type = "submit" name = "submit"
 			{% if customer %}
-			   	value="Create Account"
-			   {% elif owner %}
-			   	value="Add Item"
-			   {% elif shipment %}
-			   	value="Add Shipment"
+		   value = "Create Account"
+			{% elif owner %}
+		   value = "Add Item"
+			{% elif shipment %}
+		   value = "Add Shipment"
+			{% elif register %}
+		   value = "Register"
 			{% endif %} />
 
-    </form>
+	</form>
 
 {% endblock content %}

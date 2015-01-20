@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 import views
 import acct_views
 import inv_views
+import ship_views
 
 # General / report patterns
 urlpatterns = patterns('',
@@ -32,6 +33,6 @@ urlpatterns += patterns('',
 
 # Shipment patterns
 urlpatterns += patterns('',
-	url(r'^shipment', inv_views.shipment, name='shipment'),
-	url(r'^ship_info', inv_views.ship_info, name='ship_info'),  # for POSTing shipment info
+	url(r'^shipment', ship_views.shipment, name='shipment'),
+	url(r'^ship_info', ship_views.ship_info, name='ship_info'),
 )

@@ -25,7 +25,7 @@
 		{% endfor %}
 		</thead>
 		<tbody>
-		<td><a href = "/accounts?acct={{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
+		<td><a href = "/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
 		<td>#{{ shipment.owner.acct }}</td>
 		<td>{{ shipment.palletized }}</td>
 		{% if shipment.status != '4' %}
@@ -42,11 +42,16 @@
 	</table>
 
 	<br />
-	<div class="row">
-		<div class="col-2">
+	<div class = "row">
+		{% if user.is_authenticated %}
+			<form id = "ship_info" method = "post" action = "/ship_info?shipid={{ shipment.shipid }}">
+			{% csrf_token %}
+		{% endif %}
+		<div class = "col-2">
 			<h3>Item List ({{ shipment.inventory_set.count }})</h3>
-			<table style="width: 90%;">
+			<table class = "tableItem" style = "width: 90%;">
 				<thead>
+				<th><input type = "checkbox" class = "checkbox" onclick = "javascript:checkAll(this);"></th>
 				{% for item in item_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
@@ -54,6 +59,8 @@
 				<tbody>
 				{% for item in item_list %}
 					<tr>
+						<td id = "td_checkbox"><input type = "checkbox" class = "checkbox"
+													  name = "item_{{ item.itemid }}"></td>
 						<td id = "item_id">
 							<a href = "/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
 						</td>
@@ -68,43 +75,65 @@
 				{% endfor %}
 				</tbody>
 			</table>
+			<select name = "item_status" style = "margin-top:0.5rem;">
+				<option value = "0">Inducted (0)</option>
+				<option value = "1">Order Received (1)</option>
+				<option value = "2">Order Started (2)</option>
+				<option value = "3">Order Completed (3)</option>
+				<option value = "4">Shipped (4)</option>
+			</select>
 		</div>
 
-		<div class="col-2">
+		<div class = "col-2">
 			<div id = "shipForm" style = "display: block;">
 				<h3>Information</h3>
-			{% if user.is_authenticated %}
-				<form id="ship_info" method="post" action="/ship_info?shipid={{ shipment.shipid }}">
-					{% csrf_token %}
-			{% endif %}
-					<div class="col-2">
-						Palletized: <input type="checkbox" name="palletized" value="{{ shipment.palletized }}" /><br/>
-						Labor time: <input type="text" name="labor_time" value="{{ shipment.labor_time }}" /><br/>
-						Tracking #: <input type="text" name="tracking_number" value="{{ shipment.tracking_number }}" /><br/>
-						{% if shipment.status != '4' %}
-							<input type = "submit" name = "submit" value = "Submit" />
-						{% endif %}
-					</div>
-					<div class="col-2">
-						Shipment notes:<br />
-						<textarea name = "notes" id = "notes">{{ shipment.notes }}</textarea>
-					</div>
-			{% if user.is_authenticated %}
-				</form>
-			{% endif %}
+
+				<div class = "col-2">
+					Palletized: <input type = "checkbox" name = "palletized"
+									   value = "{{ shipment.palletized }}" /><br />
+					Labor time: <input type = "text" name = "labor_time" value = "{{ shipment.labor_time }}" /><br />
+					Tracking #: <input type = "text" name = "tracking_number"
+									   value = "{{ shipment.tracking_number }}" /><br />
+					{% if shipment.status != '4' %}
+						<a class = "btn" name = "submit" onclick = "verifyAllChecked('tableItem', 'ship_info');">Submit
+							Information</a>
+					{% else %}
+						<a class = "btn disabled" name = "submit">Submit Information</a>
+					{% endif %}
+				</div>
+				<div class = "col-2">
+					Shipment notes:<br />
+					<textarea name = "notes" id = "notes">{{ shipment.notes }}</textarea>
+				</div>
 			</div>
 		</div>
+		{% if user.is_authenticated %}
+			</form>
+		{% endif %}
+	</div>
+
+	<hr width = "85%" align = "left" />
+
+	<div class = "row">
+
 	</div>
 
 	<hr width = "85%" align = "left" />
 
 	<div class = "row">
 		<h3>Extras ({{ shipment.optextras_set.count }})</h3>
-		<table>
+		{% if user.is_authenticated %}
+			| <a href = "#">Add extra</a>
+		{% endif %}
+		<table class = "expandable">
 			<thead>
-			{% for item in extras_headers %}
-				<th>{{ item }}</th>
-			{% endfor %}
+			<tr>
+				<th><a href = "#" class = "optextras_toggle" style = "color:white;text-decoration:none;"
+					   onclick = "toggleSection(this);">-</a></th>
+				{% for item in extras_headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+			</tr>
 			</thead>
 			<tbody>
 			{% for extra in extras_list %}
@@ -120,21 +149,61 @@
 	</div>
 
 	<script>
+		function verifyAllChecked(source, formId) {
+			// If all or none of the checkboxes are checked, the form submits. Else, confirm
+			var table = document.getElementsByClassName(source)[0];
+			var checkboxes = table.getElementsByClassName('checkbox');
+			var headChecked = checkboxes[0].checked; // Value of checkbox in head row
+			var complete = true;
+			var numChecked = 0;  // If all the boxes are checked but not the header, it's fine
+			var sForm = document.forms[formId];
+
+			// If the top box is checked and any other is different, the set is incomplete
+			for (var i = 1; i < checkboxes.length; i++) {
+				if (checkboxes[i].checked) {
+					numChecked += 1;
+				}
+				if (checkboxes[i].checked != headChecked) {
+					complete = false
+				}
+			}
+			if (complete == false && numChecked != checkboxes.length - 1) {
+				if (confirm("Not all items in this shipment were selected! Continue? Shipment status will not change.")) {
+					sForm.submit();
+				} else {
+					return false
+				}
+			} else {
+				sForm.submit();
+			}
+		}
 		function disableElements(eleForm) {
 			var sForm = document.getElementById(eleForm);
-			var count = 0;
+			// TODO: Check whether it's disable-able
 			for (var i = 0; i < sForm.childElementCount; i++) {
 				var c = sForm.children[i];
 				for (var j = 0; j < c.childElementCount; j++) {
-					count += 1;
 					c.children[j].disabled = true;
 				}
 			}
-			console.log("Disabled " + count + " children of " + eleForm + ".");
 		}
 		var oldEvt = window.onload;
 		window.onload = function () {
 			if (oldEvt) oldEvt();
+
+			var shipStatus = parseInt('{{ shipment.status }}');
+			var s = document.getElementsByName('item_status')[0];
+
+			// Set the form select widget to the current value + 1
+			// Except if shipment.status = 4, disable the select widget
+			if (shipStatus < 4) {
+				s.selectedIndex = shipStatus + 1;
+			} else {
+				s.selectedIndex = 4;
+				s.disabled = true;
+			}
+
+			// If the user isn't logged in, disable the form elements
 			var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
 			if (t == 'Log in') {
 				disableElements('shipForm');

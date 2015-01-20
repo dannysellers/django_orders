@@ -1,7 +1,7 @@
 from datetime import date
 
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as auth_User
 from models import *
 
 
@@ -32,7 +32,6 @@ class InventoryForm(forms.ModelForm):
 
 	class Meta:
 		model = Inventory
-
 		fields = ('quantity', 'length', 'width', 'height', 'palletized')
 
 
@@ -46,7 +45,6 @@ class InventoryForm(forms.ModelForm):
 
 
 class OptExtraForm(forms.ModelForm):
-	# description = forms.TextInput(help_text = "Description: ")
 	description = forms.TextInput()
 	quantity = forms.CharField(max_length = 5, help_text = "Quantity: ")
 	unit_cost = forms.DecimalField(max_digits = 6, initial = 1.00, help_text = "Unit cost: ")
@@ -60,5 +58,5 @@ class UserForm(forms.ModelForm):
 	password = forms.CharField(widget = forms.PasswordInput())
 
 	class Meta:
-		model = User
+		model = auth_User
 		fields = ('username', 'email', 'password')

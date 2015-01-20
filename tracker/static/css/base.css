@@ -21,7 +21,7 @@ a.disabled {
 	pointer-events  : none;
 	cursor          : default;
 	text-decoration : none;
-	color: black;
+	color           : black;
 }
 
   /*//////////////*/
@@ -62,7 +62,7 @@ th {
 
 td {
 	padding : 0.2rem 0.35rem 0.15rem 0.5rem;
-	border: 1px solid black;
+	border  : 1px solid black;
 }
 
 /* Shipment toggle + \ - */
@@ -88,6 +88,7 @@ table tr:nth-child(odd) {
 
 #ship_head_row {
 	background-color : #dcdcdc;
+	font-weight      : 500;
 }
 
 .inactive {
@@ -121,17 +122,42 @@ table tr:nth-child(odd) {
 	width : 50%;
 }
 
-.row h2, .row h3, .row h4 {
+.row h3, .row h4 {
 	display : inline;
 }
 
 .row {
-	padding-bottom: 1rem;
-	float : left;
-	width : 85%;
+	padding-bottom : 1rem;
+	float          : left;
+	width          : 85%;
 }
 
 #notes {
-	width  : 85%;
-	height : 5rem;
+	width         : 85%;
+	height        : 5rem;
+	margin-bottom : 1rem;
+}
+
+.btn {
+	font-size       : medium;
+	display         : inline-block;
+	color           : #000000;
+	margin-top      : 1rem;
+	padding         : 10px 15px 10px 15px;
+	border          : solid #000000 2px;
+	text-decoration : none;
+}
+
+.btn #disabled {
+	background     : #b0b0b0;
+	pointer-events : none;
+	cursor         : default;
+
+}
+
+.btn:hover {
+	background      : #2c3e50;
+	color           : #ecf0f1;
+	text-decoration : none;
+	cursor          : pointer;
 }
