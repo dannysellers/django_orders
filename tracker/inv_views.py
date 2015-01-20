@@ -252,15 +252,23 @@ def shipment (request):
 	context = RequestContext(request)
 	context_dict = {}
 
-	header_list = ['Owner', 'Owner Acct', 'Ship ID', 'Palletized', 'Arrival', 'Departure',
-				   'Labor time', 'Status', 'Tracking #', 'Notes']
+	header_list = ['Owner', 'Owner Acct', 'Palletized', 'Arrival', 'Departure',
+				   'Labor time', 'Status', 'Tracking #', 'Info']
 	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
 
-	_shipment = Shipment.objects.get(shipid = request.GET['id'])
-	item_list = _shipment.inventory_set.all()
+	shipid = request.GET['id']
+	try:
+		_shipment = Shipment.objects.get(shipid = shipid)
+	except Shipment.DoesNotExist:
+		messages.add_message(request, messages.ERROR, "No shipment found with ID {}!".format(shipid))
+		return HttpResponseRedirect('/inventory?status=stored')
 
 	if int(_shipment.status) != 4:
+		header_list.remove('Departure')
+	else:
 		header_list.remove('Arrival')
+
+	item_list = _shipment.inventory_set.all()
 
 	context_dict['headers'] = header_list
 	context_dict['shipment'] = _shipment
@@ -268,3 +276,23 @@ def shipment (request):
 	context_dict['item_list'] = item_list
 
 	return render_to_response('tracker/shipment.html', context_dict, context)
+
+
+def ship_info (request):
+	shipid = request.GET['shipid']
+	if request.method == 'POST':
+		try:
+			_shipment = Shipment.objects.get(shipid = shipid)
+			_shipment.labor_time = request.POST['labor_time']
+			_shipment.notes = request.POST['notes']
+			_shipment.palletized = request.POST['palletized']
+			_shipment.tracking_number = request.POST['tracking_no']
+			_shipment.save()
+		except Shipment.DoesNotExist:
+			messages.add_message(request, messages.ERROR, "Shipment {} not found!".format(shipid))
+			return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+		messages.add_message(request, messages.SUCCESS, "Shipment {} information updated.".format(shipid))
+		return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+	else:
+		messages.add_message(request, messages.ERROR, "No POST received.")
+		return HttpResponseRedirect('/')

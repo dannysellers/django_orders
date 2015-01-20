@@ -18,7 +18,7 @@
 		{% block header %}
 			<h1>Order / Inventory Tracker</h1>
 		{% endblock header %}
-		<div class="div_user-greeting">
+		<div class="float_user-greeting">
 			<strong>
 				{% if user.is_authenticated %}
 					Hi {{ user.first_name }} ({{ user.username }})!
@@ -28,7 +28,7 @@
 			</strong><br/>
 			<a href="/register/">Register user</a> |
 			{% if not user.is_authenticated %}
-				<a id="displayText" href="javascript:toggle('toggleDiv', 'displayText');">Log in</a>
+				<a id="displayText" href="javascript:togglePane('toggleDiv', 'displayText');">Log in</a>
 				<div id="toggleDiv" style="display: none; padding-top: 0.5em;">
 					<form id="login_form" method="post" action="/login/">
 						{% csrf_token %}

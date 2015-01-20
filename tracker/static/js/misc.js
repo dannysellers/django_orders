@@ -1,4 +1,4 @@
-function toggle(idToggleDiv, toggleLink) {
+function togglePane(idToggleDiv, toggleLink) {
 	// Function to toggle account info form pane
 	var curDiv = document.getElementById(idToggleDiv);
 	var objToggle = document.getElementById(toggleLink);
@@ -7,20 +7,18 @@ function toggle(idToggleDiv, toggleLink) {
 		var preEleText = 'Edit Account Info';
 		var postEleText = 'Hide Account Info'
 	} else if (idToggleDiv == 'toggleDiv') {
-		var preEleText = 'Log in';
-		var postEleText = 'hide'
+		preEleText = 'Log in';
+		postEleText = 'hide'
 	} else if (idToggleDiv == 'shipForm') {
-		var preEleText = 'Show Notes';
-		var postEleText = 'Hide Notes'
+		preEleText = 'Show Notes';
+		postEleText = 'Hide Notes'
 	}
 
-	if (curDiv.style.display == "block") {
-		curDiv.style.display = "none";
-		objToggle.innerHTML = preEleText;
-	} else {
-		curDiv.style.display = "block";
-		objToggle.innerHTML = postEleText;
-	}
+	var eleText = (curDiv.style.display == 'block') ? preEleText : postEleText;
+	var styleDisplay = (curDiv.style.display == 'block') ? 'none' : 'block';
+
+	objToggle.innerHTML = eleText;
+	curDiv.style.display = styleDisplay;
 }
 
 function checkAll(source) {
@@ -52,7 +50,7 @@ function toggleSection(lnk) {
 	lnk.innerHTML = (lnk.innerHTML == "+") ? "-" : "+";
 
 	/* ternary operator for:
-	if (table.rows[1].style.display != 'none'){
+	if (table.rows[1].style.display == 'none'){
 	  vStyle = 'none'
 	} else {
 	  vStyle = ''
@@ -69,12 +67,12 @@ function toggleSection(lnk) {
 	}
 }
 
-function initShipTable() {
-	var tbl = document.getElementsByClassName('expandable');
-	if (tbl.length > 1) {
-		alert("More than one table found (unexpected). Using first table.");
-	}
-	tbl = tbl[0];
-
-
-}
+//function initShipTable() {
+//	var tbl = document.getElementsByClassName('expandable');
+//	if (tbl.length > 1) {
+//		alert("More than one table found (unexpected). Using first table.");
+//	}
+//	tbl = tbl[0];
+//
+//
+//}

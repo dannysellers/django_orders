@@ -90,7 +90,7 @@ def user_login (request, *args, **kwargs):
 					request.session.set_expiry(0)
 				login(request, user)
 				messages.add_message(request, messages.SUCCESS, "Login successful. Welcome {}".format(user))
-				return HttpResponseRedirect('/')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 			else:
 				messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")
 				return HttpResponseRedirect('/')

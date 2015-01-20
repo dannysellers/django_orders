@@ -116,27 +116,12 @@ def accounts (request):
 		context_dict['headers'] = header_list
 		context_dict['num_accts'] = len(customer_list)
 
-		# Replace spaces with underscores to retrieve URL
-		for customer in customer_list:
-			customer.url = 'accounts/' + str(customer.acct)
-			# Replace 0 and 1 with account status
-			# This seems to show Active or Inactive for all people in the list
-			if str(customer.status) == '0':
-				context_dict['account_status'] = 'Inactive'
-			elif str(customer.status) == '1':
-				context_dict['account_status'] = 'Active'
-			else:
-				context_dict['account_status'] = str(customer.status)
-
 		context_dict['customer_list'] = customer_list
 
 	return render_to_response('tracker/accounts.html', context_dict, context)
 
 
 def account_page (request, account_url):
-	# acct = request.GET.get('acct')
-	# if not account_url:
-	# account_url = acct
 	context = RequestContext(request)
 	context_dict = dict()
 
@@ -144,10 +129,9 @@ def account_page (request, account_url):
 	context_dict['headers'] = header_list
 
 	# Get account
-	account_acct = account_url
 	context_dict['account_url'] = account_url
 	try:
-		customer = Customer.objects.get(acct = account_acct)
+		customer = Customer.objects.get(acct = account_url)
 		# Show only items still in inventory
 		if customer.inventory_set.exclude(status = 4).count():
 			cust_shipments = customer.shipment_set.all().exclude(status = 4)
@@ -156,7 +140,7 @@ def account_page (request, account_url):
 		else:
 			messages.add_message(request, messages.INFO, "This customer has no items stored in inventory.")
 	except Customer.DoesNotExist:
-		messages.add_message(request, messages.ERROR, "Account {} not found.".format(account_acct))
+		messages.add_message(request, messages.ERROR, "Account {} not found.".format(account_url))
 		return render_to_response('tracker/accounts.html', context_dict, context)
 
 	context_dict['customer'] = customer

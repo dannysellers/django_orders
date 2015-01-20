@@ -33,11 +33,13 @@
 	{% if user.is_authenticated %}
 		| <a href="/add_account">Add new account</a>
 	{% endif %}
-	{% if user.is_authenticated and customer and account_status == 'Active' %}
-		| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
-		| <a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Edit Account Info</a>
-	{% elif user.is_authenticated and customer and account_status != 'Active' %}
-		| <a id="acctFormToggle" href="javascript:toggle('acctForm', 'acctFormToggle');">Display Account Info</a>
+	{% if user.is_authenticated and customer %}
+		{% if customer.status == '1' %}
+			| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
+		{% else %}
+			| <a href="#" class="disabled">Remove account</a>
+		{% endif %}
+		| <a id="acctFormToggle" href="javascript:togglePane('acctForm', 'acctFormToggle');">Edit Account Info</a>
 	{% endif %}
 
 	{% if messages %}
@@ -63,14 +65,14 @@
 			<tbody>
 				{% for customer in customer_list %}
 					<tr>
-						<td id="account_cell"><a href="{{ customer.url }}">{{ customer.acct }}</a></td>
+						<td id="account_cell"><a href="/accounts/{{ customer.acct }}">{{ customer.acct }}</a></td>
 						<td id="name_cell">{{ customer.name }}</td>
 						{% if status_column %}
-							<td id="status_cell">{{ customer.status }}</td>
+							<td id="status_cell">{{ customer.status|cust_status }}</td>
 						{% endif %}
 {#						TODO: Fix sorting, which uses month name#}
 						<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-						{% if 'Active' not in filter %}
+						{% if 'Active' not in head_text %}
 							{% if customer.status == "0" %}
 								<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
 							{% else %}
@@ -96,7 +98,7 @@
 					<td id="account_cell">{{ customer.acct }}</td>
 					<td id="name_cell">{{ customer.name }}</td>
 					<td id="email_cell">{{ customer.email }}</td>
-					<td id="status_cell">{{ account_status }}</td>
+					<td id="status_cell">{{ customer.status|cust_status }}</td>
 					<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
 					{% if customer.status == '0' %}
 						<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
@@ -109,15 +111,15 @@
 			<div id="acctForm" style="display: none; width: 80%;">
 				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
 					{% csrf_token %}
-					<div style="float:left; width:33%;">
+					<div class="formcol-3">
 						Name: <input type="text" name="name" value="{{ customer.name }}" />
 						<br />
 						Account: <input type="text" name="acct" value="{{ customer.acct }}" />
 					</div>
-					<div style="float:left; width:33%;">
+					<div class="formcol-3">
 						Email: <input type="text" name="email" value="{{ customer.email }}" />
 					</div>
-					<div style="float:left; width:33%;">
+					<div class="formcol-3">
 					<textarea name="notes" rows="5" cols="50">{{ customer.notes }}</textarea>
 					{% if account_status == 'Active' %}
 						<input type="submit" name="submit" value="Submit" />
@@ -148,11 +150,11 @@
 				{% if shipment_list %}
 					{% for shipment in shipment_list %}
 						<tr class="ship_head_row">
-							<td><a href="#" class="ship_toggle" onclick="toggleSection(this);">+</a></td>
-							<td><a href="/shipment?id={{ shipment.id }}">{{ shipment.id }}</a></td>
+							<td><a href="#" class="ship_toggle" onclick="toggleSection(this);">-</a></td>
+							<td><a href="/shipment?id={{ shipment.id }}">{{ shipment.id }}</a> ({{ shipment.inventory_set.count }})</td>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
-							<td></td>
+							<td>&nbsp;</td>
 							<td>{{ shipment.status|op_code }}</td>
 							<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
 						</tr>

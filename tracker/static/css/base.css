@@ -5,8 +5,8 @@
 } */
 
 p {
-	margin: 0;
-	padding: 0;
+	margin  : 0;
+	padding : 0;
 }
 
 body {
@@ -15,6 +15,13 @@ body {
 	font-family  : "Helvetica Neue", Helvetica, Arial, sans-serif;
 	padding-left : 1em;
 	/*background-color : #95a5a6;*/
+}
+
+a.disabled {
+	pointer-events  : none;
+	cursor          : default;
+	text-decoration : none;
+	color: black;
 }
 
   /*//////////////*/
@@ -64,10 +71,11 @@ td {
 
 /* Shipment toggle + / - */
 .ship_toggle:link {
-	text-decoration: none;
+	text-decoration : none;
 }
+
 .ship_toggle:hover {
-	text-decoration: underline;
+	text-decoration : underline;
 }
 
 #account_cell {
@@ -83,7 +91,7 @@ td {
 /*//////////////////*/
 
 .ship_head_row {
-	background-color: #bdbdbd;
+	background-color : #bdbdbd;
 }
 
 table tr:nth-child(even) {
@@ -98,11 +106,29 @@ table tr:nth-child(odd) {
 	background-color : #cdcdcd;
 }
 
-.div_user-greeting {
+  /*//////////////////////////*/
+ /*// FLOATING USER WINDOW //*/
+/*//////////////////////////*/
+
+.float_user-greeting {
 	position : fixed;
 	right    : 5%;
 	top      : 5%;
 	border   : thin solid;
 	padding  : 7px;
 	width    : 175px;
+}
+
+  /*///////////////////*/
+ /*// FORM ELEMENTS //*/
+/*///////////////////*/
+
+.formcol-3 {
+	float : left;
+	width : 33%;
+}
+
+.formcol-2 {
+	float : left;
+	width : 50%;
 }

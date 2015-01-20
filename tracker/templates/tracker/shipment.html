@@ -9,7 +9,7 @@
 {% endblock title %}
 
 {% block header %}
-	<h1>Shipment {{ shipment.shipid }} &#8212; {{ shipment.owner.name }}, #{{ shipment.owner.acct }}</h1>
+	<h1>Shipment {{ shipment.shipid }} ({{ shipment.inventory_set.count }} items) &#8212; {{ shipment.owner.name }}, #{{ shipment.owner.acct }}</h1>
 {% endblock header %}
 
 {% block content %}
@@ -24,46 +24,66 @@
 		<td><a href = "/accounts?acct={{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
 		<td>#{{ shipment.owner.acct }}</td>
 		<td>{{ shipment.palletized }}</td>
-		<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
-		{% if shipment.status == "4" %}
+		{% if shipment.status != '4' %}
+			<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
+		{% else %}
 			<td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
 		{% endif %}
 		<td>{{ shipment.labor_time }}</td>
-		<td>{{ shipment.status }}</td>
+		<td>{{ shipment.status|op_code }}</td>
 		<td>{{ shipment.tracking_number }}</td>
-		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:toggle('shipForm', 'shipFormToggle');">Show
-			Notes</a>
+		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:togglePane('shipForm', 'shipFormToggle');">Hide
+			Info</a>
 		</tbody>
 	</table>
 
 	<br />
-	<table class = "not-sortable">
-		<thead>
-		{% for item in item_headers %}
-			<th>{{ item }}</th>
-		{% endfor %}
-		</thead>
-		<tbody>
-		{% for item in item_list %}
-			<tr>
-				<td id = "item_id">
-					<a href = "/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-				</td>
-				<td id = "item_volume">{{ item.volume }}</td>
-				{% if not item.status == '4' %}
-					<td id = "item_storage_fees">${{ item.storage_fees }}</td>
-				{% else %}
-					<td class = "inactive"></td>
-				{% endif %}
-				<td id = "item_status">{{ item.status }}</td>
-			</tr>
-		{% endfor %}
-		</tbody>
-	</table>
+	<div class="formcol-2">
+		<table class = "not-sortable" style="width: 90%;">
+			<thead>
+			{% for item in item_headers %}
+				<th>{{ item }}</th>
+			{% endfor %}
+			</thead>
+			<tbody>
+			{% for item in item_list %}
+				<tr>
+					<td id = "item_id">
+						<a href = "/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+					</td>
+					<td id = "item_volume">{{ item.volume|length:"2" }}</td>
+					{% if not item.status == '4' %}
+						<td id = "item_storage_fees">${{ item.storage_fees }}</td>
+					{% else %}
+						<td class = "inactive"></td>
+					{% endif %}
+					<td id = "item_status">{{ item.status|op_code }}</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
 
-	<div id = "shipForm" style = "display: none;">
-		<br />Shipment notes:<br />
-		<textarea name = "notes" rows = "5" cols = "50">{{ shipment.notes }}</textarea>
+	<div class="formcol-2">
+	{% if user.is_authenticated %}
+		<div id = "shipForm" style = "display: block; width: 80%;">
+			<form id="ship_info" method="post" action="/ship_info?shipid={{ shipment.shipid }}">
+				{% csrf_token %}
+				<div class="formcol-2">
+					Palletized: <input type="checkbox" name="palletized" value="{{ shipment.palletized }}" /><br/>
+					Labor time: <input type="text" name="labor_time" value="{{ shipment.labor_time }}" /><br/>
+					Tracking #: <input type="text" name="tracking_no" value="{{ shipment.tracking_number }}" /><br/>
+					{% if shipment.status != '4' %}
+						<input type="submit" name="submit" value="Submit" />
+					{% endif %}
+				</div>
+				<div class="formcol-2">
+					Shipment notes:<br />
+					<textarea name = "notes" rows = "5" cols = "30">{{ shipment.notes }}</textarea>
+				</div>
+			</form>
+		</div>
+	{% endif %}
 	</div>
 
 {% endblock content %}
