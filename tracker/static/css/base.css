@@ -10,7 +10,7 @@ p {
 }
 
 body {
-	width        : 85%;
+	/*width        : 85%;*/
 	/* TODO: Responsive-ize this */
 	font-family  : "Helvetica Neue", Helvetica, Arial, sans-serif;
 	padding-left : 1em;
@@ -33,12 +33,6 @@ ul.errorlist {
 	color      : red;
 }
 
-#error_message {
-	color       : red;
-	font-weight : bold;
-	margin-top  : 10px;
-}
-
 .message {
 	list-style : none;
 }
@@ -48,8 +42,9 @@ ul.errorlist {
 /*////////////*/
 
 table {
-	border : 1px solid gray;
-	width  : 85%;
+	border          : 1px solid gray;
+	width           : 85%;
+	border-collapse : collapse;
 }
 
 th {
@@ -66,10 +61,11 @@ th {
 }
 
 td {
-	padding-left : 1rem;
+	padding : 0.2rem 0.35rem 0.15rem 0.5rem;
+	border: 1px solid black;
 }
 
-/* Shipment toggle + / - */
+/* Shipment toggle + \ - */
 .ship_toggle:link {
 	text-decoration : none;
 }
@@ -78,21 +74,9 @@ td {
 	text-decoration : underline;
 }
 
-#account_cell {
-	padding-left : 0.5rem;
-}
-
-#name_cell, #email_cell, #status_cell {
-	padding-left : 1.0rem;
-}
-
   /*//////////////////*/
  /*// row coloring //*/
 /*//////////////////*/
-
-.ship_head_row {
-	background-color : #bdbdbd;
-}
 
 table tr:nth-child(even) {
 	background-color : #ffffff;
@@ -100,6 +84,10 @@ table tr:nth-child(even) {
 
 table tr:nth-child(odd) {
 	background-color : #f1f1f1;
+}
+
+#ship_head_row {
+	background-color : #dcdcdc;
 }
 
 .inactive {
@@ -123,12 +111,27 @@ table tr:nth-child(odd) {
  /*// FORM ELEMENTS //*/
 /*///////////////////*/
 
-.formcol-3 {
+.col-3 {
 	float : left;
 	width : 33%;
 }
 
-.formcol-2 {
+.col-2 {
 	float : left;
 	width : 50%;
+}
+
+.row h2, .row h3, .row h4 {
+	display : inline;
+}
+
+.row {
+	padding-bottom: 1rem;
+	float : left;
+	width : 85%;
+}
+
+#notes {
+	width  : 85%;
+	height : 5rem;
 }

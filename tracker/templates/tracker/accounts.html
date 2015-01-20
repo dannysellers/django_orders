@@ -20,7 +20,7 @@
 		{% endif %}
 {% endblock header %}
 
-{% block content %}
+{% block sub_nav %}
 
 	{% if confirm_remove %}
 		<a href="/accounts?remove={{ customer.acct }}&confirm_remove=True">Yes</a>
@@ -41,18 +41,9 @@
 		{% endif %}
 		| <a id="acctFormToggle" href="javascript:togglePane('acctForm', 'acctFormToggle');">Edit Account Info</a>
 	{% endif %}
+{% endblock sub_nav %}
 
-	{% if messages %}
-		<ul class="message">
-		{% for message in messages %}
-			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-		{% endfor %}
-		</ul>
-	{% else %}
-		<br/><br/>
-{#		very nice#}
-	{% endif %}
-
+{% block content %}
 	{% if customer_list %}
 		<table>
 			<thead>
@@ -111,15 +102,15 @@
 			<div id="acctForm" style="display: none; width: 80%;">
 				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
 					{% csrf_token %}
-					<div class="formcol-3">
+					<div class="col-3">
 						Name: <input type="text" name="name" value="{{ customer.name }}" />
 						<br />
 						Account: <input type="text" name="acct" value="{{ customer.acct }}" />
 					</div>
-					<div class="formcol-3">
+					<div class="col-3">
 						Email: <input type="text" name="email" value="{{ customer.email }}" />
 					</div>
-					<div class="formcol-3">
+					<div class="col-3">
 					<textarea name="notes" rows="5" cols="50">{{ customer.notes }}</textarea>
 					{% if account_status == 'Active' %}
 						<input type="submit" name="submit" value="Submit" />
@@ -149,7 +140,7 @@
 			<tbody>
 				{% if shipment_list %}
 					{% for shipment in shipment_list %}
-						<tr class="ship_head_row">
+						<tr id="ship_head_row">
 							<td><a href="#" class="ship_toggle" onclick="toggleSection(this);">-</a></td>
 							<td><a href="/shipment?id={{ shipment.id }}">{{ shipment.id }}</a> ({{ shipment.inventory_set.count }})</td>
 							<td>&nbsp;</td>

@@ -9,11 +9,15 @@
 {% endblock title %}
 
 {% block header %}
-	<h1>Shipment {{ shipment.shipid }} ({{ shipment.inventory_set.count }} items) &#8212; {{ shipment.owner.name }}, #{{ shipment.owner.acct }}</h1>
+	<h1>Shipment {{ shipment.shipid }} &#8212; {{ shipment.owner.name }}, #{{ shipment.owner.acct }}</h1>
 {% endblock header %}
 
+{% block sub_nav %}
+
+{% endblock sub_nav %}
+
 {% block content %}
-	<br />
+
 	<table>
 		<thead>
 		{% for item in headers %}
@@ -38,52 +42,104 @@
 	</table>
 
 	<br />
-	<div class="formcol-2">
-		<table class = "not-sortable" style="width: 90%;">
+	<div class="row">
+		<div class="col-2">
+			<h3>Item List ({{ shipment.inventory_set.count }})</h3>
+			<table style="width: 90%;">
+				<thead>
+				{% for item in item_headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
+				</thead>
+				<tbody>
+				{% for item in item_list %}
+					<tr>
+						<td id = "item_id">
+							<a href = "/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+						</td>
+						<td id = "item_volume">{{ item.volume|length:"2" }}</td>
+						{% if not item.status == '4' %}
+							<td id = "item_storage_fees">${{ item.storage_fees }}</td>
+						{% else %}
+							<td class = "inactive"></td>
+						{% endif %}
+						<td id = "item_status">{{ item.status|op_code }}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="col-2">
+			<div id = "shipForm" style = "display: block;">
+				<h3>Information</h3>
+			{% if user.is_authenticated %}
+				<form id="ship_info" method="post" action="/ship_info?shipid={{ shipment.shipid }}">
+					{% csrf_token %}
+			{% endif %}
+					<div class="col-2">
+						Palletized: <input type="checkbox" name="palletized" value="{{ shipment.palletized }}" /><br/>
+						Labor time: <input type="text" name="labor_time" value="{{ shipment.labor_time }}" /><br/>
+						Tracking #: <input type="text" name="tracking_number" value="{{ shipment.tracking_number }}" /><br/>
+						{% if shipment.status != '4' %}
+							<input type = "submit" name = "submit" value = "Submit" />
+						{% endif %}
+					</div>
+					<div class="col-2">
+						Shipment notes:<br />
+						<textarea name = "notes" id = "notes">{{ shipment.notes }}</textarea>
+					</div>
+			{% if user.is_authenticated %}
+				</form>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<hr width = "85%" align = "left" />
+
+	<div class = "row">
+		<h3>Extras ({{ shipment.optextras_set.count }})</h3>
+		<table>
 			<thead>
-			{% for item in item_headers %}
+			{% for item in extras_headers %}
 				<th>{{ item }}</th>
 			{% endfor %}
 			</thead>
 			<tbody>
-			{% for item in item_list %}
+			{% for extra in extras_list %}
 				<tr>
-					<td id = "item_id">
-						<a href = "/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-					</td>
-					<td id = "item_volume">{{ item.volume|length:"2" }}</td>
-					{% if not item.status == '4' %}
-						<td id = "item_storage_fees">${{ item.storage_fees }}</td>
-					{% else %}
-						<td class = "inactive"></td>
-					{% endif %}
-					<td id = "item_status">{{ item.status|op_code }}</td>
+					<td>{{ extra.quantity }}</td>
+					<td>${{ extra.unit_cost|length:"2" }}</td>
+					<td>${{ extra.total_cost|length:"2" }}
+					<td>{{ extra.description }}</td>
 				</tr>
 			{% endfor %}
 			</tbody>
 		</table>
 	</div>
 
-	<div class="formcol-2">
-	{% if user.is_authenticated %}
-		<div id = "shipForm" style = "display: block; width: 80%;">
-			<form id="ship_info" method="post" action="/ship_info?shipid={{ shipment.shipid }}">
-				{% csrf_token %}
-				<div class="formcol-2">
-					Palletized: <input type="checkbox" name="palletized" value="{{ shipment.palletized }}" /><br/>
-					Labor time: <input type="text" name="labor_time" value="{{ shipment.labor_time }}" /><br/>
-					Tracking #: <input type="text" name="tracking_no" value="{{ shipment.tracking_number }}" /><br/>
-					{% if shipment.status != '4' %}
-						<input type="submit" name="submit" value="Submit" />
-					{% endif %}
-				</div>
-				<div class="formcol-2">
-					Shipment notes:<br />
-					<textarea name = "notes" rows = "5" cols = "30">{{ shipment.notes }}</textarea>
-				</div>
-			</form>
-		</div>
-	{% endif %}
-	</div>
+	<script>
+		function disableElements(eleForm) {
+			var sForm = document.getElementById(eleForm);
+			var count = 0;
+			for (var i = 0; i < sForm.childElementCount; i++) {
+				var c = sForm.children[i];
+				for (var j = 0; j < c.childElementCount; j++) {
+					count += 1;
+					c.children[j].disabled = true;
+				}
+			}
+			console.log("Disabled " + count + " children of " + eleForm + ".");
+		}
+		var oldEvt = window.onload;
+		window.onload = function () {
+			if (oldEvt) oldEvt();
+			var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
+			if (t == 'Log in') {
+				disableElements('shipForm');
+			}
+		}
+	</script>
 
 {% endblock content %}

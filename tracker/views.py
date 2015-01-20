@@ -11,7 +11,7 @@ from forms import UserForm
 
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from models import Customer, Inventory
+from models import *
 # import forms
 
 
@@ -21,7 +21,8 @@ def index (request):
 
 	context_dict['cust_count'] = Customer.objects.count()
 	context_dict['cust_act_count'] = Customer.objects.filter(status = 1).count()
-	context_dict['item_count'] = Inventory.objects.count()
+	context_dict['item_count'] = Inventory.objects.exclude(status = 4).count()
+	context_dict['ship_count'] = Shipment.objects.exclude(status = 4).count()
 
 	storage_fee_count = 0
 	no_storage_fee_count = 0

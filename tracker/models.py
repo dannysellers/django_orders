@@ -48,8 +48,8 @@ class ShipmentManager(models.Manager):
 		shipid = len(Shipment.objects.all()) + 1
 		arrival = date.today()
 		_shipment = self.create(owner = owner, shipid = shipid, palletized = palletized,
-					arrival = arrival, labor_time = labor_time, notes = notes,
-					tracking_number = tracking_number)
+								arrival = arrival, labor_time = labor_time, notes = notes,
+								tracking_number = tracking_number)
 		print("Created Ship ID: {}".format(_shipment.shipid))
 
 
@@ -79,10 +79,10 @@ class InventoryManager(models.Manager):
 		storage_fees = volume * UNIT_STORAGE_FEE
 		status = 0
 		_item = self.create(itemid = itemid, shipset = shipset, length = length,
-					width = width, height = height,
-					owner = owner, arrival = arrival,
-					volume = volume, storage_fees = storage_fees,
-					status = status)
+							width = width, height = height,
+							owner = owner, arrival = arrival,
+							volume = volume, storage_fees = storage_fees,
+							status = status)
 		print("Created Item ID: {}".format(_item.itemid))
 
 
@@ -111,7 +111,7 @@ class Inventory(models.Model):
 class OperationManager(models.Manager):
 	def create_operation (self, item, user, op_code):
 		_op = self.create(item = item, user = user,
-					dt = datetime.now(), op_code = op_code)
+						  dt = datetime.now(), op_code = op_code)
 		print("Created Op {0}: {1}".format(_op.op_code, _op.item))
 
 
@@ -127,11 +127,23 @@ class Operation(models.Model):
 		return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
 
 
+class OptExtraManager(models.Manager):
+	def create_optextra (self, shipment, quantity, unit_cost, description):
+		_total = unit_cost * quantity
+		_extra = self.create(shipment = shipment, quantity = quantity,
+							 unit_cost = unit_cost, total_cost = _total,
+							 description = description)
+		print("Created {} extra {} on Ship {}".format(_extra.quantity, _extra.description, _extra.shipment))
+
+
 class OptExtras(models.Model):
 	shipment = models.ForeignKey(Shipment)
 	quantity = models.IntegerField(default = 1)
 	unit_cost = models.FloatField()
+	total_cost = models.FloatField()
 	description = models.TextField()
 
+	objects = OptExtraManager()
+
 	def __unicode__ (self):
-		return '{}x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
+		return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)

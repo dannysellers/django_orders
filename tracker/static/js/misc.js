@@ -30,6 +30,7 @@ function checkAll(source) {
 }
 
 function getParent(_element, strTagName) {
+	// From http://js-code.blogspot.com/p/table-tr-td-th-border-stylesolid-border.html
 	// Get parent of _element with tag name strTagName
 	if (_element == null) return null;
 	else if (_element.nodeType == 1 && _element.tagName.toLowerCase() == strTagName.toLowerCase()) // Gecko bug, supposed to be uppercase
@@ -45,7 +46,7 @@ function toggleSection(lnk) {
 	var len = table.rows.length;
 	var tr = getParent(th, 'tr');
 	var rowIndex = tr.rowIndex;
-	var rowHead = table.rows[rowIndex].cells[1].innerText; // Ship ID
+	var rowHead = table.rows[rowIndex].cells[1].children[0].innerText; // Ship ID
 
 	lnk.innerHTML = (lnk.innerHTML == "+") ? "-" : "+";
 
@@ -66,13 +67,3 @@ function toggleSection(lnk) {
 		}
 	}
 }
-
-//function initShipTable() {
-//	var tbl = document.getElementsByClassName('expandable');
-//	if (tbl.length > 1) {
-//		alert("More than one table found (unexpected). Using first table.");
-//	}
-//	tbl = tbl[0];
-//
-//
-//}

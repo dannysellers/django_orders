@@ -49,43 +49,33 @@
 			| <a href="/about">About</a>
 			| <a href="/accounts?accts=active">Accounts</a>
 			| <a href="/inventory?status=stored">Inventory</a>
-{#			| | <a href="/register/">Register user</a>#}
-{#			{% if not user.is_authenticated %}#}
-{#				| <a href="/login/">Log in</a>#}
-{#			{% else %}#}
-{#				| <a href="/logout/">Log out</a>#}
-{#			{% endif %}#}
 		</nav>
+		<div class="row">
+			{% block sub_nav %}
+{#				<strong style="color: red;">There's nothing in the sub_nav block!</strong>#}
+			{% endblock sub_nav %}
+		</div>
+		<div class="row">
 
-	{% block content %}
-{#		<h3 id="user_greeting">#}
-{#		{% if user.is_authenticated %}#}
-{#			Hello {{ user.username }}.#}
-{#		{% else %}#}
-{#			Hello anonymous user.#}
-{#		{% endif %}#}
-{#		</h3>#}
+			{% if messages %}
+				<ul class="message">
+					{% for message in messages %}
+						<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
 
-		{% if messages %}
-			<ul class="message">
-				{% for message in messages %}
-					<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
-				{% endfor %}
-			</ul>
-		{% endif %}
+			{% block content %}
 
-{#		<br/>#}
-		Active customers: {{ cust_act_count }}<br />
-		Total customers: {{ cust_count }}<br />
-		Items currently in storage: {{ item_count }}<br />
-		<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
-		<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+				Active customers: {{ cust_act_count }}<br />
+				Total customers: {{ cust_count }}<br />
+				Shipments in storage: {{ ship_count }}<br />
+				Items currently in storage: {{ item_count }}<br />
+				<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
+				<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
 
-{#		<br/><br/><form method="get" action="/accounts">#}
-{#			Account: <input type="text" name="acct" />#}
-{#			<input type="submit" name="submit" value="Search" />#}
-{#		</form>#}
-	{% endblock %}
+			{% endblock %}
+		</div>
 
 	</body>
 </html>

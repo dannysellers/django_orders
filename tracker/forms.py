@@ -2,11 +2,11 @@ from datetime import date
 
 from django import forms
 from django.contrib.auth.models import User
-from models import Customer, Inventory
+from models import *
 
 
 class CustomerForm(forms.ModelForm):
-	name = forms.CharField(max_length = 128, help_text = "Customer's name: ")
+	name = forms.CharField(max_length = 128, help_text = "Name: ")
 	acct = forms.CharField(max_length = 5, help_text = "Account number: ")
 	email = forms.EmailField(help_text = "Email address: ")
 	status = forms.CharField(widget = forms.HiddenInput(), initial = 1, required = False)
@@ -36,8 +36,13 @@ class InventoryForm(forms.ModelForm):
 		fields = ('quantity', 'length', 'width', 'height', 'palletized')
 
 
-class ShipmentForm(forms.ModelForm):
-	quantity = forms.CharField(max_length = 5, help_text = "Quantity: ")
+# class ShipInfoForm(forms.ModelForm):
+# 	palletized = forms.BooleanField()
+# 	labor_time = forms.DecimalField(max_digits=6)
+#
+# 	class Meta:
+# 		model = Shipment
+# 		fields = ('palletized')
 
 
 class OptExtraForm(forms.ModelForm):

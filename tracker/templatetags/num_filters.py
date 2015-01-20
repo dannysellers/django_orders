@@ -13,8 +13,8 @@ def length (value, length):
 	"""
 	_length = int(length)
 	_string = str(value).split('.')
-	if len(_string[1]) == 1:  # Enforce at least two zeroes after the decimal
-		_string[1] = '00'
+	if len(_string[1]) == 1:
+		_string[1] += '0'
 	return _string[0] + '.' + _string[1][:_length]
 
 

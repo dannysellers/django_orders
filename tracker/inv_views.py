@@ -252,10 +252,6 @@ def shipment (request):
 	context = RequestContext(request)
 	context_dict = {}
 
-	header_list = ['Owner', 'Owner Acct', 'Palletized', 'Arrival', 'Departure',
-				   'Labor time', 'Status', 'Tracking #', 'Info']
-	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
-
 	shipid = request.GET['id']
 	try:
 		_shipment = Shipment.objects.get(shipid = shipid)
@@ -263,21 +259,36 @@ def shipment (request):
 		messages.add_message(request, messages.ERROR, "No shipment found with ID {}!".format(shipid))
 		return HttpResponseRedirect('/inventory?status=stored')
 
+	context_dict['shipment'] = _shipment
+
+	# Overview table
+	header_list = ['Owner', 'Owner Acct', 'Palletized', 'Arrival', 'Departure',
+				   'Labor time', 'Status', 'Tracking #', 'Info']
 	if int(_shipment.status) != 4:
 		header_list.remove('Departure')
 	else:
 		header_list.remove('Arrival')
 
+	context_dict['headers'] = header_list
+
+	# Itemlist table
+	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
 	item_list = _shipment.inventory_set.all()
 
-	context_dict['headers'] = header_list
-	context_dict['shipment'] = _shipment
 	context_dict['item_headers'] = item_headers
 	context_dict['item_list'] = item_list
+
+	# Extras table
+	extras_headers = ['Quantity', 'Unit Cost', 'Total Cost', 'Description']
+	extras_list = _shipment.optextras_set.all()
+
+	context_dict['extras_headers'] = extras_headers
+	context_dict['extras_list'] = extras_list
 
 	return render_to_response('tracker/shipment.html', context_dict, context)
 
 
+@login_required
 def ship_info (request):
 	shipid = request.GET['shipid']
 	if request.method == 'POST':
@@ -285,7 +296,11 @@ def ship_info (request):
 			_shipment = Shipment.objects.get(shipid = shipid)
 			_shipment.labor_time = request.POST['labor_time']
 			_shipment.notes = request.POST['notes']
-			_shipment.palletized = request.POST['palletized']
+			if 'palletized' not in request.POST:
+				# When the box is not checked, it's not passed at all :\
+				_shipment.palletized = False
+			else:
+				_shipment.palletized = True
 			_shipment.tracking_number = request.POST['tracking_no']
 			_shipment.save()
 		except Shipment.DoesNotExist:
