@@ -55,4 +55,5 @@ target/
 
 # Account list
 account_list.csv
-tracker.db
+order_tracker.db
+order_tracker/keys.py

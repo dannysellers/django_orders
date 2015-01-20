@@ -13,57 +13,57 @@
 {% endblock header %}
 
 {% block content %}
-	<br/>
+	<br />
 	<table>
 		<thead>
-			{% for item in headers %}
-				<th>{{ item }}</th>
-			{% endfor %}
+		{% for item in headers %}
+			<th>{{ item }}</th>
+		{% endfor %}
 		</thead>
 		<tbody>
-			<td><a href="/accounts?acct={{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
-			<td>#{{ shipment.owner.acct }}</td>
-			<td>{{ shipment.shipid }}</td>
-			<td>{{ shipment.palletized }}</td>
-			<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
-			{% if shipment.status == "Shipped" %}
-				<td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
-			{% endif %}
-			<td>{{ shipment.labor_time }}</td>
-			<td>{{ shipment.status }}</td>
-			<td>{{ shipment.tracking_number }}</td>
-			<td><a id="shipFormToggle" href="javascript:toggle('shipForm', 'shipFormToggle');">Show Notes</a>
+		<td><a href = "/accounts?acct={{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
+		<td>#{{ shipment.owner.acct }}</td>
+		<td>{{ shipment.palletized }}</td>
+		<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
+		{% if shipment.status == "4" %}
+			<td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
+		{% endif %}
+		<td>{{ shipment.labor_time }}</td>
+		<td>{{ shipment.status }}</td>
+		<td>{{ shipment.tracking_number }}</td>
+		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:toggle('shipForm', 'shipFormToggle');">Show
+			Notes</a>
 		</tbody>
 	</table>
 
-	<br/>
-	<table>
+	<br />
+	<table class = "not-sortable">
 		<thead>
-			{% for item in item_headers %}
-				<th>{{ item }}</th>
-			{% endfor %}
+		{% for item in item_headers %}
+			<th>{{ item }}</th>
+		{% endfor %}
 		</thead>
 		<tbody>
-			{% for item in item_list %}
-				<tr>
-					<td id="item_id">
-						<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-					</td>
-					<td id="item_volume">{{ item.volume }}</td>
-					{% if not item.status == '4' %}
-						<td id="item_storage_fees">${{ item.storage_fees }}</td>
-					{% else %}
-						<td class="inactive"></td>
-					{% endif %}
-					<td id="item_status">{{ item.status }}</td>
-				</tr>
-			{% endfor %}
+		{% for item in item_list %}
+			<tr>
+				<td id = "item_id">
+					<a href = "/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+				</td>
+				<td id = "item_volume">{{ item.volume }}</td>
+				{% if not item.status == '4' %}
+					<td id = "item_storage_fees">${{ item.storage_fees }}</td>
+				{% else %}
+					<td class = "inactive"></td>
+				{% endif %}
+				<td id = "item_status">{{ item.status }}</td>
+			</tr>
+		{% endfor %}
 		</tbody>
 	</table>
 
-	<div id="shipForm" style="display: none;">
-		<br/>Shipment notes:<br/>
-		<textarea name="notes" rows="5" cols="50">{{ shipment.notes }}</textarea>
+	<div id = "shipForm" style = "display: none;">
+		<br />Shipment notes:<br />
+		<textarea name = "notes" rows = "5" cols = "50">{{ shipment.notes }}</textarea>
 	</div>
 
 {% endblock content %}

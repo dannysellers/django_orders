@@ -21,6 +21,7 @@ INVENTORY_STATUS_CODES = (
 
 
 class CustomerManager(models.Manager):
+	# TODO: Is this manager necessary?
 	def create_customer (self, name, email, acct):
 		_customer = self.create(name = name, email = email,
 								createdate = date.today(), status = 1,

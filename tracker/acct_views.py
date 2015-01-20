@@ -23,9 +23,14 @@ def accounts (request):
 	context_dict = dict()
 
 	# URL params
+	acct = request.GET.get('acct')
 	accts = request.GET.get('accts')
 	remove = request.GET.get('remove')
 	confirm_remove = request.GET.get('confirm_remove')
+
+	if acct:
+		# Handles /accounts?acct={}
+		return redirect('/accounts/{}/'.format(acct))
 
 	""" Capture /accounts?remove=<acct> """
 	if remove:
@@ -144,11 +149,9 @@ def account_page (request, account_url):
 	try:
 		customer = Customer.objects.get(acct = account_acct)
 		# Show only items still in inventory
-		cust_items = Inventory.objects.order_by('itemid').filter(shipset__owner = customer).exclude(status = 4)
-		Inventory.objects.all()
-		if cust_items:
-			context_dict['inventory_list'] = cust_items
-			context_dict['count'] = len(cust_items)
+		if customer.inventory_set.exclude(status = 4).count():
+			cust_shipments = customer.shipment_set.all().exclude(status = 4)
+			context_dict['shipment_list'] = cust_shipments
 			context_dict['storage_fees'] = utils.calc_storage_fees(customer.acct)
 		else:
 			messages.add_message(request, messages.INFO, "This customer has no items stored in inventory.")

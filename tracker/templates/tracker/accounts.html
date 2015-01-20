@@ -135,37 +135,43 @@
 			| Daily storage fees as of today: $0.00<br/>
 		{% endif %}
 
-		<br/><table>
+		<br/><table class="expandable">
 			<thead>
 				<tr>
+					<th>&nbsp;</th>
 					{% for item in inv_headers %}
 						<th>{{ item }}</th>
 					{% endfor %}
 				</tr>
 			</thead>
 			<tbody>
-				{% if inventory_list %}
-					{% for item in inventory_list %}
-						<tr>
-							<td id="ship_id">
-								<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
-							</td>
-							<td id="item_id">
-								<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-							</td>
-							<td id="item_volume">{{ item.volume|length:"2" }}</td>
-							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-							<td id="item_status">{{ item.status|op_code }}</td>
-							<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
+				{% if shipment_list %}
+					{% for shipment in shipment_list %}
+						<tr class="ship_head_row">
+							<td><a href="#" class="ship_toggle" onclick="toggleSection(this);">+</a></td>
+							<td><a href="/shipment?id={{ shipment.id }}">{{ shipment.id }}</a></td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td></td>
+							<td>{{ shipment.status|op_code }}</td>
+							<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
 						</tr>
+						{% for item in shipment.inventory_set.all %}
+							<tr>
+								<td>&nbsp;</td> <!-- Toggle -->
+								<td><p style="visibility:hidden;">{{ shipment.id }}</p></td>
+								<td><a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a></td>
+								<td>{{ item.volume|length:"2" }}</td>
+								<td>${{ item.storage_fees|length:"2" }}</td>
+								<td>{{ item.status|op_code }}</td>
+								<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
+							</tr>
+						{% endfor %}
 					{% endfor %}
 				{% endif %}
 			</tbody>
 		</table>
 
-		{% if error_message %}
-			<p id="error_message">{{ error_message }}</p>
-		{% endif %}
 	{% endif %}
 
 {% endblock content %}

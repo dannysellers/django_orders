@@ -28,7 +28,13 @@ function makeSortable(table) {
 function makeAllSortable(parent) {
     parent = parent || document.body;
     var t = parent.getElementsByTagName('table'), i = t.length;
-    while (--i >= 0) makeSortable(t[i]);
+	while (--i >= 0) {
+		if (t[i].classList[0] != 'not-sortable') {
+			makeSortable(t[i]);
+		} else {
+			console.log("Table of " + t[i].rows.length + " ignored as not sortable.");
+		}
+	}
 }
 
 window.onload = function () {makeAllSortable();};
