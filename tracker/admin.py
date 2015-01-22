@@ -3,4 +3,5 @@ import models
 
 admin.site.register(models.Customer)
 admin.site.register(models.Inventory)
-admin.site.register(models.Operation)
+admin.site.register(models.ShipOperation)
+admin.site.register(models.ItemOperation)

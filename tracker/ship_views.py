@@ -25,7 +25,7 @@ def shipment (request):
 
 	# Overview table
 	header_list = ['Owner', 'Owner Acct', 'Palletized', 'Arrival', 'Departure',
-				   'Labor time', 'Status', 'Tracking #', 'Info']
+				   'Labor time', 'Status', 'Tracking #']
 	if int(_shipment.status) != 4:
 		header_list.remove('Departure')
 	else:
@@ -34,18 +34,13 @@ def shipment (request):
 	context_dict['headers'] = header_list
 
 	# Itemlist table
-	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
-	item_list = _shipment.inventory_set.all()
+	context_dict['item_headers'] = ['Item ID', 'Volume', 'Storage Fees', 'Status']
 
-	context_dict['item_headers'] = item_headers
-	context_dict['item_list'] = item_list
+	# Shipment Operation table
+	context_dict['shipop_headers'] = ['Op ID', 'Time', 'Code', 'User']
 
 	# Extras table
-	extras_headers = ['Quantity', 'Unit Cost', 'Total Cost', 'Description']
-	extras_list = _shipment.optextras_set.all()
-
-	context_dict['extras_headers'] = extras_headers
-	context_dict['extras_list'] = extras_list
+	context_dict['extras_headers'] = ['Quantity', 'Unit Cost', 'Total Cost', 'Description']
 
 	return render_to_response('tracker/shipment.html', context_dict, context)
 
@@ -89,6 +84,9 @@ def ship_info (request):
 				for item in itemlist:
 					item.status = _status
 					item.save()
+					ItemOperation.objects.create_operation(item = item,
+														   user = request.user,
+														   op_code = _status)
 				_shipment.status = _status
 
 			_shipment.save()

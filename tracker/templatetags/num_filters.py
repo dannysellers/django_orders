@@ -19,48 +19,6 @@ def length (value, val_length):
 
 
 @register.filter
-def op_code (value):
-	"""
-	Converts numerical operation status value to string
-	:param value: Item / Operation status
-	:return: String status
-	"""
-	value = int(value)
-	if not value:
-		return 'Inducted'
-	elif value == 0:
-		return 'Inducted'
-	elif value == 1:
-		return 'Order received'
-	elif value == 2:
-		return 'Order started'
-	elif value == 3:
-		return 'Order completed'
-	elif value == 4:
-		return 'Shipped'
-	else:
-		return 'Unknown operation code ({})'.format(value)
-
-
-@register.filter
-def cust_status (value):
-	"""
-	Converts numerical customer status value to string
-	:param value: Customer status
-	:return: String status
-	"""
-	value = int(value)
-	if value == 0:
-		return 'Inactive'
-	elif value == 1:
-		return 'Active'
-	elif not value:
-		return 'No val received!'
-	else:
-		return 'Unknown status code ({})'.format(value)
-
-
-@register.filter
 def storage_fee_total (item_list, stored=True):
 	"""
 	Sums the storage fees of a given item list

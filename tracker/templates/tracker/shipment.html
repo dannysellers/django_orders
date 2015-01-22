@@ -23,6 +23,7 @@
 		{% for item in headers %}
 			<th>{{ item }}</th>
 		{% endfor %}
+{#		<th>Info</th>#}
 		</thead>
 		<tbody>
 		<td><a href = "/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
@@ -34,11 +35,11 @@
 			<td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
 		{% endif %}
 		<td>{{ shipment.labor_time }}</td>
-		<td>{{ shipment.status|op_code }}</td>
+		<td>{{ shipment.get_status_display }}</td>
 		<td>{{ shipment.tracking_number }}</td>
-		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:togglePane('shipForm', 'shipFormToggle');">Hide
-			Info</a>
-		</tbody>
+{#		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:togglePane('shipForm', 'shipFormToggle');">Hide#}
+{#			Info</a>#}
+{#		</tbody>#}
 	</table>
 
 	<br />
@@ -51,13 +52,13 @@
 			<h3>Item List ({{ shipment.inventory_set.count }})</h3>
 			<table class = "tableItem" style = "width: 90%;">
 				<thead>
-				<th><input type = "checkbox" class = "checkbox" onclick = "javascript:checkAll(this);"></th>
+				<th class="checkbox"><input type = "checkbox" class = "checkbox" onclick = "javascript:checkAll(this);"></th>
 				{% for item in item_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
 				</thead>
 				<tbody>
-				{% for item in item_list %}
+				{% for item in shipment.inventory_set.all %}
 					<tr>
 						<td id = "td_checkbox"><input type = "checkbox" class = "checkbox"
 													  name = "item_{{ item.itemid }}"></td>
@@ -66,11 +67,11 @@
 						</td>
 						<td id = "item_volume">{{ item.volume|length:"2" }}</td>
 						{% if not item.status == '4' %}
-							<td id = "item_storage_fees">${{ item.storage_fees }}</td>
+							<td id = "item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 						{% else %}
 							<td class = "inactive"></td>
 						{% endif %}
-						<td id = "item_status">{{ item.status|op_code }}</td>
+						<td id = "item_status">{{ item.get_status_display }}</td>
 					</tr>
 				{% endfor %}
 				</tbody>
@@ -112,32 +113,55 @@
 		{% endif %}
 	</div>
 
-	<hr width = "85%" align = "left" />
-
 	<div class = "row">
+		<hr align = "left" />
+		<h3>Operation History ({{ shipment.shipoperation_set.count }})</h3>
 
+		<table id="shipop_history">
+			<thead>
+				<tr>
+					{% for item in shipop_headers %}
+						<th>{{ item }}</th>
+					{% endfor %}
+				</tr>
+			</thead>
+			<tbody>
+				{% for operation in shipment.shipoperation_set.all %}
+					<tr>
+						<td>{{ operation.id }}</td>
+						<td>{{ operation.dt }}</td>
+						<td>{{ operation.get_op_code_display }}</td>
+						<td>{{ operation.user.get_full_name }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 	</div>
 
-	<hr width = "85%" align = "left" />
-
 	<div class = "row">
+		<hr align = "left" />
 		<h3>Extras ({{ shipment.optextras_set.count }})</h3>
 		{% if user.is_authenticated %}
-			| <a href = "#">Add extra</a>
+			{% if shipment.status != '4' %}
+				| <a href = "#">Add extra</a>
+			{% else %}
+				| <a href = "#" class = "disabled">Add extra</a>
+			{% endif %}
 		{% endif %}
-		<table class = "expandable">
+		<table>
 			<thead>
 			<tr>
-				<th><a href = "#" class = "optextras_toggle" style = "color:white;text-decoration:none;"
-					   onclick = "toggleSection(this);">-</a></th>
+				<th onclick = "simpleTableToggle(this);"><a href = "#" class = "optextras_toggle"
+															style = "color:white;text-decoration:none;">-</a></th>
 				{% for item in extras_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
 			</tr>
 			</thead>
 			<tbody>
-			{% for extra in extras_list %}
+			{% for extra in shipment.optextras_set.all %}
 				<tr>
+					<td>&nbsp;</td>
 					<td>{{ extra.quantity }}</td>
 					<td>${{ extra.unit_cost|length:"2" }}</td>
 					<td>${{ extra.total_cost|length:"2" }}
@@ -149,44 +173,6 @@
 	</div>
 
 	<script>
-		function verifyAllChecked(source, formId) {
-			// If all or none of the checkboxes are checked, the form submits. Else, confirm
-			var table = document.getElementsByClassName(source)[0];
-			var checkboxes = table.getElementsByClassName('checkbox');
-			var headChecked = checkboxes[0].checked; // Value of checkbox in head row
-			var complete = true;
-			var numChecked = 0;  // If all the boxes are checked but not the header, it's fine
-			var sForm = document.forms[formId];
-
-			// If the top box is checked and any other is different, the set is incomplete
-			for (var i = 1; i < checkboxes.length; i++) {
-				if (checkboxes[i].checked) {
-					numChecked += 1;
-				}
-				if (checkboxes[i].checked != headChecked) {
-					complete = false
-				}
-			}
-			if (complete == false && numChecked != checkboxes.length - 1) {
-				if (confirm("Not all items in this shipment were selected! Continue? Shipment status will not change.")) {
-					sForm.submit();
-				} else {
-					return false
-				}
-			} else {
-				sForm.submit();
-			}
-		}
-		function disableElements(eleForm) {
-			var sForm = document.getElementById(eleForm);
-			// TODO: Check whether it's disable-able
-			for (var i = 0; i < sForm.childElementCount; i++) {
-				var c = sForm.children[i];
-				for (var j = 0; j < c.childElementCount; j++) {
-					c.children[j].disabled = true;
-				}
-			}
-		}
 		var oldEvt = window.onload;
 		window.onload = function () {
 			if (oldEvt) oldEvt();
@@ -203,9 +189,9 @@
 				s.disabled = true;
 			}
 
-			// If the user isn't logged in, disable the form elements
+			// If the user isn't logged in or shipStatus = 4, disable the form elements
 			var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
-			if (t == 'Log in') {
+			if (t == 'Log in' || shipStatus == 4) {
 				disableElements('shipForm');
 			}
 		}

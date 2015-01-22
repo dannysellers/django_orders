@@ -61,7 +61,11 @@
 			{% csrf_token %}
 		{% endif %}
 	{% endif %}
-	<table>
+	{% if inventory_list %}
+		<table class="sortable">
+	{% else %}
+		<table>
+	{% endif %}
 		<thead>
 			<tr>
 				{% if user.is_authenticated and customer and inventory_list %}
@@ -72,9 +76,8 @@
 					{% endif %}
 				{% endif %}
 				{% for item in headers %}
-{#					TODO: Conditional template filter for this? #}
 					{% if item == 'Arrival' or item == 'Departure' %}
-						<th class = "not-sortable">{{ item }}</th>
+						<th>{{ item }}</th>
 					{% else %}
 						<th>{{ item }}</th>
 					{% endif %}
@@ -91,7 +94,7 @@
 					</td>
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
 					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-					<td id="item_status">{{ item.status|op_code }}</td>
+					<td id="item_status">{{ item.get_status_display }}</td>
 					<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 				</tr>
 			{% elif inventory_list %}
@@ -117,7 +120,7 @@
 						{% else %}
 							<td class="inactive"></td>
 						{% endif %}
-						<td id="item_status">{{ item.status|op_code }}</td>
+						<td id="item_status">{{ item.get_status_display }}</td>
 						<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 						{% if item.status == '4' %}
 							<td>{{ item.shipset.departure|date:"m-d-Y" }}</td>
@@ -143,7 +146,7 @@
 				{% for operation in op_list %}
 					<tr id="op_row">
 						<td id="op_id">{{ operation.id }}</td>
-						<td id="op_code">{{ operation.op_code|op_code }}</td>
+						<td id="op_code">{{ operation.get_op_code_display }}</td>
 						<td id="op_time">{{ operation.dt }}</td>
 						<td id="op_actor">{{ operation.user }}</td>
 	{#					Field for additional expenses / notes?#}

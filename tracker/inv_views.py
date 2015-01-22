@@ -117,7 +117,7 @@ def inventory (request):
 
 			op_headers = ['Op ID', 'Op Code', 'Time', 'User']
 			context_dict['op_headers'] = op_headers
-			context_dict['op_list'] = Operation.objects.all().filter(item = _item)
+			context_dict['op_list'] = ItemOperation.objects.all().filter(item = _item)
 
 			storage_fees = utils.calc_storage_fees(_item)
 
@@ -172,7 +172,7 @@ def add_item (request, account_url):
 			item.height = form.cleaned_data['height'] / 12
 			item.save()
 
-			Operation.objects.get_or_create(item = item, user = request.user, op_code = 0)
+			ItemOperation.objects.get_or_create(item = item, user = request.user, op_code = 0)
 
 			return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
 
@@ -228,7 +228,7 @@ def change_item_status (request):
 				td = datetime.now()
 				user = request.user
 
-				Operation.objects.get_or_create(item = item, user = user, dt = td, op_code = operation)
+				ItemOperation.objects.get_or_create(item = item, user = user, dt = td, op_code = operation)
 				item.save()
 			else:
 				messages.add_message(request, messages.ERROR, """Item {} already has a
@@ -248,69 +248,3 @@ def change_item_status (request):
 		/inventory?acct=#####)</a>.""")
 
 		return HttpResponseRedirect('/inventory?status=stored')
-
-
-@cache_control(no_cache = True)
-def shipment (request):
-	context = RequestContext(request)
-	context_dict = {}
-
-	shipid = request.GET['id']
-	try:
-		_shipment = Shipment.objects.get(shipid = shipid)
-	except Shipment.DoesNotExist:
-		messages.add_message(request, messages.ERROR, "No shipment found with ID {}!".format(shipid))
-		return HttpResponseRedirect('/inventory?status=stored')
-
-	context_dict['shipment'] = _shipment
-
-	# Overview table
-	header_list = ['Owner', 'Owner Acct', 'Palletized', 'Arrival', 'Departure',
-				   'Labor time', 'Status', 'Tracking #', 'Info']
-	if int(_shipment.status) != 4:
-		header_list.remove('Departure')
-	else:
-		header_list.remove('Arrival')
-
-	context_dict['headers'] = header_list
-
-	# Itemlist table
-	item_headers = ['Item ID', 'Volume', 'Storage Fees', 'Status']
-	item_list = _shipment.inventory_set.all()
-
-	context_dict['item_headers'] = item_headers
-	context_dict['item_list'] = item_list
-
-	# Extras table
-	extras_headers = ['Quantity', 'Unit Cost', 'Total Cost', 'Description']
-	extras_list = _shipment.optextras_set.all()
-
-	context_dict['extras_headers'] = extras_headers
-	context_dict['extras_list'] = extras_list
-
-	return render_to_response('tracker/shipment.html', context_dict, context)
-
-
-@login_required
-def ship_info (request):
-	shipid = request.GET['shipid']
-	if request.method == 'POST':
-		try:
-			_shipment = Shipment.objects.get(shipid = shipid)
-			_shipment.labor_time = request.POST['labor_time']
-			_shipment.notes = request.POST['notes']
-			if 'palletized' not in request.POST:
-				# When the box is not checked, it's not passed at all :\
-				_shipment.palletized = False
-			else:
-				_shipment.palletized = True
-			_shipment.tracking_number = request.POST['tracking_no']
-			_shipment.save()
-		except Shipment.DoesNotExist:
-			messages.add_message(request, messages.ERROR, "Shipment {} not found!".format(shipid))
-			return HttpResponseRedirect('/shipment?id={}'.format(shipid))
-		messages.add_message(request, messages.SUCCESS, "Shipment {} information updated.".format(shipid))
-		return HttpResponseRedirect('/shipment?id={}'.format(shipid))
-	else:
-		messages.add_message(request, messages.ERROR, "No POST received.")
-		return HttpResponseRedirect('/')

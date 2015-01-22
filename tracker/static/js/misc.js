@@ -68,3 +68,61 @@ function toggleSection(lnk) {
 		}
 	}
 }
+
+function simpleTableToggle(lnk) {
+	var th = lnk.parentNode;
+	var table = getParent(th, 'table');
+	var len = table.rows.length;
+	var tr = getParent(th, 'tr');
+	var rowIndex = tr.rowIndex;
+
+	lnk.innerHTML = (lnk.innerHTML == "+") ? "-" : "+";
+
+	vStyle = (table.rows[rowIndex + 1].style.display == 'none') ? '' : 'none';
+
+	for (var i = rowIndex + 1; i < len; i++) {
+		table.rows[i].style.display = vStyle;
+	}
+}
+
+function verifyAllChecked(source, formId) {
+	// If all or none of the checkboxes are checked, the form submits. Else, confirm
+	var table = document.getElementsByClassName(source)[0];
+	var checkboxes = table.getElementsByClassName('checkbox');
+	var headChecked = checkboxes[0].checked; // Value of checkbox in head row
+	var complete = true;
+	var numChecked = 0;  // If all the boxes are checked but not the header, it's fine
+	var sForm = document.forms[formId];
+
+	// If the top box is checked and any other is different, the set is incomplete
+	for (var i = 1; i < checkboxes.length; i++) {
+		if (checkboxes[i].checked) {
+			numChecked += 1;
+		}
+		if (checkboxes[i].checked != headChecked) {
+			complete = false
+		}
+	}
+	if (complete == false && numChecked != checkboxes.length - 1) {
+		if (confirm("Not all items in this shipment were selected! Continue? Shipment status will not change (only item statuses).")) {
+			sForm.submit();
+		} else {
+			return false
+		}
+	} else {
+		sForm.submit();
+	}
+}
+
+function disableElements(eleForm) {
+	var sForm = document.getElementById(eleForm);
+	// TODO: Check whether it's disable-able?
+	for (var i = 0; i < sForm.childElementCount; i++) {
+		var c = sForm.children[i];
+		for (var j = 0; j < c.childElementCount; j++) {
+			if (c.children[j].name != 'csrfmiddlewaretoken') {
+				c.children[j].disabled = true;
+			}
+		}
+	}
+}

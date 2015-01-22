@@ -3,6 +3,8 @@ from datetime import date, datetime
 from django.db import models
 from django.contrib.auth.models import User
 
+import managers
+
 
 UNIT_STORAGE_FEE = 0.05
 
@@ -20,14 +22,6 @@ INVENTORY_STATUS_CODES = (
 )
 
 
-class CustomerManager(models.Manager):
-	def create_customer (self, name, email, acct):
-		_customer = self.create(name = name, email = email,
-								createdate = date.today(), status = 1,
-								notes = "notes", acct = acct)
-		print("Created {0}: {1}".format(_customer.name, _customer.acct))
-
-
 class Customer(models.Model):
 	name = models.CharField(max_length = 128, unique = False)
 	acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
@@ -37,20 +31,10 @@ class Customer(models.Model):
 	closedate = models.DateField(null = True)
 	notes = models.TextField()
 
-	objects = CustomerManager()
+	objects = managers.CustomerManager()
 
 	def __unicode__ (self):
 		return '{}: {}'.format(self.acct, self.name)
-
-
-class ShipmentManager(models.Manager):
-	def create_shipment (self, owner, palletized, labor_time, notes, tracking_number):
-		shipid = len(Shipment.objects.all()) + 1
-		arrival = date.today()
-		_shipment = self.create(owner = owner, shipid = shipid, palletized = palletized,
-								arrival = arrival, labor_time = labor_time, notes = notes,
-								tracking_number = tracking_number)
-		print("Created Ship ID: {}".format(_shipment.shipid))
 
 
 class Shipment(models.Model):
@@ -64,26 +48,10 @@ class Shipment(models.Model):
 	tracking_number = models.CharField(max_length = 30, null = True)
 	status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
 
-	objects = ShipmentManager()
+	objects = managers.ShipmentManager()
 
 	def __unicode__ (self):
 		return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
-
-
-class InventoryManager(models.Manager):
-	def create_inventory (self, shipset, length, width, height):
-		itemid = len(Inventory.objects.all()) + 1
-		owner = shipset.owner
-		arrival = shipset.arrival
-		volume = length * width * height
-		storage_fees = volume * UNIT_STORAGE_FEE
-		status = 0
-		_item = self.create(itemid = itemid, shipset = shipset, length = length,
-							width = width, height = height,
-							owner = owner, arrival = arrival,
-							volume = volume, storage_fees = storage_fees,
-							status = status)
-		print("Created Item ID: {}".format(_item.itemid))
 
 
 class Inventory(models.Model):
@@ -99,7 +67,7 @@ class Inventory(models.Model):
 	arrival = models.DateField()
 	departure = models.DateField(null = True)
 
-	objects = InventoryManager()
+	objects = managers.InventoryManager()
 
 	def __unicode__ (self):
 		return 'Item {}'.format(self.itemid)
@@ -108,32 +76,34 @@ class Inventory(models.Model):
 		verbose_name_plural = 'inventory'
 
 
-class OperationManager(models.Manager):
-	def create_operation (self, item, user, op_code):
-		_op = self.create(item = item, user = user,
-						  dt = datetime.now(), op_code = op_code)
-		print("Created Op {0}: {1}".format(_op.op_code, _op.item))
-
-
 class Operation(models.Model):
-	item = models.ForeignKey(Inventory)
 	user = models.ForeignKey(User)
 	dt = models.DateTimeField()
 	op_code = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
 
-	objects = OperationManager()
+	class Meta:
+		abstract = True
+
+
+class ShipOperation(Operation):
+	shipment = models.ForeignKey(Shipment)
+
+	objects = managers.ShipOpManager()
+
+	class Meta:
+		verbose_name = "shipment operation"
+
+	def __unicode__ (self):
+		return 'Item {}, Code {}'.format(self.shipment.shipid, self.op_code)
+
+
+class ItemOperation(Operation):
+	item = models.ForeignKey(Inventory)
+
+	objects = managers.ItemOpManager()
 
 	def __unicode__ (self):
 		return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
-
-
-class OptExtraManager(models.Manager):
-	def create_optextra (self, shipment, quantity, unit_cost, description):
-		_total = unit_cost * quantity
-		_extra = self.create(shipment = shipment, quantity = quantity,
-							 unit_cost = unit_cost, total_cost = _total,
-							 description = description)
-		print("Created {} extra {} on Ship {}".format(_extra.quantity, _extra.description, _extra.shipment))
 
 
 class OptExtras(models.Model):
@@ -143,7 +113,7 @@ class OptExtras(models.Model):
 	total_cost = models.FloatField()
 	description = models.TextField()
 
-	objects = OptExtraManager()
+	objects = managers.OptExtraManager()
 
 	def __unicode__ (self):
 		return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)

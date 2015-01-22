@@ -18,22 +18,17 @@ body {
 }
 
 a.disabled {
-	pointer-events  : none;
-	cursor          : default;
-	text-decoration : none;
-	color           : black;
+	pointer-events : none;
+	cursor         : default;
+	/*text-decoration : none;*/
+	color          : black;
 }
 
   /*//////////////*/
  /*// MESSAGES //*/
 /*//////////////*/
 
-ul.errorlist {
-	list-style : none;
-	color      : red;
-}
-
-.message {
+ul .messages {
 	list-style : none;
 }
 
@@ -55,6 +50,11 @@ th {
 	vertical-align   : top;
 }
 
+table.sortable th:not(.checkbox):hover {
+	background-color : #414141;
+	cursor           : pointer;
+}
+
 #td_checkbox {
 	padding-left : 0;
 	text-align   : center;
@@ -65,13 +65,18 @@ td {
 	border  : 1px solid black;
 }
 
-/* Shipment toggle + \ - */
-.ship_toggle:link {
-	text-decoration : none;
+td.ship_toggle {
+	min-width: .5em;
 }
 
-.ship_toggle:hover {
-	text-decoration : underline;
+td.ship_toggle:hover {
+	background-color : #bebebe;
+	cursor           : pointer;
+}
+
+/* Shipment toggle + \ - */
+.ship_toggle a:link {
+	text-decoration : none;
 }
 
   /*//////////////////*/
@@ -109,7 +114,7 @@ table tr:nth-child(odd) {
 }
 
   /*///////////////////*/
- /*// FORM ELEMENTS //*/
+ /*// GRID ELEMENTS //*/
 /*///////////////////*/
 
 .col-3 {
@@ -122,15 +127,17 @@ table tr:nth-child(odd) {
 	width : 50%;
 }
 
+.row {
+	padding-bottom : 1rem;
+	float          : left;
+	width          : 80%;
+	clear          : both;
+}
+
 .row h3, .row h4 {
 	display : inline;
 }
 
-.row {
-	padding-bottom : 1rem;
-	float          : left;
-	width          : 85%;
-}
 
 #notes {
 	width         : 85%;
@@ -155,7 +162,7 @@ table tr:nth-child(odd) {
 
 }
 
-.btn:hover {
+.btn:not(.disabled):hover {
 	background      : #2c3e50;
 	color           : #ecf0f1;
 	text-decoration : none;

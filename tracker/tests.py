@@ -6,21 +6,26 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from models import Customer, Inventory, Operation
-from datetime import date
-
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+from models import *
 
 
-# class CustomerTest(TestCase):
-#     testcustomers = [
-#         {'names': 'George Washington',
-#          'acct': 48291,
-#          'createdate': '2014-01-30'}
-#     ]
-#     def add_customer(self):
+# class SimpleTest(TestCase):
+# 	def test_basic_addition (self):
+# 		"""
+# 		Tests that 1 + 1 always equals 2.
+# 		"""
+# 		self.assertEqual(1 + 1, 2)
+
+
+class ItemOpTest(TestCase):
+	def setUp(self):
+		self.itemlist = Inventory.objects.all()
+
+	def test_item_op_equality(self):
+		"""
+		Tests that each Inventory object has the correct number
+		of ItemOperation objects associated with it.
+		"""
+		for item in self.itemlist:
+			iocount = ItemOperation.objects.filter(item = item).count() + 1
+			self.assertEqual(item.status, iocount)

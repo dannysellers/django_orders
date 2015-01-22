@@ -128,7 +128,7 @@ def account_page (request, account_url):
 	context = RequestContext(request)
 	context_dict = dict()
 
-	header_list = ['Account', 'Name', 'Email', 'Status', 'Create Date']
+	header_list = ['Name', 'Account', 'Email', 'Status', 'Create Date']
 	context_dict['headers'] = header_list
 
 	# Get account
@@ -151,7 +151,7 @@ def account_page (request, account_url):
 	# Table cells
 	if str(customer.status) == '0':
 		context_dict['account_status'] = 'Inactive'
-		context_dict['headers'].append('Date Closed')
+		context_dict['headers'].append('Close Date')
 		context_dict['close_date'] = str(customer.closedate)
 	elif str(customer.status) == '1':
 		context_dict['account_status'] = 'Active'

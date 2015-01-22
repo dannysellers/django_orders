@@ -41,131 +41,15 @@
 		{% endif %}
 		| <a id="acctFormToggle" href="javascript:togglePane('acctForm', 'acctFormToggle');">Edit Account Info</a>
 	{% endif %}
+
 {% endblock sub_nav %}
 
 {% block content %}
+
 	{% if customer_list %}
-		<table>
-			<thead>
-				<tr>
-					{% for item in headers %}
-						<th>{{ item }}</th>
-					{% endfor %}
-				</tr>
-			</thead>
-			<tbody>
-				{% for customer in customer_list %}
-					<tr>
-						<td id="account_cell"><a href="/accounts/{{ customer.acct }}">{{ customer.acct }}</a></td>
-						<td id="name_cell">{{ customer.name }}</td>
-						{% if status_column %}
-							<td id="status_cell">{{ customer.status|cust_status }}</td>
-						{% endif %}
-{#						TODO: Fix sorting, which uses month name#}
-						<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-						{% if 'Active' not in head_text %}
-							{% if customer.status == "0" %}
-								<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
-							{% else %}
-								<td class="inactive"></td>
-							{% endif %}
-						{% endif %}
-						{% if 'Inactive' not in head_text %}
-							<td id="ship_count">{{ customer.shipment_set.count }}</td>
-						{% endif %}
-						<td id="storage_fees">${{ customer.inventory_set.all|storage_fee_total }}</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-
+		{% include 'tracker/tracker_sub/cust_list.html' %}
 	{% elif customer %}
-		<table>
-			<thead>
-				<tr>
-					{% for item in headers %}
-						<th>{{ item }}</th>
-					{% endfor item %}
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td id="account_cell">{{ customer.acct }}</td>
-					<td id="name_cell">{{ customer.name }}</td>
-					<td id="email_cell">{{ customer.email }}</td>
-					<td id="status_cell">{{ customer.status|cust_status }}</td>
-					<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-					{% if customer.status == '0' %}
-						<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
-					{% endif %}
-				</tr>
-			</tbody>
-		</table>
-		<br/>
-		{% if user.is_authenticated %}
-			<div id="acctForm" style="display: none; width: 80%;">
-				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
-					{% csrf_token %}
-					<div class="col-3">
-						Name: <input type="text" name="name" value="{{ customer.name }}" /><br />
-						Account: <input type="text" name="acct" value="{{ customer.acct }}" /><br />
-						Email: <input type="email" name="email" value="{{ customer.email }}" />
-					</div>
-					<div class="col-3">
-						Notes:<br/> <textarea id = "notes">{{ customer.notes }}</textarea>
-					</div>
-					<div class="col-3">
-						<button class="btn" name="submit">Submit Information</button>
-					</div>
-				</form>
-			</div>
-		{% endif %}
-		<hr width="85%" align="left">
-		<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
-		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
-		{% if storage_fees %}
-			| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>
-		{% else %}
-			| Daily storage fees as of today: $0.00<br/>
-		{% endif %}
-
-		<br/><table class="expandable">
-			<thead>
-				<tr>
-					<th>&nbsp;</th>
-					{% for item in inv_headers %}
-						<th>{{ item }}</th>
-					{% endfor %}
-				</tr>
-			</thead>
-			<tbody>
-				{% if shipment_list %}
-					{% for shipment in shipment_list %}
-						<tr id="ship_head_row">
-							<td><a href="#" class="ship_toggle" onclick="toggleSection(this);">-</a></td>
-							<td><a href="/shipment?id={{ shipment.id }}">{{ shipment.id }}</a> ({{ shipment.inventory_set.count }})</td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-							<td>${{ shipment.inventory_set.all|storage_fee_total }}</td>
-							<td>{{ shipment.status|op_code }}</td>
-							<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
-						</tr>
-						{% for item in shipment.inventory_set.all %}
-							<tr>
-								<td>&nbsp;</td> <!-- Toggle -->
-								<td><p style="visibility:hidden;">{{ shipment.id }}</p></td>
-								<td><a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a></td>
-								<td>{{ item.volume|length:"2" }}</td>
-								<td>${{ item.storage_fees|length:"2" }}</td>
-								<td>{{ item.status|op_code }}</td>
-								<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
-							</tr>
-						{% endfor %}
-					{% endfor %}
-				{% endif %}
-			</tbody>
-		</table>
-
+		{% include 'tracker/tracker_sub/customer.html' %}
 	{% endif %}
 
 {% endblock content %}

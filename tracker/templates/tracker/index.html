@@ -19,30 +19,7 @@
 			<h1>Order / Inventory Tracker</h1>
 		{% endblock header %}
 		<div class="float_user-greeting">
-			<strong>
-				{% if user.is_authenticated %}
-					Hi {{ user.first_name }} ({{ user.username }})!
-				{% else %}
-					Hello anonymous.
-				{% endif %}
-			</strong><br/>
-			<a href="/register/">Register user</a> |
-			{% if not user.is_authenticated %}
-				<a id="displayText" href="javascript:togglePane('toggleDiv', 'displayText');">Log in</a>
-				<div id="toggleDiv" style="display: none; padding-top: 0.5em;">
-					<form id="login_form" method="post" action="/login/">
-						{% csrf_token %}
-						Username: <input type="text" name="username" value="" size="12" />
-						<br />
-						Password: <input type="password" name="password" value="" size="12" />
-						<br />
-						<small>Remember me</small> <input type="checkbox" value="remember_me">
-						<input type="submit" value="submit" />
-					</form>
-				</div>
-			{% else %}
-				<a href="/logout/">Log out</a>
-			{% endif %}
+			{% include 'tracker/tracker_sub/user_greeting.html' %}
 		</div>
 		<nav>
 			<a href="/">Home</a>
@@ -52,13 +29,13 @@
 		</nav>
 		<div class="row">
 			{% block sub_nav %}
-{#				<strong style="color: red;">There's nothing in the sub_nav block!</strong>#}
+
 			{% endblock sub_nav %}
 		</div>
 		<div class="row">
 
 			{% if messages %}
-				<ul class="message">
+				<ul class="messages">
 					{% for message in messages %}
 						<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
 					{% endfor %}
