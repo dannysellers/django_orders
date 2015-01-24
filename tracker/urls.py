@@ -35,4 +35,5 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
 	url(r'^shipment', ship_views.shipment, name='shipment'),
 	url(r'^ship_info', ship_views.ship_info, name='ship_info'),
+	url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', ship_views.add_shipment, name = 'add_shipment'),
 )

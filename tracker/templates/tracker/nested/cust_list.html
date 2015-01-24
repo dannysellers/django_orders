@@ -27,7 +27,7 @@
 						{% endif %}
 					{% endif %}
 					{% if 'Inactive' not in head_text %}
-						<td id="ship_count">{{ customer.shipment_set.all|stored_shipment_count }}</td>
+						<td id="ship_count">{{ customer.shipment_set.all|stored_count }}</td>
 					{% endif %}
 					<td id="storage_fees">${{ customer.inventory_set.all|storage_fee_total }}</td>
 				</tr>

@@ -188,6 +188,7 @@ def add_item (request, account_url):
 
 	context_dict['form'] = form
 	context_dict['owner'] = owner
+	context_dict['form_type'] = 'item'
 	return render_to_response('tracker/form.html', context_dict, context)
 
 

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
 import utils
-from models import Customer, Inventory
+from models import Customer
 import forms
 
 
@@ -28,7 +28,6 @@ def accounts (request):
 	acct = request.GET.get('acct')
 	accts = request.GET.get('accts')
 	remove = request.GET.get('remove')
-	confirm_remove = request.GET.get('confirm_remove')
 
 	if acct:
 		# Handles /accounts?acct={}
@@ -37,39 +36,9 @@ def accounts (request):
 	""" Capture /accounts?remove=<acct> """
 	if remove:
 		if request.user.is_authenticated:
-			if confirm_remove:
-				messages.add_message(request, messages.WARNING,
-									 "Confirmation of deactivation")
-				if remove_account(account_num = remove):
-					messages.add_message(request, messages.SUCCESS,
-										 "Account {} deactivated successfully".format(remove))
-					return HttpResponseRedirect('/accounts?accts=active', context_dict)
-
-			else:
-				try:
-					# If the customer has no items currently in storage, deactivate
-					if not Inventory.objects.filter(owner = remove).exclude(status = 4):
-						# remove_account() returns False on Customer.DoesNotExist
-						if not remove_account(account_num = remove):
-							messages.add_message(request, messages.WARNING,
-												 "Account {} not found. No changes made.".format(remove))
-							return redirect('/accounts?accts=active', context_dict)
-						else:
-							messages.add_message(request, messages.SUCCESS,
-												 "Account {} deactivated successfully".format(remove))
-							return redirect('/accounts?accts=active', context_dict)
-					else:
-						# TODO: Do confirmation for removing customers with stored items
-						messages.add_message(request, messages.WARNING,
-											 "This customer has items in inventory. Proceed with deactivation?")
-						context_dict['confirm_remove'] = 'Confirm'
-						return render_to_response('/accounts?remove={}&confirm_remove=False'.format(remove),
-												  context_dict)
-
-				except Customer.DoesNotExist:
-					messages.add_message(request, messages.ERROR,
-										 "Account {} not found. No changes made.".format(remove))
-					return HttpResponseRedirect('/accounts?accts=active', context_dict)
+			if remove_account(account_num = remove):
+				messages.add_message(request, messages.SUCCESS,
+									 "Account {} deactivated successfully.".format(remove))
 		else:
 			messages.add_message(request, messages.ERROR, "You are not logged in.")
 			return HttpResponseRedirect('/accounts?accts=active', context_dict)
@@ -207,7 +176,7 @@ def add_account (request):
 		form = forms.CustomerForm()
 
 	context_dict['form'] = form
-	context_dict['customer'] = '_'  # template flag
+	context_dict['form_type'] = 'customer'
 	return render_to_response('tracker/form.html', context_dict, context)
 
 

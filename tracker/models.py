@@ -61,6 +61,7 @@ class Shipment(models.Model):
 			super(Shipment, self).save()
 		else:
 			# raise something
+			print("No user passed for Shipment status update request!: Shipment {}".format(self.shipid))
 			pass
 
 
@@ -90,6 +91,7 @@ class Inventory(models.Model):
 			super(Inventory, self).save()
 		else:
 			# raise ???
+			print("No user passed for Inventory status update request!: Item {}".format(self.itemid))
 			pass
 
 	class Meta:

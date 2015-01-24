@@ -22,11 +22,6 @@
 
 {% block sub_nav %}
 
-	{% if confirm_remove %}
-		<a href="/accounts?remove={{ customer.acct }}&confirm_remove=True">Yes</a>
-		<a href="/accounts">No</a>
-	{% endif %}
-
 	<a href="/accounts?accts=all">All accounts</a>
 	| <a href="/accounts?accts=active">Active accounts</a>
 	| <a href="/accounts?accts=inactive">Inactive accounts</a>
@@ -35,7 +30,7 @@
 	{% endif %}
 	{% if user.is_authenticated and customer %}
 		{% if customer.status == '1' %}
-			| <a href="/accounts?remove={{ customer.acct }}">Remove account</a>
+			| <a id="remove_link" href="#">Remove account</a>
 		{% else %}
 			| <a href="#" class="disabled">Remove account</a>
 		{% endif %}
@@ -47,9 +42,9 @@
 {% block content %}
 
 	{% if customer_list %}
-		{% include 'tracker/tracker_sub/cust_list.html' %}
+		{% include 'tracker/nested/cust_list.html' %}
 	{% elif customer %}
-		{% include 'tracker/tracker_sub/customer.html' %}
+		{% include 'tracker/nested/customer.html' %}
 	{% endif %}
 
 {% endblock content %}

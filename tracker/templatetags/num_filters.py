@@ -37,16 +37,16 @@ def storage_fee_total (item_list, stored=True):
 
 
 @register.filter
-def stored_shipment_count (shipment_list):
+def stored_count (unit_list):
 	"""
-	Returns count of shipments that are still in storage (status < 4)
-	:param shipment_list: Set of shipments to filter
-	:type shipment_list: QuerySet
+	Returns count of items (Inventory or Shipment) that are still in storage (status < 4)
+	:param unit_list: Set of items to filter
+	:type unit_list: QuerySet
 	:return: Number of shipments with status < 4
 	:rtype: Int
 	"""
 	_count = int(0)
-	for shipment in shipment_list:
-		if int(shipment.status) < 4:
+	for unit in unit_list:
+		if int(unit.status) < 4:
 			_count += 1
 	return _count

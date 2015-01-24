@@ -2,18 +2,13 @@ storage fees reporting, with by date
 operation list (from ops)
 view / manage item operations
 
-notes on account pages
-table overview on account page
-Any reason to have both /account/ page and /inventory/ page per customer? (view vs mgmt)
-	/account/ page should have table overview and notes in addition
-	
-form / page to edit customer information
-
 filter individual customer's items by status
 
 add confirmation / warning on remove acct with stored inventory
 
 totals row for (customer-specific) inventory tables
+
+convert onclick events to addEventListener
 
 Reports: (reportlab.com / sphinx-doc.org)
 Items stored per customer

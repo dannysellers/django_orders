@@ -62,7 +62,7 @@ def register (request):
 		user_form = UserForm()
 
 	context_dict['form'] = user_form
-	context_dict['register'] = True  # flag
+	context_dict['form_type'] = 'register'
 
 	return render_to_response('tracker/form.html', context_dict, context)
 

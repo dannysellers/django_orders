@@ -98,15 +98,26 @@
 </div>
 
 <script>
-var oldEvt = window.onload;
-window.onload = function () {
-	if (oldEvt) oldEvt();
+	var oldEvt = window.onload;
+	window.onload = function () {
+		if (oldEvt) oldEvt();
 
-	var custStatus = parseInt('{{ customer.status }}');
+		var custStatus = parseInt('{{ customer.status }}');
 
-	var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
-	if (t == 'Log in' || custStatus == 0) {
-		disableElements('acctForm');
+		var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
+		if (t == 'Log in' || custStatus == 0) {
+			disableElements('acctForm');
+		}
+	};
+	function confirmRemove () {
+		var itemsInStorage = parseInt('{{ customer.inventory_set.all|stored_count }}');
+		if (itemsInStorage > 0) {
+			alert("This customer still has items in inventory! Process those first before proceeding, even if that means marking them as 'shipped'.")
+		} else {
+			document.location.href = "/accounts?remove={{ customer.acct }}";
+		}
 	}
-}
+
+	var link = document.getElementById('remove_link');
+	link.addEventListener('click', confirmRemove, false)
 </script>

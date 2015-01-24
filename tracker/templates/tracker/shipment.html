@@ -24,7 +24,6 @@
 			{% for item in headers %}
 				<th>{{ item }}</th>
 			{% endfor %}
-	{#		<th>Info</th>#}
 			</thead>
 			<tbody>
 			<td><a href = "/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
@@ -38,13 +37,9 @@
 			<td>{{ shipment.labor_time }}</td>
 			<td>{{ shipment.get_status_display }}</td>
 			<td>{{ shipment.tracking_number }}</td>
-	{#		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:togglePane('shipForm', 'shipFormToggle');">Hide#}
-	{#			Info</a>#}
-	{#		</tbody>#}
 		</table>
 	</div>
 
-{#	<br />#}
 	<div class = "row">
 		{% if user.is_authenticated %}
 			<form id = "ship_info" method = "post" action = "/ship_info?shipid={{ shipment.shipid }}">

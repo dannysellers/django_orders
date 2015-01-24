@@ -25,7 +25,7 @@ class InventoryForm(forms.ModelForm):
 	length = forms.DecimalField(max_digits = 6, initial = 1.00, help_text = "Length (in.): ")
 	width = forms.DecimalField(max_digits = 6, initial = 1.00, help_text = "Width (in.): ")
 	height = forms.DecimalField(max_digits = 6, initial = 1.00, help_text = "Height (in.): ")
-	palletized = forms.BooleanField(initial = False, help_text = "Palletized? :", required = False)
+	palletized = forms.BooleanField(initial = False, help_text = "Palletized?: ", required = False)
 	arrival = forms.DateField(widget = forms.HiddenInput(), initial = date.today(), required = False)
 	departure = forms.DateField(widget = forms.HiddenInput(), initial = date.today(), required = False)
 	status = forms.CharField(widget = forms.HiddenInput(), initial = 0, required = False)
@@ -35,19 +35,24 @@ class InventoryForm(forms.ModelForm):
 		fields = ('quantity', 'length', 'width', 'height', 'palletized')
 
 
-# class ShipInfoForm(forms.ModelForm):
-# 	palletized = forms.BooleanField()
-# 	labor_time = forms.DecimalField(max_digits=6)
+# class ShipmentForm(forms.ModelForm):
+# 	palletized = forms.BooleanField(initial = False, help_text = 'Palletized: ', required = False)
+# 	labor_time = forms.IntegerField(min_value = 1, help_text="Labor time: ", widget=forms.NumberInput)
+# 	notes = forms.CharField(help_text="Notes: ", widget=forms.Textarea)
+# 	tracking_number = forms.CharField(max_length = 30, required = True, help_text="Tracking number: ")
 #
 # 	class Meta:
 # 		model = Shipment
-# 		fields = ('palletized')
+# 		fields = ('labor_time', 'palletized', 'tracking_number', 'notes')
 
 
 class OptExtraForm(forms.ModelForm):
 	description = forms.TextInput()
 	quantity = forms.CharField(max_length = 5, help_text = "Quantity: ")
 	unit_cost = forms.DecimalField(max_digits = 6, initial = 1.00, help_text = "Unit cost: ")
+
+	class Meta:
+		model = OptExtras
 
 
 class UserForm(forms.ModelForm):
