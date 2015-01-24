@@ -6,7 +6,7 @@ register = template.Library()
 @register.filter
 def length (value, val_length):
 	"""
-	Receives `value`, truncates to length
+	Receives `value`, truncates to length (used primarily for storage fees/volume)
 	:param value: Value to truncate
 	:param val_length: Length to truncate after the decimal
 	:return:
@@ -34,3 +34,19 @@ def storage_fee_total (item_list, stored=True):
 		else:
 			_sum += item.storage_fees
 	return length(_sum, 2)
+
+
+@register.filter
+def stored_shipment_count (shipment_list):
+	"""
+	Returns count of shipments that are still in storage (status < 4)
+	:param shipment_list: Set of shipments to filter
+	:type shipment_list: QuerySet
+	:return: Number of shipments with status < 4
+	:rtype: Int
+	"""
+	_count = int(0)
+	for shipment in shipment_list:
+		if int(shipment.status) < 4:
+			_count += 1
+	return _count

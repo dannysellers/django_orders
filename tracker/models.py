@@ -1,7 +1,7 @@
-from datetime import date, datetime
-
 from django.db import models
 from django.contrib.auth.models import User
+# from django.dispatch import receiver
+# from django.db.models.signals import post_save
 
 import managers
 
@@ -53,6 +53,16 @@ class Shipment(models.Model):
 	def __unicode__ (self):
 		return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
 
+	def save (self, *args, **kwargs):
+		if 'user' in args[0]:
+			ShipOperation.objects.create_operation(shipment = self,
+												   user = args[0]['user'],
+												   op_code = self.status)
+			super(Shipment, self).save()
+		else:
+			# raise something
+			pass
+
 
 class Inventory(models.Model):
 	shipset = models.ForeignKey(Shipment)
@@ -71,6 +81,16 @@ class Inventory(models.Model):
 
 	def __unicode__ (self):
 		return 'Item {}'.format(self.itemid)
+
+	def save(self, *args, **kwargs):
+		if 'user' in args[0]:
+			ItemOperation.objects.create_operation(item = self,
+												   user = args[0]['user'],
+												   op_code = self.status)
+			super(Inventory, self).save()
+		else:
+			# raise ???
+			pass
 
 	class Meta:
 		verbose_name_plural = 'inventory'

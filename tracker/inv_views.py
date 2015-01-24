@@ -1,6 +1,11 @@
-from datetime import date, datetime
+from datetime import date
 
-from django.http import HttpResponseRedirect, HttpResponse
+try:
+	from django.utils import timezone as datetime
+except ImportError:
+	from datetime import datetime as datetime
+
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -148,6 +153,8 @@ def add_item (request, account_url):
 	Form to add item. Intended behavior: Either receive account # within
 	URL, or allow for selection of customer if no param is passed
 	"""
+	# TODO: This needs updating / may not be relevant any more given shipments
+
 	context = RequestContext(request)
 	context_dict = {}
 
@@ -170,9 +177,7 @@ def add_item (request, account_url):
 			item.length = form.cleaned_data['length'] / 12
 			item.width = form.cleaned_data['width'] / 12
 			item.height = form.cleaned_data['height'] / 12
-			item.save()
-
-			ItemOperation.objects.get_or_create(item = item, user = request.user, op_code = 0)
+			item.save({'user': request.user})
 
 			return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
 
@@ -193,58 +198,40 @@ def change_item_status (request):
 	If /change_status?item=##### , manage individual item.
 	If /manage_items/, receive list of items.
 	"""
-	# TODO: Enforce only one copy of induction / shipment per item
-	# TODO: Enforce triplets of order received, started, done
-	# TODO: Add confirmation on changing individual item status without shipment status
 	itemlist = []
 
-	""" Prepare itemlist for processing by db / parsing to json (maybe? eventually?) """
-	if request.GET.get('item'):  # individual item passed as URL param
-		_itemid = request.GET.get('item')
-		try:
-			item = Inventory.objects.get(itemid = _itemid)
-			itemlist.append(item)
-		except Inventory.DoesNotExist:
-			print("Item {} could not be found".format(_itemid))
-
-	# Recover operation and labor_time vals, and list of items if applicable
-	for key, value in request.POST.iteritems():
-		if value == 'on':  # multiple items; checked checkboxes return 'on'
+	if request.method == 'POST':
+		if request.GET.get('item'):  # individual item passed as URL param
+			_itemid = request.GET.get('item')
 			try:
-				item = Inventory.objects.get(itemid = key)
+				item = Inventory.objects.get(itemid = _itemid)
 				itemlist.append(item)
 			except Inventory.DoesNotExist:
-				print("Item {} could not be found".format(key))
-		if key == 'operation':  # retrieve value of desired op
-			operation = value
+				print("Item {} could not be found".format(_itemid))
 
-	""" Assign new operation to each item """
-	if request.method == 'POST':
-		# op_list = []
+		# Recover operation and labor_time vals, and list of items if applicable
+		for key, value in request.POST.iteritems():
+			if value == 'on':  # multiple items; checked checkboxes return 'on'
+				try:
+					item = Inventory.objects.get(itemid = key)
+					itemlist.append(item)
+				except Inventory.DoesNotExist:
+					print("Item {} could not be found".format(key))
+			if key == 'operation':  # retrieve value of desired op
+				operation = value
+
 		for item in itemlist:
-			if item.status != operation:
-				# Only change the status to something it isn't already
-				item.status = operation
-				td = datetime.now()
-				user = request.user
+			item.status = operation
 
-				ItemOperation.objects.get_or_create(item = item, user = user, dt = td, op_code = operation)
-				item.save()
-			else:
-				messages.add_message(request, messages.ERROR, """Item {} already has a
-				status of '{}'""".format(item.itemid, utils.int_to_status_code("Inventory", item.status)))
-				return HttpResponseRedirect('/inventory?acct={}'.format(item.owner.acct))
+			item.save({'user': request.user})
 
-		if len(itemlist) > 1:
-			return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
-		elif len(itemlist) == 1:
+		if len(itemlist) == 1:
 			return HttpResponseRedirect('/inventory?item={}'.format(itemlist[0].itemid))
 		else:
-			messages.add_message(request, messages.ERROR, "No items selected.")
-			return HttpResponseRedirect('/inventory?status=stored')
+			return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
 	else:
 		messages.add_message(request, messages.ERROR, """No request was passed.
-		Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.
-		/inventory?acct=#####)</a>.""")
+				Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.
+				/inventory?acct=#####)</a>.""")
 
 		return HttpResponseRedirect('/inventory?status=stored')

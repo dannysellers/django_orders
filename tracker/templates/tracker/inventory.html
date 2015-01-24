@@ -47,131 +47,173 @@
 
 {% block content %}
 
-	{% if storage_fees %}
-		Daily storage fees as of today: ${{ storage_fees|length:"2" }}
-		<br /><br />
-	{% endif %}
-
-	{% if user.is_authenticated %}
-		{% if item %}
-			<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
-			{% csrf_token %}
-		{% elif customer and inventory_list %}
-			<form id="manage_inventory" method="post" action="/manage_items/">
-			{% csrf_token %}
+	<div class="row">
+		{% if storage_fees %}
+			Daily storage fees as of today: ${{ storage_fees|length:"2" }}
+			<br /><br />
 		{% endif %}
-	{% endif %}
-	{% if inventory_list %}
-		<table class="sortable">
-	{% else %}
-		<table>
-	{% endif %}
-		<thead>
-			<tr>
-				{% if user.is_authenticated and customer and inventory_list %}
-					{% if customer %}
-						<th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
-					{% else %}
-						<th></th>
-					{% endif %}
-				{% endif %}
-				{% for item in headers %}
-					{% if item == 'Arrival' or item == 'Departure' %}
-						<th>{{ item }}</th>
-					{% else %}
-						<th>{{ item }}</th>
-					{% endif %}
-				{% endfor %}
-			</tr>
-		</thead>
-		<tbody>
+
+		{% if user.is_authenticated %}
 			{% if item %}
-				<tr>
-					<td id="ship_id"><a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a></td>
-					<td id="item_id">{{ item.itemid }}</td>
-					<td id="item_owner">
-						<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
-					</td>
-					<td id="item_volume">{{ item.volume|length:"2" }}</td>
-					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-					<td id="item_status">{{ item.get_status_display }}</td>
-					<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
-				</tr>
-			{% elif inventory_list %}
-				{% for item in inventory_list %}
-					<tr>
-						{% if user.is_authenticated %}
-							{% if customer %}
-								<td id="td_checkbox"><input type="checkbox" class="checkbox" name="{{ item.itemid }}"></td>
-							{% endif %}
-						{% endif %}
-						<td id="ship_id">
-							<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
-						</td>
-						<td id="item_id">
-							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-						</td>
-						<td id="item_owner">
-							<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
-						</td>
-						<td id="item_volume">{{ item.volume|length:"2" }}</td>
-						{% if not item.status == '4' %}
-							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-						{% else %}
-							<td class="inactive"></td>
-						{% endif %}
-						<td id="item_status">{{ item.get_status_display }}</td>
-						<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
-						{% if item.status == '4' %}
-							<td>{{ item.shipset.departure|date:"m-d-Y" }}</td>
-						{% elif b_inactive %}
-							<td class="inactive"></td>
-						{% endif %}
-					</tr>
-				{% endfor %}
+				<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
+				{% csrf_token %}
+			{% elif customer and inventory_list %}
+				<form id="manage_inventory" method="post" action="/manage_items/">
+				{% csrf_token %}
 			{% endif %}
-		</tbody>
-	</table>
-	{% if op_list %}
-		<h2>Operation History</h2>
-		<table id="op_history">
+		{% endif %}
+
+		{% if inventory_list %}
+			<table class="sortable">
+		{% else %}
+			<table>
+		{% endif %}
 			<thead>
 				<tr>
-					{% for item in op_headers %}
-						<th>{{ item }}</th>
+					{% if user.is_authenticated and customer and inventory_list %}
+						{% if customer %}
+							<th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
+						{% else %}
+							<th></th>
+						{% endif %}
+					{% endif %}
+					{% for item in headers %}
+						{% if item == 'Arrival' or item == 'Departure' %}
+							<th>{{ item }}</th>
+						{% else %}
+							<th>{{ item }}</th>
+						{% endif %}
 					{% endfor %}
 				</tr>
 			</thead>
 			<tbody>
-				{% for operation in op_list %}
-					<tr id="op_row">
-						<td id="op_id">{{ operation.id }}</td>
-						<td id="op_code">{{ operation.get_op_code_display }}</td>
-						<td id="op_time">{{ operation.dt }}</td>
-						<td id="op_actor">{{ operation.user }}</td>
-	{#					Field for additional expenses / notes?#}
+				{% if item %}
+					<tr>
+						<td id="ship_id"><a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a></td>
+						<td id="item_id">{{ item.itemid }}</td>
+						<td id="item_owner">
+							<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
+						</td>
+						<td id="item_volume">{{ item.volume|length:"2" }}</td>
+						<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+						<td id="item_status">{{ item.get_status_display }}</td>
+						<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
 					</tr>
-				{% endfor %}
+				{% elif inventory_list %}
+					{% for item in inventory_list %}
+						<tr>
+							{% if user.is_authenticated %}
+								{% if customer %}
+									<td id="td_checkbox"><input type="checkbox" class="checkbox" name="{{ item.itemid }}"></td>
+								{% endif %}
+							{% endif %}
+							<td id="ship_id">
+								<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
+							</td>
+							<td id="item_id">
+								<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+							</td>
+							<td id="item_owner">
+								<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
+							</td>
+							<td id="item_volume">{{ item.volume|length:"2" }}</td>
+							{% if not item.status == '4' %}
+								<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+							{% else %}
+								<td class="inactive"></td>
+							{% endif %}
+							<td id="item_status">{{ item.get_status_display }}</td>
+							<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
+							{% if item.status == '4' %}
+								<td>{{ item.shipset.departure|date:"m-d-Y" }}</td>
+							{% elif b_inactive %}
+								<td class="inactive"></td>
+							{% endif %}
+						</tr>
+					{% endfor %}
+				{% endif %}
 			</tbody>
 		</table>
-	{% endif %}
-	{% if user.is_authenticated %}
-		{% if item or customer and inventory_list %}
-			<br/>
-			<select name="operation">
-				<option value="0">Inducted (0)</option>
-				<option value="1">Order Received (1)</option>
-				<option value="2">Order Started (2)</option>
-				<option value="3">Order Completed (3)</option>
-				<option value="4">Shipped (4)</option>
-			</select>
-			{% if item.status != '4' %}
-				<input type="submit" name="submit" value="Change Status" />
-			{% else %}
-				<input type="submit" value="Change Status" disabled />
-			{% endif %}
-		</form>
+	</div>
+	<div class="row">
+		{% if op_list %}
+			<h2>Operation History</h2>
+			<table id="op_history">
+				<thead>
+					<tr>
+						{% for item in op_headers %}
+							<th>{{ item }}</th>
+						{% endfor %}
+					</tr>
+				</thead>
+				<tbody>
+					{% for operation in op_list %}
+						<tr id="op_row">
+							<td id="op_id">{{ operation.id }}</td>
+							<td id="op_code">{{ operation.get_op_code_display }}</td>
+							<td id="op_time">{{ operation.dt }}</td>
+							<td id="op_actor">{{ operation.user }}</td>
+		{#					Field for additional expenses / notes?#}
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		{% endif %}
-	{% endif %}
+		{% if user.is_authenticated %}
+			{% if item or customer and inventory_list %}
+				<br/>
+				<select name="operation">
+					<option value="0">Inducted (0)</option>
+					<option value="1">Order Received (1)</option>
+					<option value="2">Order Started (2)</option>
+					<option value="3">Order Completed (3)</option>
+					<option value="4">Shipped (4)</option>
+				</select>
+				{% if item.status != '4' %}
+					<a class="btn" name="submit" onclick="verifyStatusChange();">Submit</a>
+				{% else %}
+					<a class="btn disabled" name="submit">Submit</a>
+				{% endif %}
+			</form>
+			{% endif %}
+		{% endif %}
+	</div>
+
+	<script>
+		function verifyStatusChange () {
+			var select = document.getElementsByName('operation')[0];
+			var itemStatus = parseInt('{{ item.status }}');
+			var form = document.forms[0];
+
+			if (select.selectedIndex == itemStatus) {
+				alert("You tried to change the item status to its current status (" + itemStatus + ")!");
+			} else {
+				form.submit();
+			}
+		}
+		var oldEvt = window.onload;
+		window.onload = function () {
+			if (oldEvt) oldEvt();
+
+			var itemStatus = parseInt('{{ item.status }}');
+			var selectWidget = document.getElementsByName('operation')[0];
+
+			// Set the form select widget to the current value + 1
+			// Except if shipment.status = 4, disable the select widget
+			if (itemStatus < 4) {
+				selectWidget.selectedIndex = itemStatus + 1;
+			} else {
+				selectWidget.selectedIndex = 4;
+				selectWidget.disabled = true;
+			}
+
+			// If the user isn't logged in or shipStatus = 4, disable the form elements
+			var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
+			if (t == 'Log in' || itemStatus == 4) {
+				disableElements('shipForm');
+			}
+		}
+	</script>
+
 
 {% endblock content %}

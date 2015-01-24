@@ -83,13 +83,10 @@ def ship_info (request):
 			if itemcount == _shipment.inventory_set.count():
 				for item in itemlist:
 					item.status = _status
-					item.save()
-					ItemOperation.objects.create_operation(item = item,
-														   user = request.user,
-														   op_code = _status)
+					item.save({'user': request.user})
 				_shipment.status = _status
 
-			_shipment.save()
+			_shipment.save({'user': request.user})
 
 		except Shipment.DoesNotExist:
 			messages.add_message(request, messages.ERROR, "Shipment {} not found!".format(shipid))

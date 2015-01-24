@@ -1,4 +1,4 @@
-Django==1.5.4
-South==1.0.1
+Django==1.6.10
+gnureadline==6.3.3
 pytz==2014.10
-wsgiref==0.1.2
+South==1.0.2

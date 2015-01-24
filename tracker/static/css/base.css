@@ -38,7 +38,7 @@ ul .messages {
 
 table {
 	border          : 1px solid gray;
-	width           : 85%;
+	width           : 90%;
 	border-collapse : collapse;
 }
 
@@ -145,12 +145,16 @@ table tr:nth-child(odd) {
 	margin-bottom : 1rem;
 }
 
+#shipForm input.text_input {
+	width: 50%;
+}
+
 .btn {
 	font-size       : medium;
 	display         : inline-block;
 	color           : #000000;
-	margin-top      : 1rem;
-	padding         : 10px 15px 10px 15px;
+	margin-top      : 0.5rem;
+	padding         : 5px 10px 5px 10px;
 	border          : solid #000000 2px;
 	text-decoration : none;
 }

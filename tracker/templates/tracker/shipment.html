@@ -18,31 +18,33 @@
 
 {% block content %}
 
-	<table>
-		<thead>
-		{% for item in headers %}
-			<th>{{ item }}</th>
-		{% endfor %}
-{#		<th>Info</th>#}
-		</thead>
-		<tbody>
-		<td><a href = "/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
-		<td>#{{ shipment.owner.acct }}</td>
-		<td>{{ shipment.palletized }}</td>
-		{% if shipment.status != '4' %}
-			<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
-		{% else %}
-			<td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
-		{% endif %}
-		<td>{{ shipment.labor_time }}</td>
-		<td>{{ shipment.get_status_display }}</td>
-		<td>{{ shipment.tracking_number }}</td>
-{#		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:togglePane('shipForm', 'shipFormToggle');">Hide#}
-{#			Info</a>#}
-{#		</tbody>#}
-	</table>
+	<div class="row">
+		<table>
+			<thead>
+			{% for item in headers %}
+				<th>{{ item }}</th>
+			{% endfor %}
+	{#		<th>Info</th>#}
+			</thead>
+			<tbody>
+			<td><a href = "/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
+			<td>#{{ shipment.owner.acct }}</td>
+			<td>{{ shipment.palletized }}</td>
+			{% if shipment.status != '4' %}
+				<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
+			{% else %}
+				<td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
+			{% endif %}
+			<td>{{ shipment.labor_time }}</td>
+			<td>{{ shipment.get_status_display }}</td>
+			<td>{{ shipment.tracking_number }}</td>
+	{#		<td><a id = "shipFormToggle" href = "#" onclick = "javascript:togglePane('shipForm', 'shipFormToggle');">Hide#}
+	{#			Info</a>#}
+	{#		</tbody>#}
+		</table>
+	</div>
 
-	<br />
+{#	<br />#}
 	<div class = "row">
 		{% if user.is_authenticated %}
 			<form id = "ship_info" method = "post" action = "/ship_info?shipid={{ shipment.shipid }}">
@@ -87,13 +89,15 @@
 
 		<div class = "col-2">
 			<div id = "shipForm" style = "display: block;">
-				<h3>Information</h3>
-
 				<div class = "col-2">
+
+					<h3>Information</h3><br/>
+
 					Palletized: <input type = "checkbox" name = "palletized"
 									   value = "{{ shipment.palletized }}" /><br />
-					Labor time: <input type = "text" name = "labor_time" value = "{{ shipment.labor_time }}" /><br />
-					Tracking #: <input type = "text" name = "tracking_number"
+					Labor time: <input class = "text_input" type = "text" name = "labor_time"
+									   value = "{{ shipment.labor_time }}" /><br />
+					Tracking #: <input class = "text_input" type = "text" name = "tracking_number"
 									   value = "{{ shipment.tracking_number }}" /><br />
 					{% if shipment.status != '4' %}
 						<a class = "btn" name = "submit" onclick = "verifyAllChecked('tableItem', 'ship_info');">Submit

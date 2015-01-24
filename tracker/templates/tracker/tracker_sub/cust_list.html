@@ -1,35 +1,37 @@
 {# Template for a list of multiple customers #}
 {% load static %}
 {% load num_filters %}
-<table>
-	<thead>
-		<tr>
-			{% for item in headers %}
-				<th>{{ item }}</th>
-			{% endfor %}
-		</tr>
-	</thead>
-	<tbody>
-		{% for customer in customer_list %}
+<div class="row">
+	<table>
+		<thead>
 			<tr>
-				<td id="account_cell"><a href="/accounts/{{ customer.acct }}">{{ customer.acct }}</a></td>
-				<td id="name_cell">{{ customer.name }}</td>
-				{% if status_column %}
-					<td id="status_cell">{{ customer.get_status_display }}</td>
-				{% endif %}
-				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
-				{% if 'Active' not in head_text %}
-					{% if customer.status == "0" %}
-						<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
-					{% else %}
-						<td class="inactive"></td>
-					{% endif %}
-				{% endif %}
-				{% if 'Inactive' not in head_text %}
-					<td id="ship_count">{{ customer.shipment_set.count }}</td>
-				{% endif %}
-				<td id="storage_fees">${{ customer.inventory_set.all|storage_fee_total }}</td>
+				{% for item in headers %}
+					<th>{{ item }}</th>
+				{% endfor %}
 			</tr>
-		{% endfor %}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			{% for customer in customer_list %}
+				<tr>
+					<td id="account_cell"><a href="/accounts/{{ customer.acct }}">{{ customer.acct }}</a></td>
+					<td id="name_cell">{{ customer.name }}</td>
+					{% if status_column %}
+						<td id="status_cell">{{ customer.get_status_display }}</td>
+					{% endif %}
+					<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
+					{% if 'Active' not in head_text %}
+						{% if customer.status == "0" %}
+							<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
+						{% else %}
+							<td class="inactive"></td>
+						{% endif %}
+					{% endif %}
+					{% if 'Inactive' not in head_text %}
+						<td id="ship_count">{{ customer.shipment_set.all|stored_shipment_count }}</td>
+					{% endif %}
+					<td id="storage_fees">${{ customer.inventory_set.all|storage_fee_total }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
