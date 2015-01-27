@@ -78,7 +78,7 @@ function simpleTableToggle(lnk) {
 
 	lnk.innerHTML = (lnk.innerHTML == "+") ? "-" : "+";
 
-	vStyle = (table.rows[rowIndex + 1].style.display == 'none') ? '' : 'none';
+	var vStyle = (table.rows[rowIndex + 1].style.display == 'none') ? '' : 'none';
 
 	for (var i = rowIndex + 1; i < len; i++) {
 		table.rows[i].style.display = vStyle;
@@ -124,5 +124,16 @@ function disableElements(eleForm) {
 				c.children[j].disabled = true;
 			}
 		}
+	}
+}
+
+function confirmAcctRemove(itemsInStorage) {
+	// itemsInStorage should be passed as {{ customer.inventory_set.all|stored_count }}
+	if (itemsInStorage > 0) {
+		alert("This customer still has items in inventory! Please process those first before proceeding.")
+	} else if (itemsInStorage == 0) {
+		document.location.href = "/accounts?remove={{ customer.acct }}";
+	} else {
+		alert("No itemsInStorage passed to confirmAcctRemove(). Check the onclick of the Remove Account link.")
 	}
 }

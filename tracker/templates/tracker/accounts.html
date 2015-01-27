@@ -30,7 +30,7 @@
 	{% endif %}
 	{% if user.is_authenticated and customer %}
 		{% if customer.status == '1' %}
-			| <a id="remove_link" href="#">Remove account</a>
+			| <a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove account</a>
 		{% else %}
 			| <a href="#" class="disabled">Remove account</a>
 		{% endif %}
