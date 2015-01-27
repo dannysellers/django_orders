@@ -1,0 +1,59 @@
+{% extends 'tracker/index.html' %}
+{% load static %}
+{% load num_filters %}
+
+{% block title %}
+	<title>Add New Shipment</title>
+{% endblock title %}
+
+{% block header %}
+	<h1>Add New Shipment &#8212; {{ customer.name }} (#{{ customer.acct }})</h1>
+{% endblock header %}
+
+{% block sub_nav %}
+
+	<a href="/accounts?accts=all">All accounts</a>
+	| <a href="/accounts?accts=active">Active accounts</a>
+	| <a href="/accounts?accts=inactive">Inactive accounts</a>
+	{% if user.is_authenticated %}
+		| <a href="/add_account">Add new account</a>
+	{% endif %}
+	{% if user.is_authenticated and customer %}
+		{% if customer.status == '1' %}
+			| <a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove
+																													 account</a>
+		{% else %}
+			| <a href="#" class="disabled">Remove account</a>
+		{% endif %}
+	{% endif %}
+
+{% endblock sub_nav %}
+
+{% block content %}
+
+	<div class="row">
+
+		<form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
+			{% csrf_token %}
+
+			<label for="notes">Notes:</label><br/>
+			<textarea name="notes" rows="5" cols="35"></textarea><br/>
+
+			<label for="palletized">Palletized: </label>
+			<input type="checkbox" id="palletized" name="palletized" value="Palletized"/><br/>
+
+			<label for="labor_time">Labor Time: </label>
+			<input type="text" id="labor_time" class="number" name="labor_time" value="0"/><br/>
+
+			<label for="tracking_number">Tracking Number: </label>
+			<input type="text" id="tracking_number" name="tracking_number"/><br/>
+
+			{#			<div id="submit_buttons">#}
+			{#				<button type="reset">Reset</button>#}
+			<button type="submit" name="submit">Submit</button>
+			{#			</div>#}
+		</form>
+
+	</div>
+
+{% endblock content %}

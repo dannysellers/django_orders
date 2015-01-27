@@ -48,6 +48,7 @@
 	<hr width="85%" align="left">
 	<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
 	| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
+	| <a href="/accounts/{{ customer.acct }}/add_shipment">Add Shipment</a>
 	{% if storage_fees %}
 		| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>
 	{% else %}
@@ -102,22 +103,11 @@
 	window.onload = function () {
 		if (oldEvt) oldEvt();
 
-		var custStatus = parseInt('{{ customer.status }}');
+		var custStatus = ({{ customer.status }});
 
 		var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
 		if (t == 'Log in' || custStatus == 0) {
 			disableElements('acctForm');
 		}
 	};
-	function confirmRemove () {
-		var itemsInStorage = parseInt('{{ customer.inventory_set.all|stored_count }}');
-		if (itemsInStorage > 0) {
-			alert("This customer still has items in inventory! Please process those first before proceeding.")
-		} else {
-			document.location.href = "/accounts?remove={{ customer.acct }}";
-		}
-	}
-
-	var link = document.getElementById('remove_link');
-	link.addEventListener('click', confirmRemove, false)
 </script>

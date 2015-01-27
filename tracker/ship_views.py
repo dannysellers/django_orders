@@ -1,5 +1,4 @@
 from models import *
-import forms
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
@@ -12,6 +11,9 @@ import re
 # Disable caching by browser
 @cache_control(no_cache = True)
 def shipment (request):
+	"""
+	Overview page for an individual shipment
+	"""
 	context = RequestContext(request)
 	context_dict = {}
 
@@ -100,49 +102,53 @@ def ship_info (request):
 		return HttpResponseRedirect('/shipment?id={}'.format(shipid))
 
 
-# @login_required
-# def add_shipment (request, account_url):
-# 	context = RequestContext(request)
-# 	context_dict = {}
-#
-# 	try:
-# 		owner = Customer.objects.get(acct = account_url)
-# 	except Customer.DoesNotExist:
-# 		messages.add_message(request, messages.ERROR, "Customer {} not found.".format(account_url))
-# 		return render_to_response('tracker/add_customer.html',
-# 								  context_dict,
-# 								  context)
-#
-# 	if request.method == 'POST':
-# 		form = forms.ShipmentForm(request.POST)
-#
-# 		if form.is_valid():
-# 			form.save()
-# 			return HttpResponseRedirect('/accounts/{}/'.format(owner.acct))
-# 		else:
-# 			print form.errors
-# 	else:
-# 		form = forms.ShipmentForm()
-#
-# 	context_dict['form'] = form
-# 	context_dict['owner'] = owner
-# 	context_dict['form_type'] = 'shipment'
-# 	return render_to_response('tracker/form.html', context_dict, context)
+@login_required
+def add_shipment (request, account_url):
+	context = RequestContext(request)
+	context_dict = {}
+
+	try:
+		customer = Customer.objects.get(acct = account_url)
+		context_dict['customer'] = customer
+	except Customer.DoesNotExist:
+		messages.add_message(request, messages.ERROR, "Customer {} not found.".format(account_url))
+		return render_to_response('tracker/add_customer.html',
+								  context_dict,
+								  context)
+
+	if request.method == 'POST':
+		labor_time = request.POST.get('labor_time', '00')
+		notes = request.POST.get('notes', 'No notes yet.')
+		tracking_number = request.POST.get('tracking_number', '00000')
+		palletized = request.POST.get('palletized', False)
+
+		_shipment = Shipment.objects.create_shipment(owner = customer, palletized = palletized, labor_time =
+		labor_time, notes = notes, tracking_number = tracking_number)
+
+		# Create items for shipment
+
+		messages.add_message(request, messages.SUCCESS,
+							 "Shipment {} of {} items created successfully.".format(_shipment.shipid,
+																					_shipment.inventory_set.count()))
+		return HttpResponseRedirect('/shipments?id={}'.format(_shipment.shipid))
+	else:
+		return render_to_response('tracker/add_shipment_form.html', context_dict, context)
 
 
 @login_required
 def ship_extras (request):
+	"""
+	Function to process incoming shipment optional extra form POSTS, form id='ship_extras'
+	"""
 	shipid = int(request.GET['shipid'])
 
 	try:
 		_shipment = Shipment.objects.get(shipid = shipid)
-		# _owner = _shipment.owner
 	except Shipment.DoesNotExist:
 		messages.add_message(request, messages.ERROR, "Shipment {} not found.".format(shipid))
 		return HttpResponseRedirect('/shipment?id={}'.format(shipid))
 
 	if request.method == 'POST':
-		assert isinstance(_shipment, Shipment)
 		quantity = float(request.POST['quantity'])
 		unit_cost = float(request.POST['unit_cost'])
 		description = request.POST['description']
@@ -151,6 +157,5 @@ def ship_extras (request):
 		messages.add_message(request, messages.SUCCESS, "{} {} added successfully.".format(quantity, description))
 	else:
 		messages.add_message(request, messages.ERROR, "Invalid request received. Try submitting a form.")
-		# return HttpResponseRedirect('/shipment?id={}'.format(shipid))
 
 	return HttpResponseRedirect('/shipment?id={}'.format(shipid))
