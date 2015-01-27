@@ -31,8 +31,6 @@
 			{% block sub_nav %}
 
 			{% endblock sub_nav %}
-		</div>
-
 			{% if messages %}
 				<ul class="messages">
 					{% for message in messages %}
@@ -40,15 +38,17 @@
 					{% endfor %}
 				</ul>
 			{% endif %}
+		</div>
 
 			{% block content %}
-
-				Active customers: {{ cust_act_count }}<br />
-				Total customers: {{ cust_count }}<br />
-				Shipments in storage: {{ ship_count }}<br />
-				Items currently in storage: {{ item_count }}<br />
-				<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
-				<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+				<div class="row">
+					Active customers: {{ cust_act_count }}<br />
+					Total customers: {{ cust_count }}<br />
+					Shipments in storage: {{ ship_count }}<br />
+					Items currently in storage: {{ item_count }}<br />
+					<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
+					<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+				</div>
 
 			{% endblock %}
 

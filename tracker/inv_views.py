@@ -48,7 +48,10 @@ def inventory (request):
 					context_filter.append(str(customer))
 					inventory_list = inventory_list.filter(shipset__owner = customer)
 					if not inventory_list:
-						messages.add_message(request, messages.INFO, "This customer has no items.")
+						if int(customer.status) == 0:
+							messages.add_message(request, messages.INFO, "This account is inactive.")
+						else:
+							messages.add_message(request, messages.INFO, "This customer has no items.")
 
 					_date = date.today()
 					context_dict['date'] = _date

@@ -14,13 +14,11 @@ body {
 	/* TODO: Responsive-ize this */
 	font-family  : "Helvetica Neue", Helvetica, Arial, sans-serif;
 	padding-left : 1em;
-	/*background-color : #95a5a6;*/
 }
 
 a.disabled {
 	pointer-events : none;
 	cursor         : default;
-	/*text-decoration : none;*/
 	color          : black;
 }
 
@@ -28,7 +26,7 @@ a.disabled {
  /*// MESSAGES //*/
 /*//////////////*/
 
-ul .messages {
+ul.messages {
 	list-style : none;
 }
 
@@ -66,7 +64,7 @@ td {
 }
 
 td.ship_toggle {
-	min-width: .5em;
+	min-width : .5em;
 }
 
 td.ship_toggle:hover {
@@ -79,9 +77,9 @@ td.ship_toggle:hover {
 	text-decoration : none;
 }
 
-  /*//////////////////*/
- /*// row coloring //*/
-/*//////////////////*/
+  /*//////////////////////////*/
+ /*// TABLE > row coloring //*/
+/*//////////////////////////*/
 
 table tr:nth-child(even) {
 	background-color : #ffffff;
@@ -138,6 +136,46 @@ table tr:nth-child(odd) {
 	display : inline;
 }
 
+  /*///////////////////*/
+ /*// FORM ELEMENTS //*/
+/*///////////////////*/
+
+select {
+	border             : 1px solid #111111;
+	/* TODO: Check this CSS w/IE */
+	/*background         : transparent;*/
+	width              : 150px;
+	padding            : 5px 35px 5px 5px;
+	font-size          : 13px;
+	/*border             : 1px solid #cccccc;*/
+	/*height             : 34px;*/
+	-webkit-appearance : none;
+	-moz-appearance    : none;
+	appearance         : none;
+	background         : url("../img/down_arrow.svg") 96% / 15% no-repeat #eeeeee;
+	/* TODO: settle that URL for deployment... */
+}
+
+select:not(.disabled):hover {
+	/*border             : 2px solid #2c3e50;*/
+	/*background         : #a0cfff;*/
+	color              : #191b1c;
+	cursor             : pointer;
+	-webkit-appearance : none;
+	-moz-appearance    : none;
+	appearance         : none;
+	background         : url("../img/down_arrow.svg") 96% / 15% no-repeat #eeeeee;
+}
+
+/*target Internet Explorer 9 and Internet Explorer 10:*/
+
+@media screen and (min-width : 0\0
+) {
+	select {
+		background : url("../img/down_arrow.svg") 96% / 15% no-repeat #eeeeee;
+		padding    : 5px;
+	}
+}
 
 #notes {
 	width         : 85%;
@@ -146,7 +184,7 @@ table tr:nth-child(odd) {
 }
 
 #shipForm input.text_input {
-	width: 50%;
+	width : 50%;
 }
 
 .btn {
@@ -160,10 +198,9 @@ table tr:nth-child(odd) {
 }
 
 .btn #disabled {
-	background     : #b0b0b0;
+	background     : #c0c0c0;
 	pointer-events : none;
 	cursor         : default;
-
 }
 
 .btn:not(.disabled):hover {
@@ -171,4 +208,14 @@ table tr:nth-child(odd) {
 	color           : #ecf0f1;
 	text-decoration : none;
 	cursor          : pointer;
+}
+
+.extra-row {
+	border        : 1px solid #000000;
+	border-radius : 10px;
+	margin-top    : 0.5rem;
+	padding       : 3px 1px 3px 5px;
+	float         : left;
+	clear         : both;
+	width         : 50%;
 }

@@ -57,7 +57,7 @@ function toggleSection(lnk) {
 	} else {
 	  vStyle = ''
 	}; */
-	vStyle = (table.rows[rowIndex + 1].style.display == 'none') ? '' : 'none';
+	var vStyle = (table.rows[rowIndex + 1].style.display == 'none') ? '' : 'none';
 
 	for (var i = rowIndex + 1; i < len; i++) {
 		// Changing the child <p> of the tag allows the cell to continue
@@ -85,9 +85,9 @@ function simpleTableToggle(lnk) {
 	}
 }
 
-function verifyAllChecked(source, formId) {
+function verifyAllChecked(tableId, formId) {
 	// If all or none of the checkboxes are checked, the form submits. Else, confirm
-	var table = document.getElementsByClassName(source)[0];
+	var table = document.getElementsByClassName(tableId)[0];
 	var checkboxes = table.getElementsByClassName('checkbox');
 	var headChecked = checkboxes[0].checked; // Value of checkbox in head row
 	var complete = true;
@@ -104,7 +104,7 @@ function verifyAllChecked(source, formId) {
 		}
 	}
 	if (complete == false && numChecked != checkboxes.length - 1) {
-		if (confirm("Not all items in this shipment were selected! Continue? Shipment status will not change (only item statuses).")) {
+		if (confirm("Not all items in this shipment were selected! Continue? Shipment status will not change (only item statuses).\nTo change shipment statuses, select all their component items.")) {
 			sForm.submit();
 		} else {
 			return false

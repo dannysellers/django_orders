@@ -1,4 +1,5 @@
 from models import *
+import forms
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
@@ -47,6 +48,9 @@ def shipment (request):
 
 @login_required
 def ship_info (request):
+	"""
+	Function to handle receiving shipment info from form id="ship_info"
+	"""
 	if request.method != 'POST':
 		messages.add_message(request, messages.ERROR,
 							 "Improper request. Try submitting a form from a shipment view.")
@@ -94,3 +98,59 @@ def ship_info (request):
 
 		messages.add_message(request, messages.SUCCESS, "Shipment {} information updated.".format(shipid))
 		return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+
+
+# @login_required
+# def add_shipment (request, account_url):
+# 	context = RequestContext(request)
+# 	context_dict = {}
+#
+# 	try:
+# 		owner = Customer.objects.get(acct = account_url)
+# 	except Customer.DoesNotExist:
+# 		messages.add_message(request, messages.ERROR, "Customer {} not found.".format(account_url))
+# 		return render_to_response('tracker/add_customer.html',
+# 								  context_dict,
+# 								  context)
+#
+# 	if request.method == 'POST':
+# 		form = forms.ShipmentForm(request.POST)
+#
+# 		if form.is_valid():
+# 			form.save()
+# 			return HttpResponseRedirect('/accounts/{}/'.format(owner.acct))
+# 		else:
+# 			print form.errors
+# 	else:
+# 		form = forms.ShipmentForm()
+#
+# 	context_dict['form'] = form
+# 	context_dict['owner'] = owner
+# 	context_dict['form_type'] = 'shipment'
+# 	return render_to_response('tracker/form.html', context_dict, context)
+
+
+@login_required
+def ship_extras (request):
+	shipid = int(request.GET['shipid'])
+
+	try:
+		_shipment = Shipment.objects.get(shipid = shipid)
+		# _owner = _shipment.owner
+	except Shipment.DoesNotExist:
+		messages.add_message(request, messages.ERROR, "Shipment {} not found.".format(shipid))
+		return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+
+	if request.method == 'POST':
+		assert isinstance(_shipment, Shipment)
+		quantity = float(request.POST['quantity'])
+		unit_cost = float(request.POST['unit_cost'])
+		description = request.POST['description']
+		OptExtras.objects.create_optextra(shipment = _shipment, quantity = quantity,
+										  unit_cost = unit_cost, description = description)
+		messages.add_message(request, messages.SUCCESS, "{} {} added successfully.".format(quantity, description))
+	else:
+		messages.add_message(request, messages.ERROR, "Invalid request received. Try submitting a form.")
+		# return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+
+	return HttpResponseRedirect('/shipment?id={}'.format(shipid))

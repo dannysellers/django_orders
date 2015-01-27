@@ -37,5 +37,6 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
 	url(r'^shipment', ship_views.shipment, name='shipment'),
 	url(r'^ship_info', ship_views.ship_info, name='ship_info'),
-	url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', ship_views.add_shipment, name = 'add_shipment'),
+	url(r'^ship_extras', ship_views.ship_extras, name='ship_extras'),
+	# url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', ship_views.add_shipment, name = 'add_shipment'),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # for deployment purposes

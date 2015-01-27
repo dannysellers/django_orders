@@ -26,7 +26,7 @@
 			{% endfor %}
 			</thead>
 			<tbody>
-			<td><a href = "/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
+			<td><a href="/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
 			<td>#{{ shipment.owner.acct }}</td>
 			<td>{{ shipment.palletized }}</td>
 			{% if shipment.status != '4' %}
@@ -40,16 +40,17 @@
 		</table>
 	</div>
 
-	<div class = "row">
+	<div class="row">
 		{% if user.is_authenticated %}
-			<form id = "ship_info" method = "post" action = "/ship_info?shipid={{ shipment.shipid }}">
+			<form id="ship_info" method="post" action="/ship_info?shipid={{ shipment.shipid }}">
 			{% csrf_token %}
 		{% endif %}
-		<div class = "col-2">
+		<div class="col-2">
 			<h3>Item List ({{ shipment.inventory_set.count }})</h3>
-			<table class = "tableItem" style = "width: 90%;">
+			<table class="tableItem" style="width: 90%;">
 				<thead>
-				<th class="checkbox"><input type = "checkbox" class = "checkbox" onclick = "javascript:checkAll(this);"></th>
+				<th class="checkbox"><input type="checkbox" class="checkbox"
+											onclick="javascript:checkAll(this);"></th>
 				{% for item in item_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
@@ -57,53 +58,53 @@
 				<tbody>
 				{% for item in shipment.inventory_set.all %}
 					<tr>
-						<td id = "td_checkbox"><input type = "checkbox" class = "checkbox"
-													  name = "item_{{ item.itemid }}"></td>
-						<td id = "item_id">
-							<a href = "/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+						<td id="td_checkbox"><input type="checkbox" class="checkbox"
+													name="item_{{ item.itemid }}"></td>
+						<td id="item_id">
+							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
 						</td>
-						<td id = "item_volume">{{ item.volume|length:"2" }}</td>
+						<td id="item_volume">{{ item.volume|length:"2" }}</td>
 						{% if not item.status == '4' %}
-							<td id = "item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
+							<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 						{% else %}
-							<td class = "inactive"></td>
+							<td class="inactive"></td>
 						{% endif %}
-						<td id = "item_status">{{ item.get_status_display }}</td>
+						<td id="item_status">{{ item.get_status_display }}</td>
 					</tr>
 				{% endfor %}
 				</tbody>
 			</table>
-			<select name = "item_status" style = "margin-top:0.5rem;">
-				<option value = "0">Inducted (0)</option>
-				<option value = "1">Order Received (1)</option>
-				<option value = "2">Order Started (2)</option>
-				<option value = "3">Order Completed (3)</option>
-				<option value = "4">Shipped (4)</option>
+			<select name="item_status" style="margin-top:0.5rem;">
+				<option value="0">Inducted (0)</option>
+				<option value="1">Order Received (1)</option>
+				<option value="2">Order Started (2)</option>
+				<option value="3">Order Completed (3)</option>
+				<option value="4">Shipped (4)</option>
 			</select>
 		</div>
 
-		<div class = "col-2">
-			<div id = "shipForm" style = "display: block;">
-				<div class = "col-2">
+		<div class="col-2">
+			<div id="shipForm" style="display: block;">
+				<div class="col-2">
 
 					<h3>Information</h3><br/>
 
-					Palletized: <input type = "checkbox" name = "palletized"
-									   value = "{{ shipment.palletized }}" /><br />
-					Labor time: <input class = "text_input" type = "text" name = "labor_time"
-									   value = "{{ shipment.labor_time }}" /><br />
-					Tracking #: <input class = "text_input" type = "text" name = "tracking_number"
-									   value = "{{ shipment.tracking_number }}" /><br />
+					Palletized: <input type="checkbox" name="palletized"
+									   value="{{ shipment.palletized }}"/><br/>
+					Labor time: <input class="text_input" type="text" name="labor_time"
+									   value="{{ shipment.labor_time }}"/><br/>
+					Tracking #: <input class="text_input" type="text" name="tracking_number"
+									   value="{{ shipment.tracking_number }}"/><br/>
 					{% if shipment.status != '4' %}
-						<a class = "btn" name = "submit" onclick = "verifyAllChecked('tableItem', 'ship_info');">Submit
-							Information</a>
+						<a class="btn" name="submit" onclick="verifyAllChecked('tableItem', 'ship_info');">Submit
+																										   Information</a>
 					{% else %}
-						<a class = "btn disabled" name = "submit">Submit Information</a>
+						<a class="btn disabled" name="submit">Submit Information</a>
 					{% endif %}
 				</div>
-				<div class = "col-2">
-					Shipment notes:<br />
-					<textarea name = "notes" id = "notes">{{ shipment.notes }}</textarea>
+				<div class="col-2">
+					Shipment notes:<br/>
+					<textarea name="notes" id="notes">{{ shipment.notes }}</textarea>
 				</div>
 			</div>
 		</div>
@@ -112,65 +113,82 @@
 		{% endif %}
 	</div>
 
-	<div class = "row">
-		<hr align = "left" />
+	<div class="row">
+		<hr align="left"/>
 		<h3>Operation History ({{ shipment.shipoperation_set.count }})</h3>
 
 		<table id="shipop_history">
 			<thead>
-				<tr>
-					{% for item in shipop_headers %}
-						<th>{{ item }}</th>
-					{% endfor %}
-				</tr>
-			</thead>
-			<tbody>
-				{% for operation in shipment.shipoperation_set.all %}
-					<tr>
-						<td>{{ operation.id }}</td>
-						<td>{{ operation.dt }}</td>
-						<td>{{ operation.get_op_code_display }}</td>
-						<td>{{ operation.user.get_full_name }}</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
-
-	<div class = "row">
-		<hr align = "left" />
-		<h3>Extras ({{ shipment.optextras_set.count }})</h3>
-		{% if user.is_authenticated %}
-			{% if shipment.status != '4' %}
-				| <a href = "#">Add extra</a>
-			{% else %}
-				| <a href = "#" class = "disabled">Add extra</a>
-			{% endif %}
-		{% endif %}
-		<table>
-			<thead>
 			<tr>
-				<th onclick = "simpleTableToggle(this);"><a href = "#" class = "optextras_toggle"
-															style = "color:white;text-decoration:none;">-</a></th>
-				{% for item in extras_headers %}
+				{% for item in shipop_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
 			</tr>
 			</thead>
 			<tbody>
-			{% for extra in shipment.optextras_set.all %}
+			{% for operation in shipment.shipoperation_set.all %}
 				<tr>
-					<td>&nbsp;</td>
-					<td>{{ extra.quantity }}</td>
-					<td>${{ extra.unit_cost|length:"2" }}</td>
-					<td>${{ extra.total_cost|length:"2" }}
-					<td>{{ extra.description }}</td>
+					<td>{{ operation.id }}</td>
+					<td>{{ operation.dt }}</td>
+					<td>{{ operation.get_op_code_display }}</td>
+					<td>{{ operation.user.get_full_name }}</td>
 				</tr>
 			{% endfor %}
 			</tbody>
 		</table>
 	</div>
 
+	<div class="row">
+		<hr align="left"/>
+		<div class="col-2">
+			<h3>Extras ({{ shipment.optextras_set.count }})</h3>
+			<table>
+				<thead>
+				<tr>
+					<th onclick="simpleTableToggle(this);"><a href="#" class="optextras_toggle"
+															  style="color:white;text-decoration:none;">-</a></th>
+					{% for item in extras_headers %}
+						<th>{{ item }}</th>
+					{% endfor %}
+				</tr>
+				</thead>
+				<tbody>
+				{% for extra in shipment.optextras_set.all %}
+					<tr>
+						<td>&nbsp;</td>
+						<td>{{ extra.quantity }}</td>
+						<td>${{ extra.unit_cost|length:"2" }}</td>
+						<td>${{ extra.total_cost|length:"2" }}
+						<td>{{ extra.description }}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="col-2">
+			{% if user.is_authenticated %}
+				<form id="ship_extras" method="post" action="/ship_extras?shipid={{ shipment.shipid }}">
+				{% csrf_token %}
+				{% if shipment.status != '4' %}
+					<a href="#" id="add-extra">Add extra</a>
+					| <a href="#" id="remove-extra">Remove extra</a>
+					|
+					<button type="submit" class="btn">Submit</button>
+				{% else %}
+					<a href="#" class="disabled">Add extra</a>
+					| <a href="#" class="disabled">Remove extra</a>
+					| <button type="submit" class="btn disabled">Submit</button>
+				{% endif %}
+			{% endif %}
+			<div id="extras-holder">
+			</div>
+			{% if user.is_authenticated %}
+				</form>
+			{% endif %}
+		</div>
+	</div>
+
+	<script src="{% static "js/formelements.js" %}"></script>
 	<script>
 		var oldEvt = window.onload;
 		window.onload = function () {
@@ -188,10 +206,18 @@
 				s.disabled = true;
 			}
 
+			// Optional extra form elements
+			var addButton = document.getElementById('add-extra');
+			var removeButton = document.getElementById('remove-extra');
+
 			// If the user isn't logged in or shipStatus = 4, disable the form elements
 			var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
 			if (t == 'Log in' || shipStatus == 4) {
 				disableElements('shipForm');
+			}
+			if (t == 'Log out' && shipStatus != 4) {
+				addButton.addEventListener('click', addElement, false);
+				removeButton.addEventListener('click', removeElement, false);
 			}
 		}
 	</script>

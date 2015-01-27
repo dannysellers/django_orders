@@ -112,7 +112,7 @@
 	function confirmRemove () {
 		var itemsInStorage = parseInt('{{ customer.inventory_set.all|stored_count }}');
 		if (itemsInStorage > 0) {
-			alert("This customer still has items in inventory! Process those first before proceeding, even if that means marking them as 'shipped'.")
+			alert("This customer still has items in inventory! Please process those first before proceeding.")
 		} else {
 			document.location.href = "/accounts?remove={{ customer.acct }}";
 		}
