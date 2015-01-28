@@ -121,6 +121,8 @@ def add_shipment (request, account_url):
 		notes = request.POST.get('notes', 'No notes yet.')
 		tracking_number = request.POST.get('tracking_number', '00000')
 		palletized = request.POST.get('palletized', False)
+		if palletized == 'on':
+			palletized = True
 
 		_shipment = Shipment.objects.create_shipment(owner = customer, palletized = palletized,
 													 labor_time = labor_time, notes = notes,

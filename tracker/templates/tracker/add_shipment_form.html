@@ -20,7 +20,7 @@
 	{% endif %}
 	{% if user.is_authenticated and customer %}
 		{% if customer.status == '1' %}
-			|<a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove
+			| <a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove
 																													 account</a>
 		{% else %}
 			| <a href="#" class="disabled">Remove account</a>
@@ -53,7 +53,7 @@
 
 				<input type="text" id="tracking_number" name="tracking_number" placeholder="Tracking Number"/><br/>
 
-				<input type="checkbox" id="palletized" name="palletized" value="Palletized"/><br/>
+				<input type="checkbox" id="palletized" name="palletized" /><br/>
 
 				<textarea name="notes" rows="5" cols="35" placeholder="Notes"></textarea><br/>
 
