@@ -122,10 +122,18 @@ def add_shipment (request, account_url):
 		tracking_number = request.POST.get('tracking_number', '00000')
 		palletized = request.POST.get('palletized', False)
 
-		_shipment = Shipment.objects.create_shipment(owner = customer, palletized = palletized, labor_time =
-		labor_time, notes = notes, tracking_number = tracking_number)
+		_shipment = Shipment.objects.create_shipment(owner = customer, palletized = palletized,
+													 labor_time = labor_time, notes = notes,
+													 tracking_number = tracking_number)
 
-		# Create items for shipment
+		# Dimensions are return as ordered lists of length, width, height, quantity
+		quantity_set = request.POST.getlist('quantity')
+		height_set = request.POST.getlist('height')
+		width_set = request.POST.getlist('width')
+		length_set = request.POST.getlist('length')
+		for i in range(len(quantity_set)):
+			Inventory.objects.create_inventory(shipset = _shipment, length = length_set[i],
+											   width = width_set[i], height = height_set[i])
 
 		messages.add_message(request, messages.SUCCESS,
 							 "Shipment {} of {} items created successfully.".format(_shipment.shipid,

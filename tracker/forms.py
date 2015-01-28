@@ -35,17 +35,6 @@ class InventoryForm(forms.ModelForm):
 		fields = ('quantity', 'length', 'width', 'height', 'palletized')
 
 
-# class ShipmentForm(forms.ModelForm):
-# 	palletized = forms.BooleanField(initial = False, help_text = 'Palletized: ', required = False)
-# 	labor_time = forms.IntegerField(min_value = 1, help_text="Labor time: ", widget=forms.NumberInput)
-# 	notes = forms.CharField(help_text="Notes: ", widget=forms.Textarea)
-# 	tracking_number = forms.CharField(max_length = 30, required = True, help_text="Tracking number: ")
-#
-# 	class Meta:
-# 		model = Shipment
-# 		fields = ('labor_time', 'palletized', 'tracking_number', 'notes')
-
-
 class OptExtraForm(forms.ModelForm):
 	description = forms.TextInput()
 	quantity = forms.CharField(max_length = 5, help_text = "Quantity: ")

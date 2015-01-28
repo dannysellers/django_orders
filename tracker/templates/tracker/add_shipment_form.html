@@ -20,7 +20,7 @@
 	{% endif %}
 	{% if user.is_authenticated and customer %}
 		{% if customer.status == '1' %}
-			| <a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove
+			|<a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove
 																													 account</a>
 		{% else %}
 			| <a href="#" class="disabled">Remove account</a>
@@ -31,29 +31,62 @@
 
 {% block content %}
 
-	<div class="row">
+	<form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
+		{% csrf_token %}
 
-		<form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
-			{% csrf_token %}
+		<div class="row form">
 
-			<label for="notes">Notes:</label><br/>
-			<textarea name="notes" rows="5" cols="35"></textarea><br/>
+			<div class="col-2 left">
 
-			<label for="palletized">Palletized: </label>
-			<input type="checkbox" id="palletized" name="palletized" value="Palletized"/><br/>
+				<label for="labor_time">Labor Time: </label><br/>
 
-			<label for="labor_time">Labor Time: </label>
-			<input type="text" id="labor_time" class="number" name="labor_time" value="0"/><br/>
+				<label for="tracking_number">Tracking Number: </label><br/>
 
-			<label for="tracking_number">Tracking Number: </label>
-			<input type="text" id="tracking_number" name="tracking_number"/><br/>
+				<label for="palletized">Palletized: </label><br/>
 
-			{#			<div id="submit_buttons">#}
-			{#				<button type="reset">Reset</button>#}
+				<label for="notes">Notes:</label><br/>
+
+			</div>
+			<div class="col-2 right">
+
+				<input type="text" id="labor_time" class="number" name="labor_time" value="0"/><br/>
+
+				<input type="text" id="tracking_number" name="tracking_number" placeholder="Tracking Number"/><br/>
+
+				<input type="checkbox" id="palletized" name="palletized" value="Palletized"/><br/>
+
+				<textarea name="notes" rows="5" cols="35" placeholder="Notes"></textarea><br/>
+
+			</div>
+
+		</div>
+
+		<div class="row form">
+			<a href="#" id="add-extra">Add Carton Set</a>
+			| <a href="#" id="remove-extra">Remove Carton Set</a>
+
+			<div id="extras-holder">
+			</div>
+		</div>
+
+		<div class="row form" style="border: none;">
+			<button type="reset" name="reset">Reset</button>
 			<button type="submit" name="submit">Submit</button>
-			{#			</div>#}
-		</form>
+		</div>
+	</form>
 
-	</div>
+	<script src="{% static "js/formelements.js" %}"></script>
+	<script>
+		var oldEvt = window.onload;
+		window.onload = function () {
+			if (oldEvt) oldEvt();
+
+			var addButton = document.getElementById('add-extra');
+			addButton.addEventListener('click', addCartonSetElement, false);
+
+			var removeButton = document.getElementById('remove-extra');
+			removeButton.addEventListener('click', removeElement, false);
+		}
+	</script>
 
 {% endblock content %}

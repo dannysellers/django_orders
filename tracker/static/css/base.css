@@ -140,6 +140,18 @@ table tr:nth-child(odd) {
  /*// FORM ELEMENTS //*/
 /*///////////////////*/
 
+.row.form {
+	width         : 50%;
+	border        : 1px solid #000000;
+	border-radius : 5px;
+	padding       : 0.5rem 0.5rem 0.5rem 0.5rem;
+	margin-bottom : 5px;
+}
+
+.col-2.left {
+	width : 30%;
+}
+
 select {
 	border             : 1px solid #111111;
 	/* TODO: Check this CSS w/IE */
@@ -217,5 +229,5 @@ select:not(.disabled):hover {
 	padding       : 3px 1px 3px 5px;
 	float         : left;
 	clear         : both;
-	width         : 50%;
+	width         : 15rem;
 }
