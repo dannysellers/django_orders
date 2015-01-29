@@ -24,6 +24,11 @@ def accounts (request):
 	context = RequestContext(request)
 	context_dict = dict()
 
+	if not request.GET:
+		# Handles /accounts
+		# Redirects for clarity for the user / more accurate {{ filter }}
+		return redirect('/accounts?accts=active')
+
 	# URL params
 	acct = request.GET.get('acct')
 	accts = request.GET.get('accts')
@@ -146,16 +151,16 @@ def acct_info (request):
 		except Customer.DoesNotExist:
 			messages.add_message(request, messages.ERROR, "Could not find customer with acct #{}".format(acct))
 			return HttpResponseRedirect('/accounts?accts=active')
-		else:
-			customer.notes = request.POST['notes']
-			customer.email = request.POST['email']
-			customer.name = request.POST['name']
-			customer.notes = request.POST['notes']
-			customer.acct = request.POST['acct']  # TODO: Confirmation on changing acct number
-		finally:
-			customer.save()
-			messages.add_message(request, messages.SUCCESS, "Account information updated successfully.")
-			return HttpResponseRedirect('/accounts/{}'.format(customer.acct))
+
+		customer.email = request.POST['email']
+		customer.name = request.POST['name']
+		# customer.notes = request.POST['notes']
+		# TODO: acct_form isn't submitting <textarea> correctly (at all)
+		customer.acct = request.POST['acct']  # TODO: Confirmation on changing acct number
+		customer.save()
+
+		messages.add_message(request, messages.SUCCESS, "Account information updated successfully.")
+		return HttpResponseRedirect('/accounts/{}'.format(customer.acct))
 
 
 @login_required

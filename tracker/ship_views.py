@@ -89,10 +89,10 @@ def ship_info (request):
 			if itemcount == _shipment.inventory_set.count():
 				for item in itemlist:
 					item.status = _status
-					item.save({'user': request.user})
+					item.save()
 				_shipment.status = _status
 
-			_shipment.save({'user': request.user})
+			_shipment.save()
 
 		except Shipment.DoesNotExist:
 			messages.add_message(request, messages.ERROR, "Shipment {} not found!".format(shipid))
@@ -130,12 +130,21 @@ def add_shipment (request, account_url):
 
 		# Dimensions are return as ordered lists of length, width, height, quantity
 		quantity_set = request.POST.getlist('quantity')
-		height_set = request.POST.getlist('height')
-		width_set = request.POST.getlist('width')
 		length_set = request.POST.getlist('length')
-		for i in range(len(quantity_set)):
-			Inventory.objects.create_inventory(shipset = _shipment, length = length_set[i],
-											   width = width_set[i], height = height_set[i])
+		width_set = request.POST.getlist('width')
+		height_set = request.POST.getlist('height')
+		for index, quantity in enumerate(quantity_set):
+			for carton in range(int(quantity)):
+				index = int(index)
+				_length = length_set[index]
+				_width = width_set[index]
+				_height = height_set[index]
+				item = Inventory.objects.create_inventory(shipset = _shipment,
+														  length = _length,
+														  width = _width,
+														  height = _height)
+				print("Created Item {}, Shipment {}, Acct {}".format(item.itemid, item.shipset.shipid,
+																	 item.owner.acct))
 
 		messages.add_message(request, messages.SUCCESS,
 							 "Shipment {} of {} items created successfully.".format(_shipment.shipid,

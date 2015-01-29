@@ -36,7 +36,8 @@
 					Email: <input type="email" name="email" value="{{ customer.email }}" />
 				</div>
 				<div class="col-3">
-					Notes:<br/> <textarea id = "notes">{{ customer.notes }}</textarea>
+					Notes:<br/> <textarea id = "notes" form = "acct_info">{{ customer.notes }}</textarea>
+{#					TODO: This form element isn't being submitted #}
 				</div>
 				<div class="col-3">
 					<button class="btn" name="submit">Submit Information</button>

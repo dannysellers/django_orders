@@ -38,6 +38,7 @@ class CustomerManager(Manager):
 class Customer(models.Model):
 	name = models.CharField(max_length = 128, unique = False)
 	acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
+	# TODO: Add hidden account ID so that the front-facing one can be changed?
 	email = models.EmailField()
 	status = models.CharField(max_length = 1, choices = CUSTOMER_STATUS_CODES)
 	createdate = models.DateField()

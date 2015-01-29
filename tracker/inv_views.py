@@ -1,9 +1,9 @@
-from datetime import date
+from datetime import date, datetime
 
-try:
-	from django.utils import timezone as datetime
-except ImportError:
-	from datetime import datetime as datetime
+# try:
+# 	from django.utils import timezone as datetime
+# except ImportError:
+# 	from datetime import datetime as datetime
 
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
