@@ -9,9 +9,9 @@ class CustomerForm(forms.ModelForm):
 	name = forms.CharField(max_length = 128, help_text = "Name: ")
 	acct = forms.CharField(max_length = 5, help_text = "Account number: ")
 	email = forms.EmailField(help_text = "Email address: ")
-	status = forms.CharField(widget = forms.HiddenInput(), initial = 1, required = False)
-	createdate = forms.DateField(widget = forms.HiddenInput(), initial = date.today(), required = False)
-	closedate = forms.DateField(widget = forms.HiddenInput(), initial = date.today(), required = False)
+	# status = forms.CharField(widget = forms.HiddenInput(), initial = 1, required = False)
+	# createdate = forms.DateField(widget = forms.HiddenInput(), initial = date.today(), required = False)
+	# closedate = forms.DateField(widget = forms.HiddenInput(), initial = date.today(), required = False)
 
 	# An inline class that provides additional info on the form
 	class Meta:

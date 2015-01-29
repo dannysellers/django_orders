@@ -168,7 +168,11 @@ def add_account (request):
 		form = forms.CustomerForm(request.POST)
 
 		if form.is_valid():
-			form.save()
+			name = form.cleaned_data['name']
+			email = form.cleaned_data['email']
+			acct = form.cleaned_data['acct']
+			cust = Customer.objects.create_customer(name, email, acct)
+			messages.add_message(request, messages.SUCCESS, "Account {} created successfully.".format(cust.acct))
 			return HttpResponseRedirect('/accounts?accts=active')
 		else:
 			print form.errors
