@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Manager
-# from django.utils import timezone
-from datetime import date, datetime
+from django.utils import timezone
+from datetime import date, datetime, timedelta
 
 from audit_log.models import AuthStampedModel
 from audit_log.models.managers import AuditLog
@@ -121,6 +121,12 @@ class Inventory(AuthStampedModel):
 	def __unicode__ (self):
 		return 'Item {}'.format(self.itemid)
 
+	def get_storage_fees(self):
+		if self.arrival >= timezone.now().date() - timedelta(days=7):
+			return self.storage_fees
+		else:
+			return 0.00
+
 	def save(self, *args, **kwargs):
 		super(Inventory, self).save()
 		ItemOperation.objects.create_operation(item = self,
@@ -135,7 +141,6 @@ class Operation(AuthStampedModel):
 	Base class for ShipOperation and ItemOperation, the
 	only difference between which is the ForeignKey relation
 	"""
-	# user = CreatingUserField(related_name = 'created_ops')
 	dt = models.DateTimeField()
 	op_code = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
 
@@ -146,7 +151,7 @@ class Operation(AuthStampedModel):
 class ShipOpManager(Manager):
 	def create_operation (self, shipment, op_code):
 		_op = self.create(shipment = shipment, dt = datetime.now(), op_code = op_code)
-		# TODO: Why are Ops getting created the number of times there are items in the carton set?
+		# TODO: Why are multiple Ops getting created per user action?
 		print("Created Op {0} on Shipment {1}".format(_op.op_code, _op.shipment))
 		return _op
 

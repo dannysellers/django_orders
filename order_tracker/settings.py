@@ -11,11 +11,10 @@ MANAGERS = ADMINS
 
 import os
 SETTINGS_DIR = os.path.dirname(__file__)
-PROJECT_PATH = os.path.join(SETTINGS_DIR, os.pardir)
-PROJECT_PATH = os.path.abspath(PROJECT_PATH)
+BASE_DIR = os.path.dirname(SETTINGS_DIR)
 # This is needed for the absolute path, which Django uses for routing
 
-DATABASE_PATH = os.path.join(PROJECT_PATH, 'order_tracker.db')
+DATABASE_PATH = os.path.join(BASE_DIR, 'order_tracker.db')
 
 DATABASES = {
     'default': {
@@ -129,6 +128,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 TEMPLATE_DIRS = (
+	[os.path.join(BASE_DIR, 'templates')]
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
