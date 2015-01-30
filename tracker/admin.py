@@ -5,12 +5,23 @@ READ_ONLY_FIELDS_LABEL = "Read-only fields"
 # TODO: Add Grappelli project (https://github.com/sehmaschine/django-grappelli)
 
 
+class ShipmentInline(admin.TabularInline):
+	model = models.Shipment
+
+	fieldsets = [
+		(None, {'fields': ['shipid', 'labor_time', 'tracking_number', 'palletized', 'status']}),
+		(READ_ONLY_FIELDS_LABEL, {'fields': ['arrival', 'departure']}),
+	]
+	readonly_fields = ('shipid', 'owner', 'arrival', 'departure')
+
+
 class CustomerAdmin(admin.ModelAdmin):
 	fieldsets = [
 		(None, {'fields': ['name', 'email', 'status']}),
 		('Account Information', {'fields': ['acct', 'notes'], 'classes': ['collapse']}),
 		(READ_ONLY_FIELDS_LABEL, {'fields': ['createdate', 'closedate'], 'classes': ['collapse']})
 	]
+	inlines = [ShipmentInline]
 	readonly_fields = ('createdate', 'closedate')
 	list_display = ('acct', 'name')
 	list_filter = ['status']
@@ -31,7 +42,6 @@ class ItemOpAdmin(admin.ModelAdmin):
 		(None, {'fields': ['item', 'op_code', 'dt']})
 	]
 	readonly_fields = ('item', 'op_code', 'dt')
-	# dt.short_description = "Datetime"
 
 
 class InventoryAdmin(admin.ModelAdmin):
@@ -68,7 +78,6 @@ class ShipOpAdmin(admin.ModelAdmin):
 		(None, {'fields': ['shipment', 'op_code', 'dt']})
 	]
 	readonly_fields = ('shipment', 'op_code', 'dt')
-# dt.short_description = "Datetime"
 
 
 class ShipmentAdmin(admin.ModelAdmin):

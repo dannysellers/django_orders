@@ -156,7 +156,7 @@ select {
 	border             : 1px solid #111111;
 	/* TODO: Check this CSS w/IE */
 	/*background         : transparent;*/
-	width              : 150px;
+	/*width              : 150px;*/
 	padding            : 5px 35px 5px 5px;
 	font-size          : 13px;
 	/*border             : 1px solid #cccccc;*/
