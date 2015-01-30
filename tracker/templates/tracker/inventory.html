@@ -136,6 +136,39 @@
 		</tbody>
 		</table>
 	</div>
+
+	<div class="row">
+		<div class="pagination">
+			<span class="step-links">
+				{% if inventory_list.has_previous %}
+					<a href="?page={{ inventory_list.previous_page_number }}">Previous</a>
+				{% else %}
+					<a href="#" class="disabled">Previous</a>
+				{% endif %}
+
+				<span class="current">
+					Page {{ inventory_list.number }} of {{ inventory_list.paginator.num_pages }}
+				</span>
+
+				{% if inventory_list.has_next %}
+					<a href="?page={{ inventory_list.next_page_number }}">Next</a>
+				{% else %}
+					<a href="#" class="disabled">Next</a>
+				{% endif %}
+			</span>
+		</div>
+		<form method="get" id="inv_page_form">
+			<input type="text" name="page" placeholder="Go to...">
+			<select name="items" id="page_items_select">
+				<option value="10">10 items</option>
+				<option value="25">25 items</option>
+				<option value="50">50 items</option>
+				<option value="100">100 items</option>
+			</select>
+			<button type="submit" id="page_input_button" onclick="submitPaginationForm('inv_page_form')">Submit</button>
+		</form>
+	</div>
+
 	<div class="row">
 		{% if op_list %}
 			<h2>Operation History</h2>
@@ -181,8 +214,9 @@
 		{% endif %}
 	</div>
 
+	<script src="{% static "js/pagination.js" %}"></script>
 	<script>
-		function verifyStatusChange() {
+		function verifyStatusChange () {
 			var select = document.getElementsByName('operation')[0];
 			var itemStatus = parseInt('{{ item.status }}');
 			var form = document.forms[0];
@@ -196,6 +230,7 @@
 				return false;
 			}
 		}
+
 		var oldEvt = window.onload;
 		window.onload = function () {
 			if (oldEvt) oldEvt();
@@ -217,6 +252,11 @@
 			if (t == 'Log in' || itemStatus == 4) {
 				disableElements('shipForm');
 			}
+
+			// Pagination
+			setSelect('page_items_select');
+			// var pageSubmit = document.getElementById('page_input_button');
+			// pageSubmit.addEventListener('click', submitPaginationForm('inv_page_form'), false);
 		}
 	</script>
 

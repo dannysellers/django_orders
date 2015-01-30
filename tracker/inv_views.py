@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from models import *
 import utils
 import forms
@@ -136,12 +137,34 @@ def inventory (request):
 			context_dict['filter'] = 'All'
 			inventory_list = Inventory.objects.all()
 			storage_fees = utils.calc_storage_fees(inventory_list.exclude(status = 4))
+			context_dict['b_inactive'] = '_'
+			header_list.append('Departure')
 
-		context_dict['inventory_list'] = inventory_list
 		if len(inventory_list) > 0:
 			context_dict['count'] = str(len(inventory_list))
+
 		context_dict['headers'] = header_list
 		context_dict['storage_fees'] = storage_fees
+
+		# Pagination
+		page_items = request.GET.get('items')
+		page = request.GET.get('page')
+
+		if not page_items:
+			page_items = 25
+
+		paginator = Paginator(inventory_list, page_items)
+
+		try:
+			inventory_list = paginator.page(page)
+		except PageNotAnInteger:
+			# If page is not an integer, deliver the first page
+			inventory_list = paginator.page(1)
+		except EmptyPage:
+			# If page is out of range (e.g. 9999), deliver the last page
+			inventory_list = paginator.page(paginator.num_pages)
+
+		context_dict['inventory_list'] = inventory_list
 
 	except Inventory.DoesNotExist:
 		context_dict['inventory_list'] = []
