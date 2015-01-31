@@ -15,6 +15,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from models import *
 import utils
 import forms
+import re
 
 
 @cache_control(no_cache = True)
@@ -152,8 +153,10 @@ def inventory (request):
 
 		if not page_items:
 			page_items = 25
+		if not page:
+			page = 1
 
-		paginator = Paginator(inventory_list, page_items)
+		paginator = Paginator(inventory_list, page_items, orphans = 5)
 
 		try:
 			inventory_list = paginator.page(page)
@@ -165,6 +168,20 @@ def inventory (request):
 			inventory_list = paginator.page(paginator.num_pages)
 
 		context_dict['inventory_list'] = inventory_list
+
+		# Preserve all GET params
+		params = []
+		for key, value in request.GET.iteritems():
+			params.append("&{}={}".format(key, value))
+
+		# The first char is a &, which we replace with a ?
+		params = '?' + ''.join(params)[1:]
+
+		# Only change the page number
+		if inventory_list.has_previous():
+			context_dict['prev_page_url'] = re.sub('page=(\d+)', 'page=' + str(inventory_list.previous_page_number()), params)
+		if inventory_list.has_next():
+			context_dict['next_page_url'] = re.sub('page=(\d+)', 'page=' + str(inventory_list.next_page_number()), params)
 
 	except Inventory.DoesNotExist:
 		context_dict['inventory_list'] = []

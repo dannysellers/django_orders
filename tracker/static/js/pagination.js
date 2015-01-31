@@ -3,12 +3,13 @@ function setSelect(selectId) {
 	// Otherwise, it would reset to the first element in the select on load
 	var widgetSelect = document.getElementById(selectId);
 	var curLoc = document.location.href;
-	var re = /.*items=(\S+).*/;
-	var curSelectedItems = curLoc.match(re);
-	// ^ Returns a list with the URL and the match
-	if (curSelectedItems) {
+	// Captures the items param value whether it's proceeded by ? or &
+	var itemRegEx = /.*&items=(\d+)|\?items=(\d+)/;
+	var itemParam = curLoc.match(itemRegEx)[1];
+
+	if (itemParam) {
 		for (var i = 0; i < widgetSelect.length; i++) {
-			if (widgetSelect[i].value == curSelectedItems[1]) {
+			if (widgetSelect[i].value == itemParam) {
 				widgetSelect.selectedIndex = i;
 			}
 		}
@@ -20,21 +21,59 @@ function submitPaginationForm(formId) {
 	// Otherwise, if the user doesn't explicitly change the select widget
 	// (i.e. if it's changed in a previous query), the value is not submitted
 	// at all in the new request.
-	// TODO: This doesn't preserve any existing GET keywords...
+	// First, though, we get all the existing GET params and pass them on too
+
+	// Get url params
+	var urlParamRegEx = /.*\?(.+)$/;
+	var urlParams = document.location.href.match(urlParamRegEx)[1];
+	// Split into list of 'key=value'
+	urlParams = urlParams.split('&');
+
+	// Make and obj (dict) for easy key matching later
+	var urlObj = {};
+	for (p in urlParams) {
+		var key = urlParams[p].split('=')[0];
+		var value = urlParams[p].split('=')[1];
+		urlObj[key] = value;
+	}
+
+	// Get form params
+	var formParams = [];
 	var formPagination = document.getElementById(formId);
-	var strQuery = [];
-	for (var i = 0; i < formPagination.length; i++) {
+	for (i = 0; i < formPagination.length; i++) {
 		var element = formPagination.elements[i];
 		if (element.name == 'page' && !element.value) {
-			strQuery.push(encodeURIComponent(element.name) + "=1")
+			// If no page number is specified, put in 1
+			formParams.push(encodeURIComponent(element.name) + '=1')
 		} else if (!element.name && !element.value) {
+			// The submit button submits an empty name and value--disregard this
 			continue;
 		} else {
-			strQuery.push(encodeURIComponent(element.name) + "=" + encodeURIComponent(element.value));
+			// Otherwise, append 'key=value'
+			formParams.push(encodeURIComponent(element.name) + '=' + encodeURIComponent(element.value));
 		}
 	}
 
-	strQuery = strQuery.join("&");
+	var formObj = {};
+	for (p in formParams) {
+		var key = formParams[p].split('=')[0];
+		var value = formParams[p].split('=')[1];
+		formObj[key] = value;
+	}
+
+	// formObj has a predetermined length and composition,
+	// so we just override the urlObj values from formObj
+	for (param in formObj) {
+		urlObj[param] = formObj[param];
+	}
+
+	var newParams = '';
+	for (var property in urlObj) {
+		if (urlObj.hasOwnProperty(property)) {
+			newParams += property + "=" + urlObj[property] + "&";
+		}
+	}
+
 	var curLoc = document.location.href.split('?')[0];
-	document.location.href = curLoc + "?" + strQuery;
+	return document.location.href = curLoc + "?" + newParams;
 }

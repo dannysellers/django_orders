@@ -137,11 +137,12 @@
 		</table>
 	</div>
 
+	{% if inventory_list %}
 	<div class="row">
 		<div class="pagination">
 			<span class="step-links">
 				{% if inventory_list.has_previous %}
-					<a href="?page={{ inventory_list.previous_page_number }}">Previous</a>
+					<a href="{{ prev_page_url }}">Previous</a>
 				{% else %}
 					<a href="#" class="disabled">Previous</a>
 				{% endif %}
@@ -151,7 +152,7 @@
 				</span>
 
 				{% if inventory_list.has_next %}
-					<a href="?page={{ inventory_list.next_page_number }}">Next</a>
+					<a href="{{ next_page_url }}">Next</a>
 				{% else %}
 					<a href="#" class="disabled">Next</a>
 				{% endif %}
@@ -168,6 +169,7 @@
 			<button type="submit" id="page_input_button" onclick="submitPaginationForm('inv_page_form')">Submit</button>
 		</form>
 	</div>
+	{% endif %}
 
 	<div class="row">
 		{% if op_list %}
@@ -216,6 +218,7 @@
 
 	<script src="{% static "js/pagination.js" %}"></script>
 	<script>
+	{% if item.status == '4' %}
 		function verifyStatusChange () {
 			var select = document.getElementsByName('operation')[0];
 			var itemStatus = parseInt('{{ item.status }}');
@@ -230,11 +233,17 @@
 				return false;
 			}
 		}
+	{% endif %}
+
+		function preventDef(event) {
+			event.preventDefault();
+		}
 
 		var oldEvt = window.onload;
 		window.onload = function () {
 			if (oldEvt) oldEvt();
 
+			// Individual Inventory form
 			var itemStatus = parseInt('{{ item.status }}');
 			var selectWidget = document.getElementsByName('operation')[0];
 
@@ -247,16 +256,11 @@
 				selectWidget.disabled = true;
 			}
 
-			// If the user isn't logged in or shipStatus = 4, disable the form elements
-			var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
-			if (t == 'Log in' || itemStatus == 4) {
-				disableElements('shipForm');
-			}
-
 			// Pagination
 			setSelect('page_items_select');
-			// var pageSubmit = document.getElementById('page_input_button');
-			// pageSubmit.addEventListener('click', submitPaginationForm('inv_page_form'), false);
+			// Remove default form action on inv_page_form, because
+			// it's overridden with submitPaginationForm()
+			document.getElementById('inv_page_form').addEventListener('click', preventDef, false);
 		}
 	</script>
 
