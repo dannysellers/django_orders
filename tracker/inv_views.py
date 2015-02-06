@@ -174,6 +174,11 @@ def inventory (request):
 		for key, value in request.GET.iteritems():
 			params.append("&{}={}".format(key, value))
 
+		# Make sure page=1 is always included in params
+		# so that next_page_url can tick up correctly
+		if 'page' not in params:
+			params.append("&page=1")
+
 		# The first char is a &, which we replace with a ?
 		params = '?' + ''.join(params)[1:]
 

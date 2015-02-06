@@ -53,9 +53,9 @@ function toggleSection(lnk) {
 
 	/* ternary operator for:
 	if (table.rows[1].style.display == 'none'){
-	  vStyle = 'none'
-	} else {
 	  vStyle = ''
+	} else {
+	  vStyle = 'none'
 	}; */
 	var vStyle = (table.rows[rowIndex + 1].style.display == 'none') ? '' : 'none';
 
