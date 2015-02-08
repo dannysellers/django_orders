@@ -27,8 +27,8 @@
 
 <div class="row">
 	{% if user.is_authenticated %}
-		<div id="acctForm" style="display: none; width: 80%;">
-			<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
+		<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
+			<div id="acctForm" style="display: none; width: 80%;">
 				{% csrf_token %}
 				<div class="col-3">
 					Name: <input type="text" name="name" value="{{ customer.name }}" /><br />
@@ -42,14 +42,18 @@
 				<div class="col-3">
 					<button class="btn" name="submit">Submit Information</button>
 				</div>
-			</form>
-		</div>
+			</div>
+		</form>
 	{% endif %}
 
 	<hr width="85%" align="left">
 	<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
 	| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
-	| <a href="/accounts/{{ customer.acct }}/add_shipment">Add Shipment</a>
+	{% if customer.status != '0' %}
+		| <a href="/accounts/{{ customer.acct }}/add_shipment">Add Shipment</a>
+	{% else %}
+		| <a href="#" class="disabled">Add Shipment</a>
+	{% endif %}
 	{% if storage_fees %}
 		| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>
 	{% else %}

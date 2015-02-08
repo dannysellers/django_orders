@@ -115,8 +115,9 @@ function verifyAllChecked(tableId, formId) {
 }
 
 function disableElements(eleForm) {
+	// Disable elements of eleForm (used for account and shipment info forms).
+	// The div 'eleForm' must be inside the <form> tags
 	var sForm = document.getElementById(eleForm);
-	// TODO: Check whether it's disable-able?
 	for (var i = 0; i < sForm.childElementCount; i++) {
 		var c = sForm.children[i];
 		for (var j = 0; j < c.childElementCount; j++) {
