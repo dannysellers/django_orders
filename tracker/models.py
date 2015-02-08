@@ -5,9 +5,6 @@ from datetime import date, datetime, timedelta
 
 from audit_log.models import AuthStampedModel
 from audit_log.models.managers import AuditLog
-# from audit_log.models.fields import CreatingUserField
-
-# import managers
 
 
 UNIT_STORAGE_FEE = 0.05
@@ -50,6 +47,12 @@ class Customer(models.Model):
 	def __unicode__ (self):
 		return '{}: {}'.format(self.acct, self.name)
 
+	@property
+	def storage_fees(self):
+		fees = 0.00
+		for item in self.inventory_set.exclude(status = 4):
+			fees += item.get_storage_fees()
+		return fees
 
 class ShipmentManager(Manager):
 	def create_shipment (self, owner, palletized, labor_time, notes, tracking_number):
@@ -83,6 +86,13 @@ class Shipment(AuthStampedModel):
 		super(Shipment, self).save()
 		ShipOperation.objects.create_operation(shipment = self,
 											   op_code = self.status)
+
+	@property
+	def storage_fees(self):
+		fees = 0.00
+		for item in self.inventory_set.exclude(status = 4):
+			fees += item.get_storage_fees()
+		return fees
 
 
 class InventoryManager(Manager):
@@ -122,7 +132,7 @@ class Inventory(AuthStampedModel):
 		return 'Item {}'.format(self.itemid)
 
 	def get_storage_fees(self):
-		if self.arrival >= timezone.now().date() - timedelta(days=7):
+		if self.status != 4 and timezone.now().date() - self.arrival >= timedelta(days=7):
 			return self.storage_fees
 		else:
 			return 0.00

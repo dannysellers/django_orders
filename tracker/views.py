@@ -34,13 +34,6 @@ def index (request):
 	return render_to_response('tracker/index.html', context_dict, context)
 
 
-def about (request):
-	context = RequestContext(request)
-	context_dict = {'name': 'About'}
-
-	return render_to_response('tracker/about.html', context_dict, context)
-
-
 def register (request):
 	context = RequestContext(request)
 	context_dict = {}

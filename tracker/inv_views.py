@@ -12,9 +12,8 @@ from django.shortcuts import render_to_response
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from models import *
-import utils
-import forms
+from models import Customer, Inventory, ItemOperation
+from forms import InventoryForm
 import re
 
 
@@ -116,7 +115,9 @@ def inventory (request):
 			else:
 				context_dict['filter'] = context_filter[0]  # still gets passed a list
 
-			storage_fees = utils.calc_storage_fees(inventory_list)
+			storage_fees = 0.00
+			for item in inventory_list:
+				storage_fees += item.get_storage_fees()
 
 		# Retrieve specific item and its history
 		elif item:
@@ -127,9 +128,9 @@ def inventory (request):
 
 			op_headers = ['Op ID', 'Op Code', 'Time', 'User']
 			context_dict['op_headers'] = op_headers
-			context_dict['op_list'] = ItemOperation.objects.all().filter(item = _item)
+			context_dict['op_list'] = ItemOperation.objects.filter(item = _item)
 
-			storage_fees = utils.calc_storage_fees(_item)
+			storage_fees = _item.get_storage_fees()
 
 			# for the sake of the template
 			inventory_list = []
@@ -137,8 +138,10 @@ def inventory (request):
 		else:
 			context_dict['filter'] = 'All'
 			inventory_list = Inventory.objects.all()
-			storage_fees = utils.calc_storage_fees(inventory_list.exclude(status = 4))
-			context_dict['b_inactive'] = '_'
+			storage_fees = 0.00
+			for item in inventory_list:
+				storage_fees += item.get_storage_fees()
+			context_dict['b_inactive'] = '_'  # TODO: Set these flags to True instead?
 			header_list.append('Departure')
 
 		if len(inventory_list) > 0:
@@ -148,6 +151,7 @@ def inventory (request):
 		context_dict['storage_fees'] = storage_fees
 
 		# Pagination
+		# TODO: Extract pagination method to apply to /accounts etc
 		page_items = request.GET.get('items')
 		page = request.GET.get('page')
 
@@ -215,7 +219,7 @@ def add_item (request, account_url):
 								  context)
 
 	if request.method == 'POST':
-		form = forms.InventoryForm(request.POST)
+		form = InventoryForm(request.POST)
 
 		if form.is_valid():
 			item = form.save(commit = False)
@@ -232,7 +236,7 @@ def add_item (request, account_url):
 		else:
 			print form.errors
 	else:
-		form = forms.InventoryForm()
+		form = InventoryForm()
 
 	context_dict['form'] = form
 	context_dict['owner'] = owner

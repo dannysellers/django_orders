@@ -6,7 +6,6 @@ from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
-import utils
 from models import Customer
 import forms
 
@@ -109,18 +108,17 @@ def account_page (request, account_url):
 	context_dict['account_url'] = account_url
 	try:
 		customer = Customer.objects.get(acct = account_url)
+		context_dict['customer'] = customer
 		# Show only items still in inventory
 		if customer.inventory_set.exclude(status = 4).count():
 			cust_shipments = customer.shipment_set.all().exclude(status = 4)
 			context_dict['shipment_list'] = cust_shipments
-			context_dict['storage_fees'] = utils.calc_storage_fees(customer.acct)
+			context_dict['storage_fees'] = customer.storage_fees
 		else:
 			messages.add_message(request, messages.INFO, "This customer has no items stored in inventory.")
 	except Customer.DoesNotExist:
 		messages.add_message(request, messages.ERROR, "Account {} not found.".format(account_url))
 		return render_to_response('tracker/accounts.html', context_dict, context)
-
-	context_dict['customer'] = customer
 
 	# Table cells
 	if str(customer.status) == '0':
