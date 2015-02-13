@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from models import Customer, Inventory, ItemOperation
-from forms import InventoryForm
+# from forms import InventoryForm
 import re
 
 
@@ -199,49 +199,49 @@ def inventory (request):
 	return render_to_response('tracker/inventory.html', context_dict, context)
 
 
-@login_required
-def add_item (request, account_url):
-	"""
-	Form to add item. Intended behavior: Either receive account # within
-	URL, or allow for selection of customer if no param is passed
-	"""
-	# TODO: This needs updating / may not be relevant any more given shipments
-
-	context = RequestContext(request)
-	context_dict = {}
-
-	try:
-		owner = Customer.objects.get(acct = account_url)
-	except Customer.DoesNotExist:
-		messages.add_message(request, messages.ERROR, "Customer {} not found.".format(account_url))
-		return render_to_response('tracker/add_customer.html',
-								  context_dict,
-								  context)
-
-	if request.method == 'POST':
-		form = InventoryForm(request.POST)
-
-		if form.is_valid():
-			item = form.save(commit = False)
-
-			item.owner = owner
-
-			item.length = form.cleaned_data['length'] / 12
-			item.width = form.cleaned_data['width'] / 12
-			item.height = form.cleaned_data['height'] / 12
-			item.save({'user': request.user})
-
-			return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
-
-		else:
-			print form.errors
-	else:
-		form = InventoryForm()
-
-	context_dict['form'] = form
-	context_dict['owner'] = owner
-	context_dict['form_type'] = 'item'
-	return render_to_response('tracker/form.html', context_dict, context)
+# @login_required
+# def add_item (request, account_url):
+# 	"""
+# 	Form to add item. Intended behavior: Either receive account # within
+# 	URL, or allow for selection of customer if no param is passed
+# 	"""
+# 	TODO: This needs updating / may not be relevant any more given shipments
+#
+# 	context = RequestContext(request)
+# 	context_dict = {}
+#
+# 	try:
+# 		owner = Customer.objects.get(acct = account_url)
+# 	except Customer.DoesNotExist:
+# 		messages.add_message(request, messages.ERROR, "Customer {} not found.".format(account_url))
+# 		return render_to_response('tracker/add_customer.html',
+# 								  context_dict,
+# 								  context)
+#
+# 	if request.method == 'POST':
+# 		form = InventoryForm(request.POST)
+#
+# 		if form.is_valid():
+# 			item = form.save(commit = False)
+#
+# 			item.owner = owner
+#
+# 			item.length = form.cleaned_data['length'] / 12
+# 			item.width = form.cleaned_data['width'] / 12
+# 			item.height = form.cleaned_data['height'] / 12
+# 			item.save()
+#
+# 			return HttpResponseRedirect('/inventory?acct={}'.format(owner.acct))
+#
+# 		else:
+# 			print form.errors
+# 	else:
+# 		form = InventoryForm()
+#
+# 	context_dict['form'] = form
+# 	context_dict['owner'] = owner
+# 	context_dict['form_type'] = 'item'
+# 	return render_to_response('tracker/form.html', context_dict, context)
 
 
 @login_required
@@ -276,7 +276,7 @@ def change_item_status (request):
 		for item in itemlist:
 			item.status = operation
 
-			item.save({'user': request.user})
+			item.save()
 
 		if len(itemlist) == 1:
 			return HttpResponseRedirect('/inventory?item={}'.format(itemlist[0].itemid))

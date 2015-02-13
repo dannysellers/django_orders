@@ -33,13 +33,13 @@
 	| <a href="/inventory?status=order_completed">Order Completed</a>
 	{% if customer %}
 		<br/>
-		{% if user.is_authenticated %}
-			{% if customer.status == '1' %}
-				<a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>
-			{% else %}
-				<a href="#" class="disabled">Add Inventory</a>
-			{% endif %}
-		{% endif %}
+{#		{% if user.is_authenticated %}#}
+{#			{% if customer.status == '1' %}#}
+{#				<a href="/accounts/{{ customer.acct }}/add_inventory/">Add Inventory</a>#}
+{#			{% else %}#}
+{#				<a href="#" class="disabled">Add Inventory</a>#}
+{#			{% endif %}#}
+{#		{% endif %}#}
 		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 	{% endif %}
