@@ -32,15 +32,15 @@ function submitPaginationForm(formId) {
 	// Make and obj (dict) for easy key matching later
 	var urlObj = {};
 	for (p in urlParams) {
-		var key = urlParams[p].split('=')[0];
-		var value = urlParams[p].split('=')[1];
-		urlObj[key] = value;
+		var k = urlParams[p].split('=')[0];
+		var v = urlParams[p].split('=')[1];
+		urlObj[k] = v;
 	}
 
 	// Get form params
 	var formParams = [];
 	var formPagination = document.getElementById(formId);
-	for (i = 0; i < formPagination.length; i++) {
+	for (var i = 0; i < formPagination.length; i++) {
 		var element = formPagination.elements[i];
 		if (element.name == 'page' && !element.value) {
 			// If no page number is specified, put in 1
@@ -55,7 +55,7 @@ function submitPaginationForm(formId) {
 	}
 
 	var formObj = {};
-	for (p in formParams) {
+	for (var p in formParams) {
 		var key = formParams[p].split('=')[0];
 		var value = formParams[p].split('=')[1];
 		formObj[key] = value;
@@ -63,13 +63,14 @@ function submitPaginationForm(formId) {
 
 	// formObj has a predetermined length and composition,
 	// so we just override the urlObj values from formObj
-	for (param in formObj) {
+	for (var param in formObj) {
 		urlObj[param] = formObj[param];
 	}
 
 	var newParams = '';
 	for (var property in urlObj) {
 		if (urlObj.hasOwnProperty(property)) {
+			// TODO: This seems to be passing &page=1 correctly, but it's not showing up in the URL
 			newParams += property + "=" + urlObj[property] + "&";
 		}
 	}

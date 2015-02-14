@@ -1,97 +1,38 @@
-from models import Customer, Inventory, Shipment
-from datetime import date
-from django.db.models.query import QuerySet
+from datetime import timedelta
+
+from models import Shipment
+
+from templatetags.num_filters import length
+from django.utils import timezone
 
 
-def int_to_status_code(cls, code):
+def get_shipment_cost (shipid):
 	"""
-	Takes class and status code, returns string associated with the code
+	Tallies up all costs associated with a particular shipment. Factors include:
+	--Labor time: Billed at $35 per hour
+	--Storage fees: Per item, $0.05 per lb per day after the first 7 days
+	--Optional Extras: additional services or resources
+	:param shipid: Shipment ID
+	:type shipid: int
+	:return: Cost string
+	:rtype: str
 	"""
-	code = int(code)
-	if cls == 'Customer':
-		if code == 0:
-			return 'Inactive'
-		elif code == 1:
-			return 'Active'
-		else:
-			raise TypeError('Status code not recognized')
-	elif cls == 'Inventory':
-		if code == 0:
-			return 'Inducted'
-		elif code == 1:
-			return 'Order received'
-		elif code == 2:
-			return 'Order started'
-		elif code == 3:
-			return 'Order completed'
-		elif code == 4:
-			return 'Item shipped'
-		else:
-			raise TypeError('Status code not recognized')
-	else:
-		raise TypeError('Class not recognized')
+	shipment = Shipment.objects.get(shipid = shipid)
+	items = shipment.inventory_set.all()
+	labor = shipment.labor_time
+	extras = shipment.optextras_set.all()
 
+	cost = 0.00
+	# TODO: Make cost settings more easily configurable
+	cost += 35 * (labor / float(60))  # labor = $35.00/hr, measured in mins
+	for item in items:
+		daily_fees = item.get_storage_fees()
+		time_in_storage = timezone.now().date() - item.arrival
+		billable_storage = time_in_storage - timedelta(days = 7)
+		cost += daily_fees * billable_storage.days
+	for extra in extras:
+		cost += extra.total_cost
 
-def code_to_status_int(cls, code):
-	"""
-	Takes status code name, returns integer
-	"""
-	code = str(code).lower()
-	code.replace(' ', '_')
+	cost = length(cost, 2)
 
-	if cls == 'Customer':
-		if code == 'active':
-			return 1
-		elif code == 'inactive':
-			return 0
-		else:
-			raise TypeError('Status string not recognized')
-	elif cls == 'Inventory':
-		if code == 'inducted':
-			return 0
-		elif 'received' in code:
-			if 'inventory' in code:  # inventory received
-				return 0
-			elif 'order' in code:  # order received
-				return 1
-			else:
-				raise TypeError('Status string not recognized')
-		elif 'order' in code:
-			if 'begun' in code or 'started' in code:
-				return 2
-			elif 'completed' in code:
-				return 3
-			else:
-				raise TypeError('Status string not recognized')
-		elif 'shipped' in code:
-			return 4
-		else:
-				raise TypeError('Status string not recognized')
-	else:
-		raise TypeError('Class not recognized')
-
-
-def calc_storage_fees(*args):
-	"""
-	Receives either a list of inventory items, or a customer account number;
-	returns storage fee calculation
-	"""
-	_arg = args[0]  # args is a tuple
-	if isinstance(_arg, int):  # one item
-		customer = Customer.objects.get(acct=_arg)
-		inventory_list = Inventory.objects.all().filter(shipset__owner=customer).exclude(status=4)
-	elif isinstance(_arg, QuerySet):  # QuerySet (list)
-		inventory_list = []
-		for item in _arg:
-			if isinstance(item, Inventory):
-				item = Inventory.objects.get(itemid=item.itemid)
-				inventory_list.append(item)
-	else:
-		inventory_list = []
-
-	storage_fees = 0
-	for item in inventory_list:
-		if abs((item.shipset.arrival - date.today()).days) > 7 and item.status != '4':
-					storage_fees += item.storage_fees
-
-	return storage_fees
+	return cost

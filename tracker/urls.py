@@ -38,4 +38,9 @@ urlpatterns += patterns('tracker.ship_views',
 	url(r'^ship_info', 'ship_info'),
 	url(r'^ship_extras', 'ship_extras'),
 	url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment'),
+)
+
+# Report patterns
+urlpatterns += patterns('tracker.report_views',
+	url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_report'),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # for deployment purposes
