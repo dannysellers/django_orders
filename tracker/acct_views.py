@@ -152,9 +152,8 @@ def acct_info (request):
 
 		customer.email = request.POST['email']
 		customer.name = request.POST['name']
-		# customer.notes = request.POST['notes']
-		# TODO: acct_form isn't submitting <textarea> correctly (at all)
-		customer.acct = request.POST['acct']  # TODO: Confirmation on changing acct number
+		customer.notes = request.POST['notes']
+		customer.acct = request.POST['acct']
 		customer.save()
 
 		messages.add_message(request, messages.SUCCESS, "Account information updated successfully.")
