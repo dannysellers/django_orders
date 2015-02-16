@@ -56,7 +56,7 @@
 
 		{% if user.is_authenticated %}
 			{% if item %}
-				<form id="manage_inventory" method="post" action="/change_status?item={{ item.itemid }}">
+				<form id="manage_inventory" method="post" action="/manage_items?item={{ item.itemid }}">
 				{% csrf_token %}
 			{% elif customer and inventory_list %}
 				<form id="manage_inventory" method="post" action="/manage_items/">

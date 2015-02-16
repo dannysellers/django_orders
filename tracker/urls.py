@@ -20,23 +20,22 @@ urlpatterns += patterns('tracker.acct_views',
 	url(r'^accounts$', 'accounts'),
 	url(r'^accounts/(?P<account_url>\d+)/$', 'account_page'),
 	url(r'^add_account/$', 'add_account'),
-	url(r'^acct_info', 'acct_info'),
+	url(r'^acct_info$', 'acct_info'),
 )
 
 # Inventory patterns
 urlpatterns += patterns('tracker.inv_views',
-	url(r'^inventory', 'inventory'),
+	url(r'^inventory$', 'inventory'),
 	# url(r'^accounts/(?P<account_url>\S+)/add_inventory/$', 'add_item'),
 	# url(r'^add_inventory/$', 'add_item', name='add_inventory'),
-	url(r'^manage_items/$', 'change_item_status', name='manage_items'),  # TODO: Merge these urls
-	url(r'^change_status', 'change_item_status', name='change_status'),  # change one item's status
+	url(r'^manage_items$', 'change_item_status', name='change_item_status'),
 )
 
 # Shipment patterns
 urlpatterns += patterns('tracker.ship_views',
-	url(r'^shipment', 'shipment'),
-	url(r'^ship_info', 'ship_info'),
-	url(r'^ship_extras', 'ship_extras'),
+	url(r'^shipment$', 'shipment'),
+	url(r'^ship_info$', 'ship_info'),
+	url(r'^ship_extras$', 'ship_extras'),
 	url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment'),
 )
 

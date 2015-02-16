@@ -152,6 +152,8 @@ def inventory (request):
 
 		# Pagination
 		# TODO: Extract pagination method to apply to /accounts etc
+		# TODO: Save pagination params using sessions middleware
+		# That way, pagination could be combined with other params seamlessly
 		page_items = request.GET.get('items')
 		page = request.GET.get('page')
 
@@ -247,9 +249,7 @@ def inventory (request):
 @login_required
 def change_item_status (request):
 	"""
-	Receives list of checked items, passes them to item manager page
-	If /change_status?item=##### , manage individual item.
-	If /manage_items/, receive list of items.
+	Receives individual item or list of checked items, passes them to item manager page.
 	"""
 	itemlist = []
 
