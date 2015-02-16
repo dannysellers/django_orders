@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 
 # try:
 # 	from django.utils import timezone as datetime
@@ -190,9 +190,11 @@ def inventory (request):
 
 		# Only change the page number
 		if inventory_list.has_previous():
-			context_dict['prev_page_url'] = re.sub('page=(\d+)', 'page=' + str(inventory_list.previous_page_number()), params)
+			context_dict['prev_page_url'] = re.sub('page=(\d+)', 'page=' + str(inventory_list.previous_page_number()),
+												   params)
 		if inventory_list.has_next():
-			context_dict['next_page_url'] = re.sub('page=(\d+)', 'page=' + str(inventory_list.next_page_number()), params)
+			context_dict['next_page_url'] = re.sub('page=(\d+)', 'page=' + str(inventory_list.next_page_number()),
+												   params)
 
 	except Inventory.DoesNotExist:
 		context_dict['inventory_list'] = []

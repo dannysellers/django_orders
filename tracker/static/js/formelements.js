@@ -22,7 +22,7 @@ function removeElement() {
 	}
 }
 
-function addCartonSetElement () {
+function addCartonSetElement() {
 	//console.log('addCartonSetElement called');
 	var newExtra = document.createElement('div');
 	newExtra.className = 'extra-row';

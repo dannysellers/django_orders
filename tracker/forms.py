@@ -1,5 +1,3 @@
-from datetime import date
-
 from django import forms
 from django.contrib.auth.models import User as auth_User
 from models import *

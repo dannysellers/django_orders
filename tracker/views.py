@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
@@ -77,7 +75,8 @@ def user_login (request):
 				if not request.POST.get('remember_me', None):
 					request.session.set_expiry(0)
 				login(request, user)
-				messages.add_message(request, messages.SUCCESS, "Login successful. Welcome, {}.".format(user.first_name))
+				messages.add_message(request, messages.SUCCESS,
+									 "Login successful. Welcome, {}.".format(user.first_name))
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 			else:
 				messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")

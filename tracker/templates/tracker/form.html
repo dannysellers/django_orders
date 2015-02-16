@@ -24,13 +24,13 @@
 	<div class="row">
 
 		{% if form_type == 'customer' %}
-			<form id = "account_form" method = "post" action = "/add_account/">
+			<form id="account_form" method="post" action="/add_account/">
 		{% elif form_type == 'item' %}
-			<form id = "inventory_form" method = "post" action = "/accounts/{{ owner.acct }}/add_inventory/">
+			<form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
 		{% elif form_type == 'shipment' %}
-			<form id = "shipment_form" method = "post" action = "/accounts/{{ owner.acct }}/add_shipment/">
+			<form id="shipment_form" method="post" action="/accounts/{{ owner.acct }}/add_shipment/">
 		{% elif form_type == 'register' %}
-			<form id = "user_form" method = "post" action = "/register/" enctype = "multipart/form-data">
+			<form id="user_form" method="post" action="/register/" enctype="multipart/form-data">
 		{% endif %}
 		{% csrf_token %}
 		{% for hidden in form.hidden_fields %}
@@ -42,22 +42,22 @@
 				{{ field.errors }}
 				{{ field.help_text }}
 				{{ field }}
-				<br />
+				<br/>
 			{% endfor %}
 		{% else %}
 			<h4>Create a new user.</h4>
 			{{ form.as_p }}
 		{% endif %}
 
-		<input type = "submit" name = "submit"
+		<input type="submit" name="submit"
 				{% if form_type == 'customer' %}
-			   value = "Create Account"
+			   value="Create Account"
 				{% elif form_type == 'item' %}
-			   value = "Add Item"
+			   value="Add Item"
 				{% elif form_type == 'shipment' %}
-			   value = "Add Shipment"
+			   value="Add Shipment"
 				{% elif form_type == 'register' %}
-			   value = "Register"
+			   value="Register"
 				{% endif %} />
 
 		</form>

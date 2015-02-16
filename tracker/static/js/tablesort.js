@@ -17,11 +17,13 @@ function sortTable(table, col, reverse) {
 function makeSortable(table) {
 	var th = table.tHead, i;
 	th && (th = th.rows[0]) && (th = th.children);
-    if (th) i = th.length;
-    else return; // if no `<thead>` then do nothing
-    while (--i >= 0) (function (i) {
-        var dir = 1;
-		th[i].addEventListener('click', function () {sortTable(table, i, (dir = 1 - dir))});
+	if (th) i = th.length;
+	else return; // if no `<thead>` then do nothing
+	while (--i >= 0) (function (i) {
+		var dir = 1;
+		th[i].addEventListener('click', function () {
+			sortTable(table, i, (dir = 1 - dir))
+		});
 	}(i));
 }
 
@@ -31,8 +33,8 @@ function makeAllSortable(parent) {
 	while (--i >= 0) {
 		if (t[i].classList[0] == 'sortable') {
 			makeSortable(t[i]);
-		//} else {
-		//	console.log("Table of " + t[i].rows.length + " rows ignored as not sortable.");
+			//} else {
+			//	console.log("Table of " + t[i].rows.length + " rows ignored as not sortable.");
 		}
 	}
 }

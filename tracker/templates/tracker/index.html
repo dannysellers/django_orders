@@ -4,53 +4,53 @@
 
 <html>
 
-	<head>
-		{% block title %}
-			<title>Inventory&#8212;Order Tracker</title>
-		{% endblock title %}
-		<link rel="stylesheet" href="{% static "css/base.css" %}" />
-		<script src="{% static "js/tablesort.js" %}"></script>
-		<script src="{% static "js/misc.js" %}"></script>
-{#		<script src="{% static "js/ajax.js" %}"></script>#}
-	</head>
+<head>
+	{% block title %}
+		<title>Inventory&#8212;Order Tracker</title>
+	{% endblock title %}
+	<link rel="stylesheet" href="{% static "css/base.css" %}"/>
+	<script src="{% static "js/tablesort.js" %}"></script>
+	<script src="{% static "js/misc.js" %}"></script>
+	{#		<script src="{% static "js/ajax.js" %}"></script>#}
+</head>
 
-	<body>
-		{% block header %}
-			<h1>Order / Inventory Tracker</h1>
-		{% endblock header %}
-		<div class="float_user-greeting">
-			{% include 'tracker/nested/user_greeting.html' %}
-		</div>
-		<nav>
-			<a href="/">Home</a>
-			| <a href="/accounts?accts=active">Accounts</a>
-			| <a href="/inventory?status=stored">Inventory</a>
-		</nav>
-		<div class="row">
-			{% block sub_nav %}
+<body>
+{% block header %}
+	<h1>Order / Inventory Tracker</h1>
+{% endblock header %}
+<div class="float_user-greeting">
+	{% include 'tracker/nested/user_greeting.html' %}
+</div>
+<nav>
+	<a href="/">Home</a>
+	| <a href="/accounts?accts=active">Accounts</a>
+	| <a href="/inventory?status=stored">Inventory</a>
+</nav>
+<div class="row">
+	{% block sub_nav %}
 
-			{% endblock sub_nav %}
-			{% if messages %}
-				<ul class="messages">
-					{% for message in messages %}
-						<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
-					{% endfor %}
-				</ul>
-			{% endif %}
-		</div>
+	{% endblock sub_nav %}
+	{% if messages %}
+		<ul class="messages">
+			{% for message in messages %}
+				<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+</div>
 
-			{% block content %}
-				<div class="row">
-					Active customers: {{ cust_act_count }}<br />
-					Total customers: {{ cust_count }}<br />
-					Shipments in storage: {{ ship_count }}<br />
-					Items currently in storage: {{ item_count }}<br />
-					Total volume of stored items: ___<br />
-					<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
-					<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
-				</div>
+{% block content %}
+	<div class="row">
+		Active customers: {{ cust_act_count }}<br/>
+		Total customers: {{ cust_count }}<br/>
+		Shipments in storage: {{ ship_count }}<br/>
+		Items currently in storage: {{ item_count }}<br/>
+		Total volume of stored items: ___<br/>
+		<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
+		<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+	</div>
 
-			{% endblock %}
+{% endblock %}
 
-	</body>
+</body>
 </html>

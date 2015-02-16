@@ -13,11 +13,11 @@
 {% endblock %}
 
 {% block header %}
-		{% if customer %}
-			<h1>{{ customer.name }} &#8212; #{{ customer.acct }}</h1>
-		{% else %}
-			<h1>Tracker &#8212; {{ head_text }} ({{ num_accts }})</h1>
-		{% endif %}
+	{% if customer %}
+		<h1>{{ customer.name }} &#8212; #{{ customer.acct }}</h1>
+	{% else %}
+		<h1>Tracker &#8212; {{ head_text }} ({{ num_accts }})</h1>
+	{% endif %}
 {% endblock header %}
 
 {% block sub_nav %}
@@ -30,7 +30,8 @@
 	{% endif %}
 	{% if user.is_authenticated and customer %}
 		{% if customer.status == '1' %}
-			| <a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove account</a>
+			|<a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove
+																													 account</a>
 		{% else %}
 			| <a href="#" class="disabled">Remove account</a>
 		{% endif %}

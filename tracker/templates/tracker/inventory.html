@@ -138,8 +138,8 @@
 	</div>
 
 	{% if inventory_list %}
-	<div class="row">
-		<div class="pagination">
+		<div class="row">
+			<div class="pagination">
 			<span class="step-links">
 				{% if inventory_list.has_previous %}
 					<a href="{{ prev_page_url }}">Previous</a>
@@ -157,18 +157,19 @@
 					<a href="#" class="disabled">Next</a>
 				{% endif %}
 			</span>
+			</div>
+			<form method="get" id="inv_page_form">
+				<input type="text" name="page" placeholder="Go to...">
+				<select name="items" id="page_items_select">
+					<option value="10">10 items</option>
+					<option value="25">25 items</option>
+					<option value="50">50 items</option>
+					<option value="100">100 items</option>
+				</select>
+				<button type="submit" id="page_input_button" onclick="submitPaginationForm('inv_page_form')">Submit
+				</button>
+			</form>
 		</div>
-		<form method="get" id="inv_page_form">
-			<input type="text" name="page" placeholder="Go to...">
-			<select name="items" id="page_items_select">
-				<option value="10">10 items</option>
-				<option value="25">25 items</option>
-				<option value="50">50 items</option>
-				<option value="100">100 items</option>
-			</select>
-			<button type="submit" id="page_input_button" onclick="submitPaginationForm('inv_page_form')">Submit</button>
-		</form>
-	</div>
 	{% endif %}
 
 	<div class="row">
@@ -218,22 +219,22 @@
 
 	<script src="{% static "js/pagination.js" %}"></script>
 	<script>
-	{% if item.status == '4' %}
-		function verifyStatusChange () {
-			var select = document.getElementsByName('operation')[0];
-			var itemStatus = parseInt('{{ item.status }}');
-			var form = document.forms[0];
+		{% if item.status == '4' %}
+			function verifyStatusChange() {
+				var select = document.getElementsByName('operation')[0];
+				var itemStatus = parseInt('{{ item.status }}');
+				var form = document.forms[0];
 
-			if (select.selectedIndex == itemStatus) {
-				alert("You tried to change the item status to its current status (" + itemStatus + ")!");
-			} else if (confirm("Not all items in this shipment were selected. Shipment status will not change (only item statuses).\n\nTo change shipment statuses, navigate to the shipment page and change the status of all the items.\n\nContinue?")) {
-				// TODO: Remove confirmation if all items of a single shipment are selected
-				form.submit();
-			} else {
-				return false;
+				if (select.selectedIndex == itemStatus) {
+					alert("You tried to change the item status to its current status (" + itemStatus + ")!");
+				} else if (confirm("Not all items in this shipment were selected. Shipment status will not change (only item statuses).\n\nTo change shipment statuses, navigate to the shipment page and change the status of all the items.\n\nContinue?")) {
+					// TODO: Remove confirmation if all items of a single shipment are selected
+					form.submit();
+				} else {
+					return false;
+				}
 			}
-		}
-	{% endif %}
+		{% endif %}
 
 		function preventDef(event) {
 			event.preventDefault();

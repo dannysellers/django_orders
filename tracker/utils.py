@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from models import Shipment
-
 from templatetags.num_filters import length
 from django.utils import timezone
 

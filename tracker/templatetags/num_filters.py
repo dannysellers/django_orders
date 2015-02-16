@@ -19,7 +19,7 @@ def length (value, val_length):
 
 
 @register.filter
-def storage_fee_total (item_list, stored=True):
+def storage_fee_total (item_list, stored = True):
 	"""
 	Sums the storage fees of a given item list
 	:param item_list: List of items to process

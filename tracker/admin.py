@@ -45,7 +45,7 @@ class ItemOpAdmin(admin.ModelAdmin):
 
 
 class InventoryAdmin(admin.ModelAdmin):
-	def bool_storage_fees(self, instance):
+	def bool_storage_fees (self, instance):
 		if instance.get_storage_fees() == 0.00:
 			return False
 		else:
@@ -59,7 +59,7 @@ class InventoryAdmin(admin.ModelAdmin):
 	readonly_fields = ('shipset', 'itemid', 'shipset', 'owner', 'arrival', 'departure', 'bool_storage_fees')
 	list_display = ('itemid', 'shipset', 'owner', 'bool_storage_fees')
 	inlines = [ItemOpInline]
-	list_filter = ['status']  #, 'bool_storage_fees']
+	list_filter = ['status']  # , 'bool_storage_fees']
 
 	bool_storage_fees.short_description = 'Storage fees?'
 
