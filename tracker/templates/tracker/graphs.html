@@ -1,0 +1,73 @@
+{% extends 'tracker/index.html' %}
+{% load static %}
+{% load num_filters %}
+
+{% block content %}
+	<div class="row">
+
+		<p>Shipments in storage over time</p>
+		<canvas id="shipments-chart"></canvas>
+		<br/>
+
+		<div id="json-response-ship-num"></div>
+		<input type="text" id="start-date-ship-num" placeholder="Start Date" disabled>
+		<input type="text" id="end-date-ship-num" placeholder="End Date" disabled>
+		<button onclick="getData('shipments_count')">Refresh Stored Shipments over Time</button>
+
+
+		<p>Volume of items in storage over time</p>
+		<canvas id="item-volume-chart"></canvas>
+		<br/>
+
+		<div id="json-response-item-vol"></div>
+		<input type="text" id="start-date-item-vol" placeholder="Start Date" disabled>
+		<input type="text" id="end-date-item-vol" placeholder="End Date" disabled>
+		<button onclick="getData('items_volume')">Refresh Items Volume over Time</button>
+
+		<script>
+			var canvasEl = document.createElement('canvas');
+
+			function getData(kwQuery) {
+				if (kwQuery == 'shipments_count') {
+					var _url = "/shipment_ajax";
+					//var _dump = $("#json-response-ship-num");
+					var _graph = $("#shipments-chart")
+				} else if (kwQuery == 'items_volume') {
+					_url = "/ajax2";
+					//_dump = $("#json-response-item-vol");
+					_graph = $("#item-volume-chart")
+				}
+
+				$.ajax({
+					url: _url,
+					// url: "/shipment_ajax/",// + kwQuery,
+					dataType: "text",
+					type: "GET",
+					error: function (err) {
+						alert("Error: " + err.statusText.toString())
+					},
+					success: function (data) {
+						//_dump.html(data);
+						drawGraph(JSON.parse(data), _graph);
+					}
+				});
+			}
+
+			function drawGraph(data, graph) {
+				var ctx = graph.get(0).getContext("2d");
+				var myLineChart = new Chart(ctx).Line(data);
+			}
+
+			var oldEvt = window.onload;
+			window.onload = function () {
+				if (oldEvt) oldEvt();
+				if (!canvasEl.getContext) {
+					// Chart.js relies on <canvas> support
+					document.write("HTML5 Canvas not supported by your browser!")
+				}
+			};
+		</script>
+
+	</div>
+	<script src="{% static "js/Chart.js" %}"></script>
+{% endblock content %}
