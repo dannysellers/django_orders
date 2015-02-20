@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.db.models import Sum
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -14,10 +15,11 @@ def index (request):
 	context = RequestContext(request)
 	context_dict = dict()
 
-	context_dict['cust_count'] = Customer.objects.count()
+	# context_dict['cust_count'] = Customer.objects.count()
 	context_dict['cust_act_count'] = Customer.objects.filter(status = 1).count()
 	context_dict['item_count'] = Inventory.objects.exclude(status = 4).count()
 	context_dict['ship_count'] = Shipment.objects.exclude(status = 4).count()
+	context_dict['total_item_volume'] = Inventory.objects.exclude(status = 4).aggregate(Sum('volume'))['volume__sum']
 
 	storage_fee_count = 0
 	no_storage_fee_count = 0

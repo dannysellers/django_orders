@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 
 {% load static %}
+{% load num_filters %}
 
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 
 <head>
 	{% block title %}
@@ -11,7 +12,7 @@
 	<link rel="stylesheet" href="{% static "css/base.css" %}"/>
 	<script src="{% static "js/tablesort.js" %}"></script>
 	<script src="{% static "js/misc.js" %}"></script>
-	{#		<script src="{% static "js/ajax.js" %}"></script>#}
+	<script src="{% static "js/jquery-1.11.2.min.js" %}"></script>
 </head>
 
 <body>
@@ -42,10 +43,10 @@
 {% block content %}
 	<div class="row">
 		Active customers: {{ cust_act_count }}<br/>
-		Total customers: {{ cust_count }}<br/>
+		<!-- Total customers: {{ cust_count }}<br/> -->
 		Shipments in storage: {{ ship_count }}<br/>
 		Items currently in storage: {{ item_count }}<br/>
-		Total volume of stored items: ___<br/>
+		Total volume of items currently in storage: {{ total_item_volume|length:"2" }} <br/>
 		<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
 		<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
 	</div>
