@@ -1,11 +1,11 @@
 from django.db import models
-from django.db.models import Manager
 from django.utils import timezone
-from datetime import date, datetime, timedelta
+from datetime import timedelta
 
 from audit_log.models import AuthStampedModel
 from audit_log.models.managers import AuditLog
 
+from .managers import CustomerManager, ShipmentManager, InventoryManager, ItemOpManager, ShipOpManager, OptExtraManager
 
 UNIT_STORAGE_FEE = 0.05
 
@@ -21,15 +21,6 @@ INVENTORY_STATUS_CODES = (
 	('3', 'Order completed'),
 	('4', 'Shipped'),
 )
-
-
-class CustomerManager(Manager):
-	def create_customer (self, name, email, acct):
-		_customer = self.create(name = name, email = email,
-								createdate = date.today(), status = 1,
-								notes = "notes", acct = int(acct))
-		print("Created {0}: {1}".format(_customer.name, _customer.acct))
-		return _customer
 
 
 class Customer(models.Model):
@@ -54,16 +45,6 @@ class Customer(models.Model):
 			fees += item.get_storage_fees()
 		return fees
 
-class ShipmentManager(Manager):
-	def create_shipment (self, owner, palletized, labor_time, notes, tracking_number):
-		shipid = Shipment.objects.count() + 1
-		arrival = date.today()
-		_shipment = self.create(owner = owner, shipid = shipid, palletized = palletized,
-								arrival = arrival, labor_time = labor_time, notes = notes,
-								tracking_number = tracking_number)
-		print("Created Ship ID: {}".format(_shipment.shipid))
-		return _shipment
-
 
 class Shipment(AuthStampedModel):
 	owner = models.ForeignKey(Customer)
@@ -83,9 +64,16 @@ class Shipment(AuthStampedModel):
 		return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
 
 	def save (self, *args, **kwargs):
-		super(Shipment, self).save()
-		ShipOperation.objects.create_operation(shipment = self,
-											   op_code = self.status)
+		"""
+		When a Shipment is first created, the ShipOperation creation is
+		handled by ShipmentManager (at that point, there is no self.pk).
+		Whenever the Shipment's status is changed after then, though,
+		a new ShipOperation should be created
+		"""
+		if self.pk:
+			ShipOperation.objects.create_operation(shipment = self,
+												   op_code = self.status)
+		super(Shipment, self).save(*args, **kwargs)
 
 	@property
 	def storage_fees(self):
@@ -93,23 +81,6 @@ class Shipment(AuthStampedModel):
 		for item in self.inventory_set.exclude(status = 4):
 			fees += item.get_storage_fees()
 		return fees
-
-
-class InventoryManager(Manager):
-	def create_inventory (self, shipset, length, width, height):
-		itemid = Inventory.objects.count() + 1
-		owner = shipset.owner
-		arrival = shipset.arrival
-		volume = float(length) * float(width) * float(height)
-		storage_fees = volume * UNIT_STORAGE_FEE
-		status = 0
-		_item = self.create(itemid = itemid, shipset = shipset, length = length,
-							width = width, height = height,
-							owner = owner, arrival = arrival,
-							volume = volume, storage_fees = storage_fees,
-							status = status)
-		print("Created Item ID: {}".format(_item.itemid))
-		return _item
 
 
 class Inventory(AuthStampedModel):
@@ -138,9 +109,10 @@ class Inventory(AuthStampedModel):
 			return 0.00
 
 	def save(self, *args, **kwargs):
-		super(Inventory, self).save()
-		ItemOperation.objects.create_operation(item = self,
-											   op_code = self.status)
+		if self.pk:
+			ItemOperation.objects.create_operation(item = self,
+												   op_code = self.status)
+		super(Inventory, self).save(*args, **kwargs)
 
 	class Meta:
 		verbose_name_plural = 'inventory'
@@ -158,14 +130,6 @@ class Operation(AuthStampedModel):
 		abstract = True
 
 
-class ShipOpManager(Manager):
-	def create_operation (self, shipment, op_code):
-		_op = self.create(shipment = shipment, dt = datetime.now(), op_code = op_code)
-		# TODO: Why are multiple Ops getting created per user action?
-		print("Created Op {0} on Shipment {1}".format(_op.op_code, _op.shipment))
-		return _op
-
-
 class ShipOperation(Operation):
 	shipment = models.ForeignKey(Shipment)
 
@@ -178,13 +142,6 @@ class ShipOperation(Operation):
 		return 'Item {}, Code {}'.format(self.shipment.shipid, self.op_code)
 
 
-class ItemOpManager(Manager):
-	def create_operation (self, item, op_code):
-		_op = self.create(item = item, dt = datetime.now(), op_code = op_code)
-		print("Created Op {0} on Item {1}".format(_op.op_code, _op.item))
-		return _op
-
-
 class ItemOperation(Operation):
 	item = models.ForeignKey(Inventory)
 
@@ -192,16 +149,6 @@ class ItemOperation(Operation):
 
 	def __unicode__ (self):
 		return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
-
-
-class OptExtraManager(Manager):
-	def create_optextra (self, shipment, quantity, unit_cost, description):
-		_total = unit_cost * quantity
-		_extra = self.create(shipment = shipment, quantity = quantity,
-							 unit_cost = unit_cost, total_cost = _total,
-							 description = description)
-		print("Created {} extra {} on Ship {}".format(_extra.quantity, _extra.description, _extra.shipment))
-		return _extra
 
 
 class OptExtras(models.Model):

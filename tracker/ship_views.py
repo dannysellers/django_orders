@@ -149,7 +149,7 @@ def add_shipment (request, account_url):
 		messages.add_message(request, messages.SUCCESS,
 							 "Shipment {} of {} items created successfully.".format(_shipment.shipid,
 																					_shipment.inventory_set.count()))
-		return HttpResponseRedirect('/shipments?id={}'.format(_shipment.shipid))
+		return HttpResponseRedirect('/shipment?id={}'.format(_shipment.shipid))
 	else:
 		return render_to_response('tracker/add_shipment_form.html', context_dict, context)
 
