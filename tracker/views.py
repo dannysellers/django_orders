@@ -6,9 +6,11 @@ from django.db.models import Sum
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from forms import UserForm
 
+from forms import UserForm
 from models import *
+
+from datetime import date
 
 
 def index (request):
@@ -85,7 +87,7 @@ def user_login (request):
 				return HttpResponseRedirect('/')
 
 		else:
-			messages.add_message(request, messages.ERROR, "Invalid login details: {0}, {1}".format(username, password))
+			messages.add_message(request, messages.ERROR, "Invalid login details for {0}".format(username))
 			return HttpResponseRedirect('/')
 	else:
 		return render_to_response('tracker/login.html', context)
