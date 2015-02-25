@@ -27,7 +27,7 @@ def reports (request):
 	context = RequestContext(request)
 	context_dict = dict()
 
-	# context_dict['model_list'] = [i.__name__ for i in find_subclasses(models, Model, 'tracker.models')]
+	context_dict['model_list'] = [i.__name__ for i in find_subclasses(models, Model, 'tracker.models')]
 
 	return render_to_response('tracker/graphs.html', context_dict, context)
 
@@ -77,6 +77,8 @@ def ajax (request):
 		# 'shipment_num_count', 'inventory_volume_total'
 		query_model, query_attr, query_op = query.split("_")
 
+		query_summation = request.GET.get('summation')
+
 		# get model from list of classes under 'tracker.models'
 		model_list = find_subclasses(models, Model, 'tracker.models')
 		for model in model_list:
@@ -104,7 +106,15 @@ def ajax (request):
 				query.append("SELECT * FROM %s " % _table)
 
 			# TODO: Resolve how to deduce which month/year to use. Maybe just do report by calendar month?
-			prev_date = start_date + timedelta(days = day_labels[index - 1])
+			if query_summation == 'cumulative':
+				# cumulative throughout the whole period
+				prev_date = start_date
+			elif query_summation == 'per-interval':
+				# cumulative during each sliver
+				prev_date = start_date + timedelta(days = day_labels[index - 1])
+			else:
+				prev_date = start_date
+
 			try:
 				_date = start_date + timedelta(days=day_labels[index])
 			except IndexError:
@@ -116,8 +126,6 @@ def ajax (request):
 
 			c.execute("".join(query))
 			cq = c.fetchall()
-
-			print "{} to {}: {}".format(prev_date, _date, cq)
 			count_dict[day] = cq
 
 		# Chart.js options
@@ -137,7 +145,9 @@ def ajax (request):
 
 		returned_data['query'] = [q['sql'] for q in connection.queries]
 
-		return HttpResponse(json.dumps(returned_data), content_type = 'application/json')
+		chart_args = {'bezierCurve': False}
+
+		return HttpResponse("[{},{}]".format(json.dumps(returned_data), json.dumps(chart_args)), content_type = 'application/json')
 
 
 def shipment_report (request, shipid):

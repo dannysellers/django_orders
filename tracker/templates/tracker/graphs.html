@@ -5,9 +5,6 @@
 {% block content %}
 	<div class="row">
 
-		<label for="query-debug" style="font-size:80%;">Show query</label>
-		<input type="checkbox" id="query-debug" disabled>
-
 		<p>Shipments in storage over time</p>
 		<canvas id="shipments-chart"></canvas>
 		<br/>
@@ -30,22 +27,33 @@
 			Refresh Items Volume over Time
 		</button>
 
-		<pre style="border:1px solid black;padding:1rem;display:none;" id="json-response"></pre>
-
+{#		<hr/>#}
 {#		<p>Custom Query</p>#}
 {#		<canvas id="custom-chart"></canvas>#}
 {#		<br/>#}
-
-{#		<div id="json-response-custom"></div>#}
+{#		<input type="text" class="start-date-custom" placeholder="Start Date" disabled>#}
+{#		<input type="text" class="end-date-custom" placeholder="End Date" disabled><br/>#}
+{#		<div id="json-response-custom" style="padding-top:0.5rem;"></div>#}
 {#		<label for="model-select">Model</label>#}
-{#		<select id="model-select">#}
+{#		<select id="model-select" disabled>#}
 {#			{% for mdl in model_list %}#}
 {#				<option id="{{ mdl }}">{{ mdl }}</option>#}
 {#			{% endfor %}#}
 {#		</select>#}
 
-{#		<input type="text" class="start-date-custom" placeholder="Start Date">#}
-{#		<input type="text" class="end-date-custom" placeholder="End Date">#}
+		<label for="sum-select">Summation</label>
+		<select id="sum-select">
+			<option id="cumulative">Cumulative</option>
+			<option id="interval">Per-interval</option>
+		</select>
+
+		<!-- "shipment_num_total", "inventory_volume_total" -->
+{#		<button onclick="getData('arg', '#json-response-custom', 'custom')">Draw Graph</button>#}
+
+		<hr/>
+		<label for="query-debug" style="font-size:80%;">Show query</label>
+		<input type="checkbox" id="query-debug" disabled>
+		<pre style="border:1px solid black;padding:1rem;display:none;" id="json-response"></pre>
 
 		<script>
 			// TODO: Load sample graphs on pageload
@@ -56,7 +64,8 @@
 				var endId = '.end-date-' + dateIdFrag;
 				var startDate = $(startId)[0];
 				var endDate = $(endId)[0];
-				var params = {start: startDate.value, end: endDate.value, query: kwQuery};
+				var kwSummation = $('#sum-select').find(':selected').text().toLowerCase();
+				var params = {start: startDate.value, end: endDate.value, query: kwQuery, summation: kwSummation};
 				$.ajax({
 					// url: _url,
 					url: "/query_ajax?" + jQuery.param(params),
@@ -66,17 +75,18 @@
 						alert("Error: " + err.statusText.toString())
 					},
 					success: function (data) {
-						var _data = JSON.parse(data);
-						drawGraph(_data, $(graphId));
+						var _data = JSON.parse(data)[0];
+						var chartArgs = JSON.parse(data)[1];
+						drawGraph(_data, chartArgs, $(graphId));
 						$("#json-response").html(JSON.stringify(_data['query'], null, 4))
 								.show();
 					}
 				});
 			}
 
-			function drawGraph(data, graph) {
+			function drawGraph(data, options, graph) {
 				var ctx = graph.get(0).getContext("2d");
-				var myLineChart = new Chart(ctx).Line(data);
+				var myLineChart = new Chart(ctx).Line(data, options);
 			}
 
 			var oldEvt = window.onload;
