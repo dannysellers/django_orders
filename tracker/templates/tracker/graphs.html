@@ -5,50 +5,71 @@
 {% block content %}
 	<div class="row">
 
+		<label for="query-debug" style="font-size:80%;">Show query</label>
+		<input type="checkbox" id="query-debug" disabled>
+
 		<p>Shipments in storage over time</p>
 		<canvas id="shipments-chart"></canvas>
 		<br/>
 
-		<div id="json-response-ship-num"></div>
-		<input type="text" id="start-date-ship-num" placeholder="Start Date" disabled>
-		<input type="text" id="end-date-ship-num" placeholder="End Date" disabled>
-		<button onclick="getData('shipments_count')">Refresh Stored Shipments over Time</button>
+		<!-- TODO: Add date validation/normalization -->
+		<input type="text" class="start-date-ship-num" id="datepicker" placeholder="Start Date">
+		<input type="text" class="end-date-ship-num" id="datepicker" placeholder="End Date">
+		<button onclick="getData('shipment_num_count', '#shipments-chart', 'ship-num')">
+			Refresh Stored Shipments over Time
+		</button>
 
-
+		<hr/>
 		<p>Volume of items in storage over time</p>
 		<canvas id="item-volume-chart"></canvas>
 		<br/>
 
-		<div id="json-response-item-vol"></div>
-		<input type="text" id="start-date-item-vol" placeholder="Start Date" disabled>
-		<input type="text" id="end-date-item-vol" placeholder="End Date" disabled>
-		<button onclick="getData('items_volume')">Refresh Items Volume over Time</button>
+		<input type="text" class="start-date-item-vol" id="datepicker" placeholder="Start Date">
+		<input type="text" class="end-date-item-vol" id="datepicker" placeholder="End Date">
+		<button onclick="getData('inventory_volume_total', '#item-volume-chart', 'ship-num')">
+			Refresh Items Volume over Time
+		</button>
+
+		<pre style="border:1px solid black;padding:1rem;display:none;" id="json-response"></pre>
+
+{#		<p>Custom Query</p>#}
+{#		<canvas id="custom-chart"></canvas>#}
+{#		<br/>#}
+
+{#		<div id="json-response-custom"></div>#}
+{#		<label for="model-select">Model</label>#}
+{#		<select id="model-select">#}
+{#			{% for mdl in model_list %}#}
+{#				<option id="{{ mdl }}">{{ mdl }}</option>#}
+{#			{% endfor %}#}
+{#		</select>#}
+
+{#		<input type="text" class="start-date-custom" placeholder="Start Date">#}
+{#		<input type="text" class="end-date-custom" placeholder="End Date">#}
 
 		<script>
-			var canvasEl = document.createElement('canvas');
+			// TODO: Load sample graphs on pageload
+			var elemCanvas = document.createElement('canvas');
 
-			function getData(kwQuery) {
-				if (kwQuery == 'shipments_count') {
-					var _url = "/shipment_ajax";
-					//var _dump = $("#json-response-ship-num");
-					var _graph = $("#shipments-chart")
-				} else if (kwQuery == 'items_volume') {
-					_url = "/ajax2";
-					//_dump = $("#json-response-item-vol");
-					_graph = $("#item-volume-chart")
-				}
-
+			function getData(kwQuery, graphId, dateIdFrag) {
+				var startId = '.start-date-' + dateIdFrag;
+				var endId = '.end-date-' + dateIdFrag;
+				var startDate = $(startId)[0];
+				var endDate = $(endId)[0];
+				var params = {start: startDate.value, end: endDate.value, query: kwQuery};
 				$.ajax({
-					url: _url,
-					// url: "/shipment_ajax/",// + kwQuery,
+					// url: _url,
+					url: "/query_ajax?" + jQuery.param(params),
 					dataType: "text",
 					type: "GET",
 					error: function (err) {
 						alert("Error: " + err.statusText.toString())
 					},
 					success: function (data) {
-						//_dump.html(data);
-						drawGraph(JSON.parse(data), _graph);
+						var _data = JSON.parse(data);
+						drawGraph(_data, $(graphId));
+						$("#json-response").html(JSON.stringify(_data['query'], null, 4))
+								.show();
 					}
 				});
 			}
@@ -61,7 +82,7 @@
 			var oldEvt = window.onload;
 			window.onload = function () {
 				if (oldEvt) oldEvt();
-				if (!canvasEl.getContext) {
+				if (!elemCanvas.getContext) {
 					// Chart.js relies on <canvas> support
 					document.write("HTML5 Canvas not supported by your browser!")
 				}

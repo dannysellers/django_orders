@@ -1,4 +1,5 @@
 from datetime import timedelta
+import inspect
 
 from models import Shipment
 from templatetags.num_filters import length
@@ -35,3 +36,23 @@ def get_shipment_cost (shipid):
 	cost = length(cost, 2)
 
 	return cost
+
+
+def find_subclasses (module, clazz, scope):
+	"""
+	Returns all subclasses of module 'module' of class 'clazz'
+	:param module: Python module to iterate over
+	:type module: module
+	:param clazz: Class type to filter against
+	:type clazz: class
+	:param scope: Scope
+	:type scope: str
+	:return: List of subclasses of type clazz
+	:rtype: list
+	"""
+	return [
+		cls
+		for name, cls in inspect.getmembers(module)
+		if inspect.isclass(cls) and issubclass(cls, clazz)
+		and cls.__module__ == scope
+	]
