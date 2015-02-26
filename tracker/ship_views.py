@@ -55,9 +55,10 @@ def ship_info (request):
 	"""
 	if request.method != 'POST':
 		messages.add_message(request, messages.ERROR,
-							 "Improper request. Try submitting a form from a shipment view.")
+							 "Improper request. Try submitting a form from a shipment page.")
 		return HttpResponseRedirect('/')
 	else:
+		# TODO: Prohibit changing status to current status / duplicate ShipOp items (same for items)
 		# Shipment information
 		shipid = request.GET['shipid']
 		try:

@@ -1,7 +1,7 @@
-from datetime import date, datetime
+from datetime import date
 
 from django.db.models import Manager
-# from django.utils import timezone
+from django.utils import timezone
 
 
 class CustomerManager(Manager):
@@ -15,7 +15,7 @@ class CustomerManager(Manager):
 
 class ShipmentManager(Manager):
 	def create_shipment (self, owner, palletized, labor_time, notes, tracking_number):
-		from models import Shipment, ShipOperation
+		from models import Shipment
 
 		shipid = Shipment.objects.count() + 1
 		arrival = date.today()
@@ -24,14 +24,12 @@ class ShipmentManager(Manager):
 								arrival = arrival, labor_time = labor_time, notes = notes,
 								tracking_number = tracking_number, status = status)
 		print("Created Ship ID: {}".format(_shipment.shipid))
-		ShipOperation.objects.create_operation(shipment = _shipment,
-											   op_code = _shipment.status)
 		return _shipment
 
 
 class InventoryManager(Manager):
 	def create_inventory (self, shipset, length, width, height):
-		from models import Inventory, UNIT_STORAGE_FEE, ItemOperation
+		from models import Inventory, UNIT_STORAGE_FEE
 
 		itemid = Inventory.objects.count() + 1
 		owner = shipset.owner
@@ -45,22 +43,20 @@ class InventoryManager(Manager):
 							volume = volume, storage_fees = storage_fees,
 							status = status)
 		print("Created Item ID: {}".format(_item.itemid))
-		ItemOperation.objects.create_operation(item = _item,
-											   op_code = status)
 		return _item
 
 
 class ShipOpManager(Manager):
 	def create_operation (self, shipment, op_code):
-		_op = self.create(shipment = shipment, dt = datetime.now(), op_code = op_code)
-		print("Created Op {0} on Shipment {1}".format(_op.op_code, _op.shipment))
+		_op = self.create(shipment = shipment, dt = timezone.now(), op_code = op_code)
+		print("Created Op {0} on {1}".format(_op.op_code, _op.shipment))
 		return _op
 
 
 class ItemOpManager(Manager):
 	def create_operation (self, item, op_code):
-		_op = self.create(item = item, dt = datetime.now(), op_code = op_code)
-		print("Created Op {0} on Item {1}".format(_op.op_code, _op.item))
+		_op = self.create(item = item, dt = timezone.now(), op_code = op_code)
+		print("Created Op {0} on {1}".format(_op.op_code, _op.item))
 		return _op
 
 
@@ -71,5 +67,5 @@ class OptExtraManager(Manager):
 		_extra = self.create(shipment = shipment, quantity = quantity,
 							 unit_cost = unit_cost, total_cost = _total,
 							 description = description)
-		print("Created {} extra {} on Ship {}".format(_extra.quantity, _extra.description, _extra.shipment))
+		print("Created {} extra {} on {}".format(_extra.quantity, _extra.description, _extra.shipment))
 		return _extra
