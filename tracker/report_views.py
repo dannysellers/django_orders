@@ -24,6 +24,9 @@ from utils import get_shipment_cost, find_subclasses
 
 
 def reports (request):
+	"""
+	Initial page view for /reports/
+	"""
 	context = RequestContext(request)
 	context_dict = dict()
 
@@ -33,13 +36,30 @@ def reports (request):
 
 
 @csrf_exempt
+def form_ajax (request, model_name):
+	"""
+	Function to handle returning attributes for selected model.
+	"""
+	context_dict = dict()
+
+	model_list = find_subclasses(models, Model, 'tracker.models')
+	for model in model_list:
+		if model.__name__ == model_name:
+			_model = model
+
+	context_dict['attr_list'] = [field.name for field in _model._meta.fields]
+
+	return HttpResponse(json.dumps(context_dict), content_type = 'application/json')
+
+
+@csrf_exempt
 def ajax (request):
 	"""
 	query should be [MODEL]_[ATTRIBUTE]_[OPERATION]
 	"""
 	if request.method != 'GET':
 		messages.add_message(request, messages.ERROR, "That URL doesn't accept POSTs.")
-		return HttpResponseRedirect('/')
+		return HttpResponseRedirect('/reports/')
 	else:
 		returned_data = dict()
 
@@ -47,35 +67,35 @@ def ajax (request):
 		start_date = request.GET.get('start')
 		if not start_date:
 			start_date = date(2015, 1, 1)
-		# else:
-		# 	try:
+		else:
+			try:
 				# TODO: Add jQuery date validation/normalization
-				# _day, _month, _year = start_date.split('-')
-				# start_date = date(_year, _month, _day)
-			# except TypeError:
-			# 	start_date = date(2015, 1, 1)
+				_year, _month, _day = start_date.split('-')
+				start_date = date(int(_year), int(_month), int(_day))
+			except TypeError:
+				start_date = date(2015, 1, 1)
 
 		finish_date = request.GET.get('finish')
 		if not finish_date:
 			finish_date = date(2015, 1, 31)
-		# else:
-		# 	try:
-		# 		_day, _month, _year = finish_date.split('-')
-		# 		finish_date = date(_year, _month, _day)
-		# 	except TypeError:
-		# 		finish_date = date(2015, 1, 31)
+		else:
+			try:
+				_year, _month, _day = finish_date.split('-')
+				finish_date = date(int(_year), int(_month), int(_day))
+			except TypeError:
+				finish_date = date(2015, 1, 31)
 
-		# TODO: Make this work with dates in different months
 		td = finish_date - start_date
 		day_labels = range(1, td.days)[::3]
 
 		# Axis labels for dict to return
-		returned_data['labels'] = [str(i) for i in day_labels]
+		returned_data['labels'] = [str(start_date + timedelta(days = day_labels[index])) for index, d in
+								   enumerate(day_labels)]
 
 		# Parse query
 		query = request.GET.get('query')
 		# 'shipment_num_count', 'inventory_volume_total'
-		query_model, query_attr, query_op = query.split("_")
+		query_model, query_attr, query_op = query.split(",")
 
 		query_summation = request.GET.get('summation')
 
@@ -84,6 +104,13 @@ def ajax (request):
 		for model in model_list:
 			if model.__name__.lower() == query_model:
 				query_model = model
+
+		if query_model.__name__.lower() == 'customer':
+			query_index = 'createdate'
+		elif query_model.__name__.lower() == 'inventory' or query_model.__name__.lower() == 'shipment':
+			query_index = 'arrival'
+		else:
+			query_index = 'dt'
 
 		_table = 'tracker_{}'.format(query_model.__name__.lower())
 
@@ -94,16 +121,16 @@ def ajax (request):
 				query_attr = field
 
 		count_dict = {}
-		for index, day in enumerate(day_labels, start=1):
+		for index, day in enumerate(day_labels, start = 1):
 			query = list()
 			c = connection.cursor()
 
-			if query_op == 'count' or query_op == 'num':
+			if query_op == 'count':
 				query.append("SELECT COUNT(*) FROM %s " % _table)
-			elif query_op == 'sum' or query_op == 'total':
+			elif query_op == 'sum':
 				query.append("SELECT SUM(%s) from %s " % (query_attr.name, _table))
 			else:
-				query.append("SELECT * FROM %s " % _table)
+				query.append("SELECT COUNT(*) FROM %s " % _table)
 
 			# TODO: Resolve how to deduce which month/year to use. Maybe just do report by calendar month?
 			if query_summation == 'cumulative':
@@ -116,28 +143,28 @@ def ajax (request):
 				prev_date = start_date
 
 			try:
-				_date = start_date + timedelta(days=day_labels[index])
+				_date = start_date + timedelta(days = day_labels[index])
 			except IndexError:
 				_year, _month = start_date.year, start_date.month
 				_date = date(_year, _month, monthrange(_year, _month)[1])
 
 			query.append(u"WHERE {1} BETWEEN \'{2}\' and \'{3}\';".format(
-				_table, 'arrival', str(prev_date), str(_date)))
+				_table, query_index, str(prev_date), str(_date)))
 
 			c.execute("".join(query))
 			cq = c.fetchall()
-			count_dict[day] = cq
+			count_dict[index] = cq
 
 		# Chart.js options
 		# TODO: Thinking about flot library now
 		data_dict = dict()
-		data_dict['label'] = 'Shipments'
-		data_dict['fillColor'] = 'rgba(220,220,220,0.5)'
-		data_dict['strokeColor'] = 'rgba(220,220,220,0.8)'
-		data_dict['pointColor'] = "rgba(220,220,220,1)"
+		data_dict['label'] = query_model.__name__
+		data_dict['fillColor'] = '#6886AD'
+		data_dict['strokeColor'] = '#185BAD'
+		data_dict['pointColor'] = "#5856AD"
 		data_dict['pointStrokeColor'] = "#fff"
-		data_dict['pointHighlightFill'] = "#fff"
-		data_dict['pointHighlightStroke'] = "rgba(220,220,220,1)"
+		data_dict['pointHighlightFill'] = "#6D61CD"
+		data_dict['pointHighlightStroke'] = "#7F71EF"
 
 		data_dict['data'] = count_dict.values()
 
@@ -145,9 +172,12 @@ def ajax (request):
 
 		returned_data['query'] = [q['sql'] for q in connection.queries]
 
-		chart_args = {'bezierCurve': False}
+		chart_args = dict()
+		chart_args['bezierCurve'] = False
+		chart_args['pointHitDetectionRadius'] = 10
 
-		return HttpResponse("[{},{}]".format(json.dumps(returned_data), json.dumps(chart_args)), content_type = 'application/json')
+		return HttpResponse("[{},{}]".format(json.dumps(returned_data), json.dumps(chart_args)),
+							content_type = 'application/json')
 
 
 def shipment_report (request, shipid):
