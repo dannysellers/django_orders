@@ -44,4 +44,5 @@ urlpatterns += patterns('tracker.report_views',
 	url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_report'),
 	url(r'^reports/$', 'reports'),
 	url(r'^query_ajax$', 'ajax'),
+	url(r'^form_ajax/(?P<model_name>\w+)$', 'form_ajax'),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # for deployment purposes
