@@ -7,8 +7,7 @@
 {% endblock title %}
 
 {% block header %}
-	<h1>Add New Shipment &#8212; <a href="/accounts/{{ customer.acct }}">{{ customer.name }} (#{{ customer.acct }})</a>
-	</h1>
+	Add New Shipment &#8212; <a href="/accounts/{{ customer.acct }}">{{ customer.name }} (#{{ customer.acct }})</a>
 {% endblock header %}
 
 {% block sub_nav %}
@@ -21,8 +20,7 @@
 	{% endif %}
 	{% if user.is_authenticated and customer %}
 		{% if customer.status == '1' %}
-			|<a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory_set.all|stored_count }})">Remove
-																													 account</a>
+			| <a id="remove-link" href="#">Remove account</a>
 		{% else %}
 			| <a href="#" class="disabled">Remove account</a>
 		{% endif %}
@@ -32,62 +30,71 @@
 
 {% block content %}
 
-	<form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
-		{% csrf_token %}
+	<div class="row">
 
-		<div class="row form">
+		<form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
+			{% csrf_token %}
 
-			<div class="col-2 left">
+			<div class="small-5 columns">
 
-				<label for="labor_time">Labor Time: </label><br/>
+				<label>Labor time:
+					<input type="text" id="labor_time" class="number" name="labor_time" value="0"/>
+				</label>
 
-				<label for="tracking_number">Tracking Number: </label><br/>
+				<label>Tracking number:
+					<input type="text" id="tracking_number" name="tracking_number"
+						   placeholder="Tracking number"/>
+				</label>
 
-				<label for="palletized">Palletized: </label><br/>
+				<label>Palletized:
+					<input type="checkbox" id="palletized" name="palletized"/>
+				</label>
 
-				<label for="notes">Notes:</label><br/>
+				<label>Notes:
+					<textarea name="notes" placeholder="Notes"></textarea>
+				</label>
+
+				<button class="small button radius" type="reset" name="reset">Reset</button>
+				<button class="small button radius" type="submit" name="submit">Submit</button>
 
 			</div>
-			<div class="col-2 right">
+			<div class="small-7 columns">
+				<input type="button" class="small button radius" id="add-extra" value="Add Carton Set">
+				<input type="button" class="small button radius" id="remove-extra" value="Remove Carton Set">
 
-				<input type="text" id="labor_time" class="number" name="labor_time" value="0"/><br/>
-
-				<input type="text" id="tracking_number" name="tracking_number" placeholder="Tracking Number"/><br/>
-
-				<input type="checkbox" id="palletized" name="palletized"/><br/>
-
-				<textarea name="notes" rows="5" cols="35" placeholder="Notes"></textarea><br/>
-
+				<div id="extras-holder">
+					<div class="extra-row">
+						<label>Quantity
+							<input type='number' name='quantity' placeholder='Quantity'>
+						</label>
+						<input id='dim-input' type='number' name='length' step='any' placeholder='Length'>
+						x <input id='dim-input' type='number' name='width' step='any' placeholder='Width'>
+						x <input id='dim-input' type='number' name='height' step='any' placeholder='Height'>
+					</div>
+				</div>
 			</div>
 
-		</div>
+		</form>
 
-		<div class="row form">
-			<a href="#" id="add-extra">Add Carton Set</a>
-			| <a href="#" id="remove-extra">Remove Carton Set</a>
+		<script src="{% static "js/formelements.js" %}"></script>
+		<script>
+			var oldEvt = window.onload;
+			window.onload = function () {
+				if (oldEvt) oldEvt();
 
-			<div id="extras-holder">
-			</div>
-		</div>
+				$("#add-extra").click(function () {
+					addCartonSetElement();
+				});
 
-		<div class="row form" style="border: none;">
-			<button type="reset" name="reset">Reset</button>
-			<button type="submit" name="submit">Submit</button>
-		</div>
-	</form>
+				$("#remove-extra").click(function () {
+					removeElement();
+				});
 
-	<script src="{% static "js/formelements.js" %}"></script>
-	<script>
-		var oldEvt = window.onload;
-		window.onload = function () {
-			if (oldEvt) oldEvt();
-
-			var addButton = document.getElementById('add-extra');
-			addButton.addEventListener('click', addCartonSetElement, false);
-
-			var removeButton = document.getElementById('remove-extra');
-			removeButton.addEventListener('click', removeElement, false);
-		}
-	</script>
+				$("#remove-link").click(function () {
+					confirmAcctRemove({{ customer.inventory_set.all|stored_count }});
+				});
+			}
+		</script>
+	</div>
 
 {% endblock content %}

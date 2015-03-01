@@ -14,9 +14,9 @@
 
 {% block header %}
 	{% if customer %}
-		<h1>{{ customer.name }} &#8212; #{{ customer.acct }}</h1>
+		{{ customer.name }} <span class="subheader">&#8212; #{{ customer.acct }}</span>
 	{% else %}
-		<h1>Tracker &#8212; {{ head_text }} ({{ num_accts }})</h1>
+		Tracker <span class="subheader">&#8212; {{ head_text }} ({{ num_accts }})</span>
 	{% endif %}
 {% endblock header %}
 

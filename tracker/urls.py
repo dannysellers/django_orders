@@ -1,11 +1,6 @@
 from django.conf.urls import patterns, url
 from django.conf import settings
 from django.conf.urls.static import static
-# import views
-# import acct_views
-# import inv_views
-# import ship_views
-# import report_views
 
 # General / report patterns
 urlpatterns = patterns('tracker.views',

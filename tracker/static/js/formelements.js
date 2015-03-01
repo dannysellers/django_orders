@@ -1,5 +1,5 @@
-var extraElement = "Description: <input type='text' name='description' placeholder='Description'><br/>Quantity: <input type='number' name='quantity' placeholder='Quantity'><br/>Unit cost: <input type='number' name='unit_cost' pattern='[0-9]+([\.|,][0-9]+)?' step='0.01' placeholder='Unit cost'>";
-var extraCartonSetElement = "Quantity: <input type='number' name='quantity' placeholder='Quantity'><br/>Length: <input type='number' name='length' step='any' placeholder='Length'><br/>Width: <input type='number' name='width' step='any' placeholder='Width'><br/>Height: <input type='number' name='height' step='any' placeholder='Height'>"
+var extraElement = "<label>Description<input type='text' name='description' placeholder='Description'></label><label>Quantity<input type='number' name='quantity' placeholder='Quantity'></label><label>Unit cost<input type='number' name='unit_cost' pattern='[0-9]+([\.|,][0-9]+)?' step='0.01' placeholder='Unit cost'></label>";
+var extraCartonSetElement = "<label>Quantity<input type='number' name='quantity' placeholder='Quantity'></label><input id='dim-input' type='number' name='length' step='any' placeholder='Length'> x <input id='dim-input' type='number' name='width' step='any' placeholder='Width'> x <input id='dim-input' type='number' name='height' step='any' placeholder='Height'>";
 var holdingArea = document.getElementById('extras-holder');
 
 function addElement() {

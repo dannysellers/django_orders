@@ -1,25 +1,28 @@
-/* Universal reset */
-/* * {
-	margin: 0;
-	padding: 0;
-} */
+body {
+	/*width        : 85%;*/
+	/* TODO: Responsive-ize this */
+	font-family  : "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 
 p {
 	margin  : 0;
 	padding : 0;
 }
 
-body {
-	/*width        : 85%;*/
-	/* TODO: Responsive-ize this */
-	font-family  : "Helvetica Neue", Helvetica, Arial, sans-serif;
-	padding-left : 1em;
-}
-
 a.disabled {
 	pointer-events : none;
 	cursor         : default;
-	color          : black;
+	color          : gray;
+}
+
+.top-bar {
+	margin-bottom: 1rem !important;
+}
+
+.row {
+	padding-bottom : 0.5rem;
+	float          : left;
+	clear          : both;
 }
 
   /*//////////////*/
@@ -37,30 +40,22 @@ ul.messages {
 table {
 	border          : 1px solid gray;
 	width           : 90%;
-	border-collapse : collapse;
 }
 
 th {
-	color            : #ffffff;
-	background-color : #555555;
-	border           : 1px solid #555555;
+	border-bottom    : 2px solid rgba(85,85,85,0.15);
 	padding          : 3px;
 	vertical-align   : top;
 }
 
 table.sortable th:not(.checkbox):hover {
-	background-color : #414141;
+	background-color : #C7C7C7;
 	cursor           : pointer;
 }
 
 #td_checkbox {
 	padding-left : 0;
 	text-align   : center;
-}
-
-td {
-	padding : 0.2rem 0.35rem 0.15rem 0.5rem;
-	border  : 1px solid black;
 }
 
 td.ship_toggle {
@@ -81,14 +76,6 @@ td.ship_toggle:hover {
  /*// TABLE > row coloring //*/
 /*//////////////////////////*/
 
-table tr:nth-child(even) {
-	background-color : #ffffff;
-}
-
-table tr:nth-child(odd) {
-	background-color : #f1f1f1;
-}
-
 #ship_head_row {
 	background-color : #dcdcdc;
 	font-weight      : 500;
@@ -98,95 +85,8 @@ table tr:nth-child(odd) {
 	background-color : #cdcdcd;
 }
 
-  /*//////////////////////////*/
- /*// FLOATING USER WINDOW //*/
-/*//////////////////////////*/
-
-.float_user-greeting {
-	position : fixed;
-	right    : 5%;
-	top      : 5%;
-	border   : thin solid;
-	padding  : 7px;
-	width    : 175px;
-}
-
-  /*///////////////////*/
- /*// GRID ELEMENTS //*/
-/*///////////////////*/
-
-.col-3 {
-	float : left;
-	width : 33%;
-}
-
-.col-2 {
-	float : left;
-	width : 50%;
-}
-
-.row {
-	padding-bottom : 1rem;
-	float          : left;
-	width          : 80%;
-	clear          : both;
-}
-
-.row h3, .row h4 {
-	display : inline;
-}
-
-  /*///////////////////*/
- /*// FORM ELEMENTS //*/
-/*///////////////////*/
-
-.row.form {
-	width         : 50%;
-	border        : 1px solid #000000;
-	border-radius : 5px;
-	padding       : 0.5rem 0.5rem 0.5rem 0.5rem;
-	margin-bottom : 5px;
-}
-
-.col-2.left {
-	width : 30%;
-}
-
-select {
-	border             : 1px solid #111111;
-	/* TODO: Check this CSS w/IE */
-	/*background         : transparent;*/
-	/*width              : 150px;*/
-	padding            : 5px 35px 5px 5px;
-	font-size          : 13px;
-	/*border             : 1px solid #cccccc;*/
-	/*height             : 34px;*/
-	-webkit-appearance : none;
-	-moz-appearance    : none;
-	appearance         : none;
-	background         : url("../img/down_arrow.svg") 96% / 15% no-repeat #eeeeee;
-	/* TODO: settle that URL for deployment... */
-}
-
 select:not(.disabled):hover {
-	/*border             : 2px solid #2c3e50;*/
-	/*background         : #a0cfff;*/
-	color              : #191b1c;
 	cursor             : pointer;
-	-webkit-appearance : none;
-	-moz-appearance    : none;
-	appearance         : none;
-	background         : url("../img/down_arrow.svg") 96% / 15% no-repeat #eeeeee;
-}
-
-/*target Internet Explorer 9 and Internet Explorer 10:*/
-
-@media screen and (min-width : 0\0
-) {
-	select {
-		background : url("../img/down_arrow.svg") 96% / 15% no-repeat #eeeeee;
-		padding    : 5px;
-	}
 }
 
 #notes {
@@ -195,39 +95,23 @@ select:not(.disabled):hover {
 	margin-bottom : 1rem;
 }
 
-#shipForm input.text_input {
-	width : 50%;
-}
-
-.btn {
-	font-size       : medium;
-	display         : inline-block;
-	color           : #000000;
-	margin-top      : 0.5rem;
-	padding         : 5px 10px 5px 10px;
-	border          : solid #000000 2px;
-	text-decoration : none;
-}
-
-.btn #disabled {
-	background     : #c0c0c0;
-	pointer-events : none;
-	cursor         : default;
-}
-
-.btn:not(.disabled):hover {
-	background      : #2c3e50;
-	color           : #ecf0f1;
-	text-decoration : none;
-	cursor          : pointer;
-}
-
 .extra-row {
-	border        : 1px solid #000000;
-	border-radius : 10px;
-	margin-top    : 0.5rem;
-	padding       : 3px 1px 3px 5px;
+	border        : 1px solid #dddddd;
+	border-radius : 3px;
+	margin-bottom : 1rem;
+	padding       : 0.75rem;
 	float         : left;
 	clear         : both;
-	width         : 15rem;
+	width         : 60%;
+}
+
+.extra-row input[id="dim-input"] {
+	display      : inline;
+	width        : 28%;
+	margin-left  : 0.1rem;
+	margin-right : 0.1rem;
+}
+
+div.small-12.column.form > form > input:not([type="submit"]) {
+	width : 40%;
 }

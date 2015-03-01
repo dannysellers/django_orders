@@ -3,55 +3,108 @@
 {% load static %}
 {% load num_filters %}
 
-<html xmlns="http://www.w3.org/1999/html">
-
 <head>
 	{% block title %}
 		<title>Inventory&#8212;Order Tracker</title>
 	{% endblock title %}
-	<!--<link rel="stylesheet" href="{% static "css/normalize.css" %}"/>
-	<link rel="stylesheet" href="{% static "css/skeleton.css" %}"/>-->
+	<link rel="stylesheet" href="{% static "css/normalize.css" %}"/>
 	<link rel="stylesheet" href="{% static "css/base.css" %}"/>
+	<link rel="stylesheet" href="{% static "css/foundation.css" %}"/>
+
 	<script src="{% static "js/tablesort.js" %}"></script>
 	<script src="{% static "js/misc.js" %}"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="{% static "js/foundation/foundation.js" %}"></script>
 </head>
 
 <body>
-{% block header %}
-	<h1>Order / Inventory Tracker</h1>
-{% endblock header %}
-<div class="float_user-greeting">
-	{% include 'tracker/nested/user_greeting.html' %}
-</div>
-<nav>
-	<a href="/">Home</a>
-	| <a href="/accounts?accts=active">Accounts</a>
-	| <a href="/inventory?status=stored">Inventory</a>
-	| <a href="/reports/">Reports</a>
-</nav>
-<div class="row">
-	{% block sub_nav %}
-
-	{% endblock sub_nav %}
-	{% if messages %}
-		<ul class="messages">
-			{% for message in messages %}
-				<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
-			{% endfor %}
+{#<div class="sticky">#}
+<!-- TODO: Navbar isn't sticking properly -->
+<nav class="top-bar" data-topbar role="navigation" data-options="stick_on: [small,medium,large]">
+	<ul class="title-area">
+		<li class="name">
+			<h1><a href="/">Middle Man Fulfillment</a></h1>
+		</li>
+	</ul>
+	<section class="top-bar-section">
+		<ul class="left">
+			<li><a href="/accounts?accts=active">Accounts</a></li>
+			<li><a href="/inventory?status=stored">Inventory</a></li>
+			<li><a href="/reports/">Reports</a></li>
 		</ul>
-	{% endif %}
+		<ul class="right">
+			{% if user.is_authenticated %}
+				<li><a href="#" class="disabled">Hi {{ user.first_name }} ({{ user.username }})</a></li>
+				<li class="divider"></li>
+				<li><a href="/logout/">Log out</a></li>
+			{% else %}
+				<li><a href="#" class="disabled">Hello anonymous.</a></li>
+				<li class="divider"></li>
+				<li class="has-dropdown">
+					<a data-dropdown="logindrop" aria-controls="logindrop" aria-expanded="false">Log in</a>
+					<!-- TODO: Fix this -->
+					<!-- 	Line
+							Line
+					   Button | Button-->
+					<div id="logindrop" data-dropdown-content class="f-dropdown small content" aria-hidden="true"
+						 tabindex="-1">
+						<form id="login_form" method="post" action="/login/">
+							{% csrf_token %}
+							<div class="row">
+								<input type="text" name="username" placeholder="Username"/>
+							</div>
+							<div class="row">
+								<input type="password" name="password" placeholder="Password"/>
+							</div>
+							<div class="row">
+								<ul class="button-group">
+									<li><a href="/register/" class="button tiny secondary">Register</a></li>
+									<li><input type="submit" class="button tiny" value="Submit"></li>
+								</ul>
+							</div>
+						</form>
+					</div>
+				</li>
+			{% endif %}
+		</ul>
+	</section>
+</nav>
+{#</div>#}
+
+<div class="row">
+	<div class="small-12 column">
+		<h3>
+			{% block header %}Order / Inventory Tracker{% endblock header %}
+		</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="small-12 column">
+		{% block sub_nav %}
+
+		{% endblock sub_nav %}
+		{% if messages %}
+			<ul class="messages">
+				{% for message in messages %}
+					<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</div>
 </div>
 
 {% block content %}
 	<div class="row">
-		Active customers: {{ cust_act_count }}<br/>
-		<!-- Total customers: {{ cust_count }}<br/> -->
-		Shipments in storage: {{ ship_count }}<br/>
-		Items currently in storage: {{ item_count }}<br/>
-		Total volume of items currently in storage: {{ total_item_volume|length:"2" }} <br/>
-		<a href="/inventory?storage_fees=yes">Items currently incurring storage fees: {{ item_storage_count }}</a><br/>
-		<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+		<div class="small-12 column">
+			Active customers: {{ cust_act_count }}<br/>
+			Shipments in storage: {{ ship_count }}<br/>
+			Items currently in storage: {{ item_count }}<br/>
+			Total volume of items currently in storage: {{ total_item_volume|length:"2" }} <br/>
+			<a href="/inventory?storage_fees=yes">Items currently incurring storage
+												  fees: {{ item_storage_count }}</a><br/>
+			<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+		</div>
 	</div>
 
 {% endblock %}

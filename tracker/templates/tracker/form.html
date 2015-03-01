@@ -9,58 +9,52 @@
 
 {% block header %}
 	{% if form_type == 'customer' %}
-		<h1>Add an Account</h1>
+		Add an Account
 	{% elif form_type == 'register' %}
-		<h1>Register New User</h1>
+		Register New User
 	{% elif form_type == 'shipment' %}
-		<h1>Create New Shipment (#{{ owner.acct }})</h1>
+		Create New Shipment (#{{ owner.acct }})
 	{% else %}
-		<h1>Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}</h1>
+		Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}
 	{% endif %}
 {% endblock header %}
 
 {% block content %}
 
 	<div class="row">
+		<div class="small-12 column form">
 
-		{% if form_type == 'customer' %}
-			<form id="account_form" method="post" action="/add_account/">
-		{% elif form_type == 'item' %}
-			<form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
-		{% elif form_type == 'shipment' %}
-			<form id="shipment_form" method="post" action="/accounts/{{ owner.acct }}/add_shipment/">
-		{% elif form_type == 'register' %}
-			<form id="user_form" method="post" action="/register/" enctype="multipart/form-data">
-		{% endif %}
-		{% csrf_token %}
-		{% for hidden in form.hidden_fields %}
-			{{ hidden }}
-		{% endfor %}
+			{% if form_type == 'customer' %}
+				<form id="account_form" method="post" action="/add_account/">
+			{% elif form_type == 'item' %}
+				<form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
+			{% elif form_type == 'register' %}
+				<form id="user_form" method="post" action="/register/" enctype="multipart/form-data">
+			{% endif %}
 
-		{% if form_type != 'register' %}
+			{% csrf_token %}
+			{% for hidden in form.hidden_fields %}
+				{{ hidden }}
+			{% endfor %}
+
 			{% for field in form.visible_fields %}
 				{{ field.errors }}
 				{{ field.help_text }}
 				{{ field }}
 				<br/>
 			{% endfor %}
-		{% else %}
-			<h4>Create a new user.</h4>
-			{{ form.as_p }}
-		{% endif %}
 
-		<input type="submit" name="submit"
-				{% if form_type == 'customer' %}
-			   value="Create Account"
-				{% elif form_type == 'item' %}
-			   value="Add Item"
-				{% elif form_type == 'shipment' %}
-			   value="Add Shipment"
-				{% elif form_type == 'register' %}
-			   value="Register"
-				{% endif %} />
+			<input class="small button radius" type="submit" name="submit"
+					{% if form_type == 'customer' %}
+				   value="Create Account"
+					{% elif form_type == 'item' %}
+				   value="Add Item"
+					{% elif form_type == 'register' %}
+				   value="Register"
+					{% endif %} />
 
-		</form>
+			</form>
+		</div>
 	</div>
 
 {% endblock content %}

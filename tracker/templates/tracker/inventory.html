@@ -16,11 +16,11 @@
 
 {% block header %}
 	{% if item %}
-		<h1>Item {{ item.itemid }} &#8212; {{ customer.name }}, #{{ customer.acct }}</h1>
+		Item {{ item.itemid }} <span class="subheader">&#8212; {{ customer.name }}, #{{ customer.acct }}</span>
 	{% elif filter %}
-		<h1>Inventory &#8212; {{ filter }} {% if count %}({{ count }}){% endif %}</h1>
+		Inventory <span class="subheader">&#8212; {{ filter }} {% if count %}({{ count }}){% endif %}</span>
 	{% else %}
-		<h1>Inventory {% if count %}({{ count }}){% endif %}</h1>
+		Inventory {% if count %}({{ count }}){% endif %}
 	{% endif %}
 {% endblock header %}
 
@@ -40,7 +40,7 @@
 {#				<a href="#" class="disabled">Add Inventory</a>#}
 {#			{% endif %}#}
 {#		{% endif %}#}
-		| <a href="/accounts/{{ customer.acct }}">Manage Account</a>
+		<a href="/accounts/{{ customer.acct }}">Manage Account</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 	{% endif %}
 
@@ -49,171 +49,191 @@
 {% block content %}
 
 	<div class="row">
-		{% if storage_fees %}
-			Daily storage fees as of today: ${{ storage_fees|length:"2" }}
-			<br/><br/>
-		{% endif %}
-
-		{% if user.is_authenticated %}
-			{% if item %}
-				<form id="manage_inventory" method="post" action="/manage_items?item={{ item.itemid }}">
-				{% csrf_token %}
-			{% elif customer and inventory_list %}
-				<form id="manage_inventory" method="post" action="/manage_items/">
-				{% csrf_token %}
+		<div class="small-12 column">
+			{% if storage_fees %}
+				Daily storage fees as of today: ${{ storage_fees|length:"2" }}
 			{% endif %}
-		{% endif %}
+		</div>
+	</div>
 
-		{% if inventory_list %}
-			<table class="sortable inventory_table">
-		{% else %}
-			<table>
-		{% endif %}
-		<thead>
-		<tr>
-			{% if user.is_authenticated and customer and inventory_list %}
-				{% if customer %}
-					<th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
-				{% else %}
-					<th></th>
+	<div class="row">
+		<div class="small-12 column">
+
+			{% if user.is_authenticated %}
+				{% if item %}
+					<form id="manage_inventory" method="post" action="/manage_items?item={{ item.itemid }}">
+					{% csrf_token %}
+				{% elif customer and inventory_list %}
+					<form id="manage_inventory" method="post" action="/manage_items/">
+					{% csrf_token %}
 				{% endif %}
 			{% endif %}
-			{% for item in headers %}
-				{% if item == 'Arrival' or item == 'Departure' %}
-					<th>{{ item }}</th>
-				{% else %}
-					<th>{{ item }}</th>
-				{% endif %}
-			{% endfor %}
-		</tr>
-		</thead>
-		<tbody>
-		{% if item %}
+
+			{% if inventory_list %}
+				<table class="sortable">
+			{% else %}
+				<table>
+			{% endif %}
+			<thead>
 			<tr>
-				<td id="ship_id"><a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a></td>
-				<td id="item_id">{{ item.itemid }}</td>
-				<td id="item_owner">
-					<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
-				</td>
-				<td id="item_volume">{{ item.volume|length:"2" }}</td>
-				<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-				<td id="item_status">{{ item.get_status_display }}</td>
-				<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
-			</tr>
-		{% elif inventory_list %}
-			{% for item in inventory_list %}
-				<tr>
-					{% if user.is_authenticated %}
-						{% if customer %}
-							<td class="checkbox"><input type="checkbox" class="checkbox" name="{{ item.itemid }}"></td>
-						{% endif %}
+				{% if user.is_authenticated and customer and inventory_list %}
+					{% if customer %}
+						<th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
+					{% else %}
+						<th></th>
 					{% endif %}
-					<td id="ship_id">
-						<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
-					</td>
-					<td id="item_id">
-						<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
-					</td>
+				{% endif %}
+				{% for item in headers %}
+					{% if item == 'Arrival' or item == 'Departure' %}
+						<th>{{ item }}</th>
+					{% else %}
+						<th>{{ item }}</th>
+					{% endif %}
+				{% endfor %}
+			</tr>
+			</thead>
+			<tbody>
+			{% if item %}
+				<tr>
+					<td id="ship_id"><a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a></td>
+					<td id="item_id">{{ item.itemid }}</td>
 					<td id="item_owner">
 						<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
 					</td>
 					<td id="item_volume">{{ item.volume|length:"2" }}</td>
-					{% if not item.status == '4' %}
-						<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
-					{% else %}
-						<td class="inactive"></td>
-					{% endif %}
+					<td id="item_storage_fees">${{ item.storage_fees|length:"2" }}</td>
 					<td id="item_status">{{ item.get_status_display }}</td>
 					<td id="item_arrival">{{ item.shipset.arrival|date:"m-d-Y" }}</td>
-					{% if item.status == '4' %}
-						<td>{{ item.shipset.departure|date:"m-d-Y" }}</td>
-					{% elif b_inactive %}
-						<td class="inactive"></td>
-					{% endif %}
 				</tr>
-			{% endfor %}
-		{% endif %}
-		</tbody>
-		</table>
+			{% elif inventory_list %}
+				{% for item in inventory_list %}
+					<tr>
+						{% if user.is_authenticated %}
+							{% if customer %}
+								<td class="checkbox"><input type="checkbox" class="checkbox" name="{{ item.itemid }}">
+								</td>
+							{% endif %}
+						{% endif %}
+						<td>
+							<a href="/shipment?id={{ item.shipset.shipid }}">{{ item.shipset.shipid }}</a>
+						</td>
+						<td>
+							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
+						</td>
+						<td>
+							<a href="/accounts/{{ item.shipset.owner.acct }}">{{ item.shipset.owner.name }}</a>
+						</td>
+						<td>{{ item.volume|length:"2" }}</td>
+						{% if not item.status == '4' %}
+							<td>${{ item.storage_fees|length:"2" }}</td>
+						{% else %}
+							<td class="inactive"></td>
+						{% endif %}
+						<td>{{ item.get_status_display }}</td>
+						<td>{{ item.shipset.arrival|date:"m-d-Y" }}</td>
+						{% if item.status == '4' %}
+							<td>{{ item.shipset.departure|date:"m-d-Y" }}</td>
+						{% elif b_inactive %}
+							<td class="inactive"></td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+			{% endif %}
+			</tbody>
+			</table>
+		</div>
 	</div>
 
 	{% if inventory_list %}
 		<div class="row">
-			<div class="pagination">
-			<span class="step-links">
-				{% if inventory_list.has_previous %}
-					<a href="{{ prev_page_url }}">Previous</a>
-				{% else %}
-					<a href="#" class="disabled">Previous</a>
-				{% endif %}
+			<div class="small-6 column">
+				<div class="pagination small-12 column">
+					{% if inventory_list.has_previous %}
+						<a href="{{ prev_page_url }}">Previous</a>
+					{% else %}
+						<a href="#" class="disabled">Previous</a>
+					{% endif %}
 
-				<span class="current">
-					Page {{ inventory_list.number }} of {{ inventory_list.paginator.num_pages }}
-				</span>
+					<span class="current">
+						Page {{ inventory_list.number }} of {{ inventory_list.paginator.num_pages }}
+					</span>
 
-				{% if inventory_list.has_next %}
-					<a href="{{ next_page_url }}">Next</a>
-				{% else %}
-					<a href="#" class="disabled">Next</a>
-				{% endif %}
-			</span>
+					{% if inventory_list.has_next %}
+						<a href="{{ next_page_url }}">Next</a>
+					{% else %}
+						<a href="#" class="disabled">Next</a>
+					{% endif %}
+				</div>
+				<form method="get" id="inv_page_form">
+					<div class="small-4 columns">
+						<input type="text" name="page" placeholder="Go to...">
+					</div>
+					<div class="small-4 columns">
+						<select name="items" id="page_items_select">
+							<option value="10">10 items</option>
+							<option value="25">25 items</option>
+							<option value="50">50 items</option>
+							<option value="100">100 items</option>
+						</select>
+					</div>
+					<div class="small-4 columns">
+						<button class="small button" type="submit" id="page_input_button"
+								onclick="submitPaginationForm('inv_page_form')">Submit
+						</button>
+					</div>
+				</form>
 			</div>
-			<form method="get" id="inv_page_form">
-				<input type="text" name="page" placeholder="Go to...">
-				<select name="items" id="page_items_select">
-					<option value="10">10 items</option>
-					<option value="25">25 items</option>
-					<option value="50">50 items</option>
-					<option value="100">100 items</option>
-				</select>
-				<button type="submit" id="page_input_button" onclick="submitPaginationForm('inv_page_form')">Submit
-				</button>
-			</form>
 		</div>
 	{% endif %}
 
 	<div class="row">
 		{% if op_list %}
-			<h2>Operation History</h2>
-			<table id="op_history">
-				<thead>
-				<tr>
-					{% for item in op_headers %}
-						<th>{{ item }}</th>
-					{% endfor %}
-				</tr>
-				</thead>
-				<tbody>
-				{% for operation in op_list %}
-					<tr id="op_row">
-						<td id="op_id">{{ operation.id }}</td>
-						<td id="op_code">{{ operation.get_op_code_display }}</td>
-						<td id="op_time">{{ operation.dt }}</td>
-						<td id="op_actor">{{ operation.created_by }}</td>
+			<div class="small-12 column">
+				<h4>Operation History</h4>
+				<table>
+					<thead>
+					<tr>
+						{% for item in op_headers %}
+							<th>{{ item }}</th>
+						{% endfor %}
 					</tr>
-				{% endfor %}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+					{% for operation in op_list %}
+						<tr>
+							<td>{{ operation.id }}</td>
+							<td>{{ operation.get_op_code_display }}</td>
+							<td>{{ operation.dt }}</td>
+							<td>{{ operation.created_by }}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
 		{% endif %}
 		{% if user.is_authenticated %}
-			{% if item or customer and inventory_list %}
-				<br/>
-				<select name="operation">
-					<option value="0">Inducted (0)</option>
-					<option value="1">Order Received (1)</option>
-					<option value="2">Order Started (2)</option>
-					<option value="3">Order Completed (3)</option>
-					<option value="4">Shipped (4)</option>
-				</select>
-				{% if inventory_list %}
-					<a class="btn" name="submit" onclick="verifyAllChecked('inventory_table', 'manage_inventory')">Submit</a>
-				{% elif item.status != '4' %}
-					<a class="btn" name="submit" onclick="verifyStatusChange();">Submit</a>
-				{% elif item.status == '4' %}
-					<a class="btn disabled" name="submit">Submit</a>
+			<div class="small-3 columns">
+				{% if item or customer and inventory_list %}
+					<select name="operation">
+						<option value="0">Inducted (0)</option>
+						<option value="1">Order Received (1)</option>
+						<option value="2">Order Started (2)</option>
+						<option value="3">Order Completed (3)</option>
+						<option value="4">Shipped (4)</option>
+					</select>
+					</div>
+					<div class="small-9 columns">
+					{% if inventory_list %}
+						<a class="small button radius" name="submit"
+						   onclick="verifyAllChecked('inventory_table', 'manage_inventory')">Submit</a>
+					{% elif item.status != '4' %}
+						<a class="small button radius" name="submit" onclick="verifyStatusChange();">Submit</a>
+					{% elif item.status == '4' %}
+						<a class="small button radius disabled" name="submit">Submit</a>
+					{% endif %}
+					</form>
 				{% endif %}
-				</form>
-			{% endif %}
+				</div>
 		{% endif %}
 	</div>
 

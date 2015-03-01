@@ -2,123 +2,146 @@
 {% load static %}
 {% load num_filters %}
 
+{% block title %}
+	<title>Graph Report</title>
+{% endblock title %}
+
+{% block header %}
+	Graph some data
+{% endblock header %}
+
 {% block content %}
 	<div class="row">
+		<div class="small-12 column">
 
-		<!-- TODO: Add date validation/normalization -->
-		<h4>Custom Query</h4>
+			<!-- TODO: Add date validation/normalization -->
 
-		<br/>
-		<label for="model-select">Model</label>
-		<select id="model-select">
-			{% for mdl in model_list %}
-				<option id="{{ mdl }}">{{ mdl }}</option>
-			{% endfor %}
-		</select>
+			<div class="small-4 columns">
+				<label>Model:
+					<select id="model-select">
+						{% for mdl in model_list %}
+							<option id="{{ mdl }}">{{ mdl }}</option>
+						{% endfor %}
+					</select>
+				</label>
 
-		<label for="model-attr-select">Attribute</label>
-		<select id="model-attr-select">
-		</select><br/>
+				<label>Operation:
+					<select id="op-select">
+						<option id="sum">Sum</option>
+						<option id="count">Count</option>
+					</select>
+				</label>
+			</div>
+			<div class="small-4 columns">
+				<label>Attribute:
+					<select id="model-attr-select"></select>
+				</label>
 
-		<label for="op-select">Operation</label>
-		<select id="op-select">
-			<option id="sum">Sum</option>
-			<option id="count">Count</option>
-		</select>
+				<label>Summation:
+					<select id="sum-select">
+						<option id="cumulative">Cumulative</option>
+						<option id="interval">Per-interval</option>
+					</select>
+				</label>
+			</div>
+			<div class="small-4 columns">
+				<label>Start date:
+					<input type="text" id="start-date" placeholder="Start Date">
+				</label>
+				<label>End date:
+					<input type="text" id="end-date" placeholder="End Date">
+				</label>
 
-		<label for="sum-select">Summation</label>
-		<select id="sum-select">
-			<option id="cumulative">Cumulative</option>
-			<option id="interval">Per-interval</option>
-		</select>
+				<p style="font-size:small;">Dates must be 'YYYY-MM-DD' for now.</p>
+				<input type="button" class="small button radius" value="Get Data" onclick="getData()">
 
-		<br/><br/>
-		<input type="text" id="start-date" placeholder="Start Date">
-		<input type="text" id="end-date" placeholder="End Date">
-		<button onclick="getData()">Draw Graph</button>
+			</div>
 
-		<p style="font-size:small;">Dates must be 'YYYY-MM-DD' for now.</p>
+			<hr/>
+			<canvas id="custom-chart" style="width:500px;"></canvas>
 
-		<hr/>
-		<canvas id="custom-chart" style="width:500px;"></canvas>
+			{#		<hr/>#}
+			{#		<label for="query-debug" style="font-size:80%;">Show query</label>#}
+			{#		<input type="checkbox" id="query-debug" disabled>#}
+			<pre style="border:1px solid black;padding:1rem;display:none;" id="json-response"></pre>
 
-{#		<hr/>#}
-{#		<label for="query-debug" style="font-size:80%;">Show query</label>#}
-{#		<input type="checkbox" id="query-debug" disabled>#}
-		<pre style="border:1px solid black;padding:1rem;display:none;" id="json-response"></pre>
+			<script>
+				// TODO: Load sample graphs on pageload
+				var elemCanvas = document.createElement('canvas');
 
-		<script>
-			// TODO: Load sample graphs on pageload
-			var elemCanvas = document.createElement('canvas');
+				function getData() {
+					var startDate = $('#start-date');
+					var endDate = $('#end-date');
+					var queryList = [$("#model-select").val().toLowerCase(), $("#model-attr-select").val(), $("#op-select").val().toLowerCase()];
+					var kwQuery = queryList.join(",");
+					var kwSummation = $('#sum-select').find(':selected').text().toLowerCase();
+					var params = {
+						start: startDate.val(),
+						finish: endDate.val(),
+						query: kwQuery,
+						summation: kwSummation
+					};
+					$.ajax({
+						url: "/query_ajax?" + jQuery.param(params),
+						dataType: "text",
+						type: "GET",
+						error: function (err) {
+							alert("Error: " + err.statusText.toString())
+						},
+						success: function (data) {
+							var _data = JSON.parse(data)[0];
+							var chartArgs = JSON.parse(data)[1];
+							drawGraph(_data, chartArgs, "custom-chart");
+							$("#json-response").html(JSON.stringify(_data['query'], null, 4))
+									.show();
+						}
+					});
+				}
 
-			function getData() {
-				var startDate = $('#start-date');
-				var endDate = $('#end-date');
-				var queryList = [$("#model-select").val().toLowerCase(), $("#model-attr-select").val(), $("#op-select").val().toLowerCase()];
-				var kwQuery = queryList.join(",");
-				var kwSummation = $('#sum-select').find(':selected').text().toLowerCase();
-				var params = {start: startDate.val(), finish: endDate.val(), query: kwQuery, summation: kwSummation};
-				$.ajax({
-					url: "/query_ajax?" + jQuery.param(params),
-					dataType: "text",
-					type: "GET",
-					error: function (err) {
-						alert("Error: " + err.statusText.toString())
-					},
-					success: function (data) {
-						var _data = JSON.parse(data)[0];
-						var chartArgs = JSON.parse(data)[1];
-						drawGraph(_data, chartArgs, "custom-chart");
-						$("#json-response").html(JSON.stringify(_data['query'], null, 4))
-								.show();
+				function drawGraph(data, options, graph) {
+					var ctx = document.getElementById(graph).getContext("2d");
+					if (typeof(lineChart) != 'undefined') {
+						// Avoid overlapping charts
+						lineChart.destroy();
+					}
+					lineChart = new Chart(ctx).Line(data, options);
+				}
+
+				var oldEvt = window.onload;
+				window.onload = function () {
+					if (oldEvt) oldEvt();
+					if (!elemCanvas.getContext) {
+						// Chart.js relies on <canvas> support
+						document.write("HTML5 Canvas not supported by your browser!")
+					}
+				};
+
+				$("#model-select").change(function () {
+					$.ajax({
+						url: "/form_ajax/" + $("#model-select").val(),
+						dataType: "text",
+						type: "GET",
+						error: function (err) {
+							alert("Error: " + err.statusText.toString())
+						},
+						success: function (data) {
+							var attrs = JSON.parse(data).attr_list;
+							var modelSelect = $("#model-attr-select");
+							modelSelect.children().remove();
+							for (var i = 0; i < attrs.length; i++) modelSelect.append("<option id=" + i + ">" + attrs[i] + "</option>");
+						}
+					})
+				});
+
+				$("#op-select").change(function () {
+					if ($("#op-select").val().toLowerCase() == 'count') {
+						$("#model-attr-select").attr('disabled', true);
+					} else {
+						$("#model-attr-select").attr('disabled', false);
 					}
 				});
-			}
-
-			function drawGraph(data, options, graph) {
-				var ctx = document.getElementById(graph).getContext("2d");
-				if (typeof(lineChart) != 'undefined') {
-					// Avoid overlapping charts
-					lineChart.destroy();
-				}
-				lineChart = new Chart(ctx).Line(data, options);
-			}
-
-			var oldEvt = window.onload;
-			window.onload = function () {
-				if (oldEvt) oldEvt();
-				if (!elemCanvas.getContext) {
-					// Chart.js relies on <canvas> support
-					document.write("HTML5 Canvas not supported by your browser!")
-				}
-			};
-
-			$("#model-select").change(function () {
-				$.ajax({
-					url: "/form_ajax/" + $("#model-select").val(),
-					dataType: "text",
-					type: "GET",
-					error: function (err) {
-						alert("Error: " + err.statusText.toString())
-					},
-					success: function (data) {
-						var attrs = JSON.parse(data).attr_list;
-						var modelSelect = $("#model-attr-select");
-						modelSelect.children().remove();
-						for (var i = 0; i < attrs.length; i++) modelSelect.append("<option id=" + i + ">" + attrs[i] + "</option>");
-					}
-				})
-			});
-
-			$("#op-select").change(function () {
-				if ($("#op-select").val().toLowerCase() == 'count') {
-					$("#model-attr-select").attr('disabled', true);
-				} else {
-					$("#model-attr-select").attr('disabled', false);
-				}
-			});
-		</script>
-
+			</script>
+		</div>
 	</div>
 	<script src="{% static "js/Chart.js" %}"></script>
 {% endblock content %}

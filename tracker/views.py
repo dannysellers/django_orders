@@ -17,7 +17,6 @@ def index (request):
 	context = RequestContext(request)
 	context_dict = dict()
 
-	# context_dict['cust_count'] = Customer.objects.count()
 	context_dict['cust_act_count'] = Customer.objects.filter(status = 1).count()
 	context_dict['item_count'] = Inventory.objects.exclude(status = 4).count()
 	context_dict['ship_count'] = Shipment.objects.exclude(status = 4).count()
