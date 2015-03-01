@@ -28,14 +28,18 @@ BASE_DIR = os.path.dirname(SETTINGS_DIR)
 #     }
 # }
 
+from keys import DJANGO_SECRET_KEY, DB_USERNAME, DB_PASSWORD
+
 DATABASES = {
 	'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ordertracker',
         'USER': '',
+		# 'USER': DB_USERNAME,
         'PASSWORD': '',
+		# 'PASSWORD': DB_PASSWORD,
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 
@@ -79,6 +83,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
+# STATIC_ROOT = '/home/ubuntu/static'
 STATIC_ROOT = ''
 
 # URL prefix for static files.
@@ -101,7 +106,6 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-from keys import DJANGO_SECRET_KEY
 SECRET_KEY = DJANGO_SECRET_KEY
 
 # List of callables that know how to import templates from various sources.

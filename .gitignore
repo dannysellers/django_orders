@@ -53,6 +53,5 @@ docs/_build/
 # PyBuilder
 target/
 
-# Account list
-order_tracker.db
+# Secret keys
 order_tracker/keys.py
