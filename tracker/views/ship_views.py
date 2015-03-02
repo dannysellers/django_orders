@@ -1,4 +1,4 @@
-from models import *
+from ..models import *
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required

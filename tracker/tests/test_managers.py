@@ -1,15 +1,12 @@
-# import os
 from django.test import TestCase
-from django.test.client import Client
-from models import *
-from datetime import date, datetime
+from ..models import *
+from datetime import date
 
-
-############
-# DATABASE #
-############
 
 class CustomerFactoryTest(TestCase):
+	"""
+	Test case for CustomerManager
+	"""
 	def setUp(self):
 		self.customer = Customer.objects.create_customer(name = "Test Customer",
 														 email = "test@domain.com",
@@ -25,6 +22,9 @@ class CustomerFactoryTest(TestCase):
 
 
 class ItemShipmentFactoryTest(TestCase):
+	"""
+	Test case for InventoryManager and ShipmentManager
+	"""
 	def setUp(self):
 		self.customer = Customer.objects.create_customer(name = "Test Customer",
 														 email = "test@domain.com",
@@ -72,61 +72,3 @@ class ItemShipmentFactoryTest(TestCase):
 		item_ops = list(self.item.itemoperation_set.all())
 		self.assertEqual(self.item.status, len(item_ops) - 1)
 		self.assertEqual(self.item.get_status_display(), int(item_ops[-1].op_code))
-
-
-# class ItemOpTestCases(TestCase):
-# 	def setUp (self):
-# 		self.itemlist = Inventory.objects.all()
-#
-# 	def test_item_op_equality (self):
-# 		"""
-# 		Tests that each Inventory object has the correct number
-# 		of ItemOperation objects associated with it.
-# 		"""
-# 		for item in self.itemlist:
-# 			iocount = ItemOperation.objects.filter(item = item).count() + 1
-# 			self.assertEqual(item.status, iocount)
-
-
-# class ShipOpTestCases(TestCase):
-# 	def setUp (self):
-# 		self.shipmentlist = Shipment.objects.all()
-#
-# 	def test_shipment_op_equality (self):
-# 		"""
-# 		Confirms that each shipment has the correct number
-# 		of associated ShipOperation objects.
-# 		"""
-# 		for shipment in self.shipmentlist:
-# 			socount = Shipment.objects.filter(shipment = shipment).count() + 1
-# 			self.assertEqual(shipment.status, socount)
-
-
-#########
-# VIEWS #
-#########
-
-
-# class InventoryViewTestCases(TestCase):
-# 	def setUp (self):
-# 		inv_status_codes = [i[0] for i in INVENTORY_STATUS_CODES]
-# 		inv_status_displays = [i[1] for i in INVENTORY_STATUS_CODES]
-#
-# 	def test_all_items (self):
-# 		c = Client()
-# 		response = c.get('/inventory')
-
-
-###########
-# WEBSITE #
-###########
-
-
-# class LogInTestCase(TestCase):
-# def setUp(self):
-# 		self.login_info = {'username': 'asdf', 'password': 'password'}
-#
-# 	def test_login (self):
-# 		c = Client()
-# 		response = c.post('/login/', self.login_info)
-# 		self.assertEqual(response.status_code, 200)

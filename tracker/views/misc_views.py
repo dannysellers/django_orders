@@ -3,12 +3,11 @@ from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.db.models import Sum
-
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from forms import UserForm
-from models import *
+from ..models import *
 
 from datetime import date
 

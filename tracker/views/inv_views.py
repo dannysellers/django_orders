@@ -12,7 +12,7 @@ from django.shortcuts import render_to_response
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from models import Customer, Inventory, ItemOperation
+from ..models import Customer, Inventory, ItemOperation
 # from forms import InventoryForm
 import re
 

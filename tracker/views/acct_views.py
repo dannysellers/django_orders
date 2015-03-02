@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
-from models import Customer
+from ..models import Customer
 import forms
 
 

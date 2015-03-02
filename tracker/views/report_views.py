@@ -21,9 +21,9 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 
-import models
-from templatetags.num_filters import length
-from utils import get_shipment_cost, find_subclasses
+from .. import models
+from ..templatetags.num_filters import length
+from ..utils import get_shipment_cost, find_subclasses
 
 
 def reports (request):
