@@ -10,6 +10,17 @@
 	Graph some data
 {% endblock header %}
 
+{% block extra_stylesheets %}
+	<link rel="stylesheet" href="{% static "css/pikaday.css" %}"/>
+{% endblock extra_stylesheets %}
+
+{% block extra_scripts %}
+	<script src="{% static "js/Chart.js" %}"></script>
+	<script src="{% static "js/moment.min.js" %}"></script>
+	<script src="{% static "js/pikaday.js" %}"></script>
+	<script src="{% static "js/pikaday.jquery.js" %}"></script>
+{% endblock extra_scripts %}
+
 {% block content %}
 	<div class="row">
 		<div class="small-12 column">
@@ -46,10 +57,10 @@
 			</div>
 			<div class="small-4 columns">
 				<label>Start date:
-					<input type="text" id="start-date" placeholder="Start Date">
+					<input type="text" class="datepicker" id="start-date" placeholder="Start Date">
 				</label>
 				<label>End date:
-					<input type="text" id="end-date" placeholder="End Date">
+					<input type="text" class="datepicker" id="end-date" placeholder="End Date">
 				</label>
 
 				<p style="font-size:small;">Dates must be 'YYYY-MM-DD' for now.</p>
@@ -107,15 +118,6 @@
 					lineChart = new Chart(ctx).Line(data, options);
 				}
 
-				var oldEvt = window.onload;
-				window.onload = function () {
-					if (oldEvt) oldEvt();
-					if (!elemCanvas.getContext) {
-						// Chart.js relies on <canvas> support
-						document.write("HTML5 Canvas not supported by your browser!")
-					}
-				};
-
 				$("#model-select").change(function () {
 					$.ajax({
 						url: "/form_ajax/" + $("#model-select").val(),
@@ -140,8 +142,17 @@
 						$("#model-attr-select").attr('disabled', false);
 					}
 				});
+
+				var oldEvt = window.onload;
+				window.onload = function () {
+					if (oldEvt) oldEvt();
+					if (!elemCanvas.getContext) {
+						// Chart.js relies on <canvas> support
+						document.write("HTML5 Canvas not supported by your browser!")
+					}
+					$('.datepicker').pikaday({ format: 'YYYY-MM-DD' });
+				};
 			</script>
 		</div>
 	</div>
-	<script src="{% static "js/Chart.js" %}"></script>
 {% endblock content %}
