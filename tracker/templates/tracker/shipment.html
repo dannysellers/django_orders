@@ -52,8 +52,12 @@
 			<h4>Item List ({{ shipment.inventory_set.count }})</h4>
 			<table class="tableItem">
 				<thead>
+				{% if shipment.status != '4' %}
 				<th class="checkbox"><input type="checkbox" class="checkbox"
 											onclick="javascript:checkAll(this);"></th>
+				{% else %}
+				<th class="checkbox"><input type="checkbox" disabled></th>
+				{% endif %}
 				{% for item in item_headers %}
 					<th>{{ item }}</th>
 				{% endfor %}
@@ -61,7 +65,12 @@
 				<tbody>
 				{% for item in shipment.inventory_set.all %}
 					<tr>
-						<td id="td_checkbox"><input type="checkbox" class="checkbox" name="item_{{ item.itemid }}">
+						<td id="td_checkbox">
+						{% if shipment.status != '4' %}
+							<input type="checkbox" class="checkbox" name="item_{{ item.itemid }}">
+						{% else %}
+							<input type="checkbox" disabled>
+						{% endif %}
 						</td>
 						<td id="item_id">
 							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>

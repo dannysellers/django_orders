@@ -6,6 +6,7 @@ except ImportError:
 from datetime import date, timedelta
 from calendar import monthrange
 import json
+import psycopg2
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
@@ -15,9 +16,11 @@ from django.db import connection
 from django.db.models import Model
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils import timezone
+
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
+
 import models
 from templatetags.num_filters import length
 from utils import get_shipment_cost, find_subclasses
@@ -109,6 +112,8 @@ def ajax (request):
 			query_index = 'createdate'
 		elif query_model.__name__.lower() == 'inventory' or query_model.__name__.lower() == 'shipment':
 			query_index = 'arrival'
+		elif query_model.__name__.lower() == 'optextras':
+			query_index = 'tracker_shipment.arrival'
 		else:
 			query_index = 'dt'
 
@@ -123,7 +128,6 @@ def ajax (request):
 		count_dict = {}
 		for index, day in enumerate(day_labels, start = 1):
 			query = list()
-			c = connection.cursor()
 
 			if query_op == 'count':
 				query.append("SELECT COUNT(*) FROM %s " % _table)
@@ -132,7 +136,6 @@ def ajax (request):
 			else:
 				query.append("SELECT COUNT(*) FROM %s " % _table)
 
-			# TODO: Resolve how to deduce which month/year to use. Maybe just do report by calendar month?
 			if query_summation == 'cumulative':
 				# cumulative throughout the whole period
 				prev_date = start_date
@@ -148,11 +151,19 @@ def ajax (request):
 				_year, _month = start_date.year, start_date.month
 				_date = date(_year, _month, monthrange(_year, _month)[1])
 
-			query.append(u"WHERE {1} BETWEEN \'{2}\' and \'{3}\';".format(
-				_table, query_index, str(prev_date), str(_date)))
+			if query_model.__name__.lower() == 'optextras':
+				query.append(u"JOIN tracker_shipment ON tracker_optextras.shipment_id = tracker_shipment.id ")
 
-			c.execute("".join(query))
-			cq = c.fetchall()
+			query.append(u"WHERE {0} BETWEEN \'{1}\' and \'{2}\';".format(
+				query_index, str(prev_date), str(_date)))
+
+			c = connection.cursor()
+			try:
+				c.execute("".join(query))
+				cq = c.fetchall()
+			except psycopg2.ProgrammingError as e:
+				print(e)
+				# return HttpResponse(json.dumps(e), content_type='application/json')
 			count_dict[index] = cq
 
 		# Chart.js options
@@ -176,6 +187,7 @@ def ajax (request):
 		chart_args['bezierCurve'] = False
 		chart_args['pointHitDetectionRadius'] = 10
 
+		# TODO: A better way to serialize data for JSON
 		return HttpResponse("[{},{}]".format(json.dumps(returned_data), json.dumps(chart_args)),
 							content_type = 'application/json')
 
