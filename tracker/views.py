@@ -22,15 +22,12 @@ def index (request):
 	context_dict['ship_count'] = Shipment.objects.exclude(status = 4).count()
 	context_dict['total_item_volume'] = Inventory.objects.exclude(status = 4).aggregate(Sum('volume'))['volume__sum']
 
-	storage_fee_count = 0
-	no_storage_fee_count = 0
-	for item in Inventory.objects.all().exclude(status = 4):
-		if abs((item.shipset.arrival - date.today()).days) >= 7:
-			storage_fee_count += 1
-		else:
-			no_storage_fee_count += 1
-	context_dict['item_storage_count'] = storage_fee_count
-	context_dict['item_no_storage_count'] = no_storage_fee_count
+	a_week_ago = date.today() - timedelta(days = 7)
+
+	context_dict['item_storage_count'] = Inventory.objects.exclude(status = 4)\
+		.filter(arrival__lte = a_week_ago).count()
+	context_dict['item_no_storage_count'] = Inventory.objects.exclude(status = 4)\
+		.filter(arrival__range = (a_week_ago, date.today())).count()
 
 	return render_to_response('tracker/index.html', context_dict, context)
 
