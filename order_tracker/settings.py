@@ -10,6 +10,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 import os
+
 SETTINGS_DIR = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(SETTINGS_DIR)
 # This is needed for the absolute path, which Django uses for routing
@@ -17,13 +18,14 @@ BASE_DIR = os.path.dirname(SETTINGS_DIR)
 # DATABASE_PATH = os.path.join(BASE_DIR, 'order_tracker.db')
 
 # DATABASES = {
-#     'default': {
+# 'default': {
 #         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
 #         'NAME': DATABASE_PATH,                      # Or path to database file if using sqlite3.
 #         # The following settings are not used with sqlite3:
 #         'USER': '',
 #         'PASSWORD': '',
-#         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+#         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost
+# through TCP.
 #         'PORT': '',                      # Set to empty string for default.
 #     }
 # }
@@ -31,16 +33,16 @@ BASE_DIR = os.path.dirname(SETTINGS_DIR)
 from keys import DJANGO_SECRET_KEY, DB_USERNAME, DB_PASSWORD
 
 DATABASES = {
-	'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ordertracker',
-        'USER': '',
-		# 'USER': DB_USERNAME,
-        'PASSWORD': '',
-		# 'PASSWORD': DB_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'ordertracker',
+    'USER': '',
+    # 'USER': DB_USERNAME,
+    'PASSWORD': '',
+    # 'PASSWORD': DB_PASSWORD,
+    'HOST': 'localhost',
+    'PORT': '5432',
+}
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
@@ -102,7 +104,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -112,7 +114,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -123,7 +125,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'audit_log.middleware.UserLoggingMiddleware',
+    'audit_log.middleware.UserLoggingMiddleware',
 )
 
 ROOT_URLCONF = 'order_tracker.urls'
@@ -143,7 +145,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 TEMPLATE_DIRS = (
-	[os.path.join(BASE_DIR, 'templates')]
+    [os.path.join(BASE_DIR, 'templates')]
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -160,8 +162,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-	'debug_toolbar',
-	'tracker',
+    # 'debug_toolbar',
+    'rest_framework',
+    'tracker',
     'south',
 )
 
@@ -198,3 +201,13 @@ LOGGING = {
 
 # URL to dump anonymous user who tries to access restricted page
 LOGIN_URL = '/login/'
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAdminUser',
+    ],
+    'PAGE_SIZE': 10
+}
