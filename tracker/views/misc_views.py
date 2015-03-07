@@ -21,12 +21,12 @@ def index (request):
 	context_dict['ship_count'] = Shipment.objects.exclude(status = 4).count()
 	context_dict['total_item_volume'] = Inventory.objects.exclude(status = 4).aggregate(Sum('volume'))['volume__sum']
 
-	a_week_ago = date.today() - timedelta(days = 7)
+	ten_days_ago = date.today() - timedelta(days = 10)
 
 	context_dict['item_storage_count'] = Inventory.objects.exclude(status = 4)\
-		.filter(arrival__lte = a_week_ago).count()
+		.filter(arrival__lte = ten_days_ago).count()
 	context_dict['item_no_storage_count'] = Inventory.objects.exclude(status = 4)\
-		.filter(arrival__range = (a_week_ago, date.today())).count()
+		.filter(arrival__range = (ten_days_ago, date.today())).count()
 
 	return render_to_response('tracker/index.html', context_dict, context)
 

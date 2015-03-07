@@ -100,12 +100,12 @@ def inventory (request):
 					# TODO: How to use True / False as values, rather than yes/no
 					context_filter.append('Items not yet incurring storage fees')
 					for item in inventory_list.exclude(status = 4):
-						if abs((item.shipset.arrival - date.today()).days) < 7:
+						if abs((item.shipset.arrival - date.today()).days) < 10:
 							_filtered_list.append(item)
 				else:
 					context_filter.append('Currently incurring storage fees')
 					for item in inventory_list.exclude(status = 4):
-						if abs((item.shipset.arrival - date.today()).days) >= 7:
+						if abs((item.shipset.arrival - date.today()).days) >= 10:
 							_filtered_list.append(item)
 
 				inventory_list = _filtered_list
