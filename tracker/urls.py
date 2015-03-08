@@ -4,12 +4,16 @@ from django.conf.urls.static import static
 
 from api import urls as api_urls
 
-# General / report patterns
+# Index
 urlpatterns = patterns('tracker.views.misc_views',
    url(r'^$', 'index'),
-   url(r'^register/$', 'register'),
-   url(r'^login/$', 'user_login', name = 'login'),
-   url(r'^logout/$', 'user_logout', name = 'logout'),
+)
+
+# Authentication patterns
+urlpatterns += patterns('tracker.views.auth_views',
+    url(r'^register/$', 'register'),
+    url(r'^login/$', 'user_login', name = 'login'),
+    url(r'^logout/$', 'user_logout', name = 'logout'),
 )
 
 # Account patterns
@@ -42,10 +46,13 @@ urlpatterns += patterns('tracker.views.report_views',
     url(r'^reports/$', 'reports'),
     url(r'^query_ajax$', 'ajax'),
     url(r'^form_ajax/(?P<model_name>\w+)$', 'form_ajax'),
-) + static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)  # for deployment purposes
+)
 
 # API patterns
 urlpatterns += patterns('',
     url(r'^api/', include(api_urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 )
+
+# For deployment
+urlpatterns += static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)

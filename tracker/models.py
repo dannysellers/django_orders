@@ -10,155 +10,155 @@ from .managers import CustomerManager, ShipmentManager, InventoryManager, ItemOp
 UNIT_STORAGE_FEE = 0.05
 
 CUSTOMER_STATUS_CODES = (
-	('0', 'Inactive'),
-	('1', 'Active'),
+('0', 'Inactive'),
+('1', 'Active'),
 )
 
 INVENTORY_STATUS_CODES = (
-	('0', 'Inducted'),
-	('1', 'Order received'),
-	('2', 'Order started'),
-	('3', 'Order completed'),
-	('4', 'Shipped'),
+('0', 'Inducted'),
+('1', 'Order received'),
+('2', 'Order started'),
+('3', 'Order completed'),
+('4', 'Shipped'),
 )
 
 
 class Customer(models.Model):
-	name = models.CharField(max_length = 128, unique = False)
-	acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
-	# TODO: Add hidden account ID so that the front-facing one can be changed?
-	email = models.EmailField()
-	status = models.CharField(max_length = 1, choices = CUSTOMER_STATUS_CODES)
-	createdate = models.DateField()
-	closedate = models.DateField(null = True)
-	notes = models.TextField()
+    name = models.CharField(max_length = 128, unique = False)
+    acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
+    # TODO: Add hidden account ID so that the front-facing one can be changed?
+    email = models.EmailField()
+    status = models.CharField(max_length = 1, choices = CUSTOMER_STATUS_CODES)
+    createdate = models.DateField()
+    closedate = models.DateField(null = True)
+    notes = models.TextField()
 
-	objects = CustomerManager()
+    objects = CustomerManager()
 
-	def __unicode__ (self):
-		return '{}: {}'.format(self.acct, self.name)
+    def __unicode__ (self):
+        return '{}: {}'.format(self.acct, self.name)
 
-	@property
-	def storage_fees(self):
-		fees = 0.00
-		for item in self.inventory_set.exclude(status = 4):
-			fees += item.get_storage_fees()
-		return fees
+    @property
+    def storage_fees (self):
+        fees = 0.00
+        for item in self.inventory_set.exclude(status = 4):
+            fees += item.get_storage_fees()
+        return fees
 
 
 class Shipment(AuthStampedModel):
-	owner = models.ForeignKey(Customer)
-	shipid = models.IntegerField(unique = True)
-	palletized = models.BooleanField(default = False)
-	arrival = models.DateField()
-	departure = models.DateField(null = True)
-	labor_time = models.IntegerField()
-	notes = models.TextField(null = True)
-	tracking_number = models.CharField(max_length = 30, null = True)
-	status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
+    owner = models.ForeignKey(Customer)
+    shipid = models.IntegerField(unique = True)
+    palletized = models.BooleanField(default = False)
+    arrival = models.DateField()
+    departure = models.DateField(null = True)
+    labor_time = models.IntegerField()
+    notes = models.TextField(null = True)
+    tracking_number = models.CharField(max_length = 30, null = True)
+    status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
 
-	objects = ShipmentManager()
-	audit_log = AuditLog()
+    objects = ShipmentManager()
+    audit_log = AuditLog()
 
-	def __unicode__ (self):
-		return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
+    def __unicode__ (self):
+        return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
 
-	def save (self, *args, **kwargs):
-		"""
-		When a Shipment is first created, the ShipOperation creation is
-		handled by ShipmentManager (at that point, there is no self.pk).
-		Whenever the Shipment's status is changed after then, though,
-		a new ShipOperation should be created
-		"""
-		if self.pk:
-			ShipOperation.objects.create_operation(shipment = self,
-												   op_code = self.status)
-		super(Shipment, self).save(*args, **kwargs)
+    def save (self, *args, **kwargs):
+        """
+        When a Shipment is first created, the ShipOperation creation is
+        handled by ShipmentManager (at that point, there is no self.pk).
+        Whenever the Shipment's status is changed after then, though,
+        a new ShipOperation should be created
+        """
+        if self.pk:
+            ShipOperation.objects.create_operation(shipment = self,
+                                                   op_code = self.status)
+        super(Shipment, self).save(*args, **kwargs)
 
-	@property
-	def storage_fees(self):
-		fees = 0.00
-		for item in self.inventory_set.exclude(status = 4):
-			fees += item.get_storage_fees()
-		return fees
+    @property
+    def storage_fees (self):
+        fees = 0.00
+        for item in self.inventory_set.exclude(status = 4):
+            fees += item.get_storage_fees()
+        return fees
 
 
 class Inventory(AuthStampedModel):
-	shipset = models.ForeignKey(Shipment)
-	owner = models.ForeignKey(Customer)
-	itemid = models.IntegerField(unique = True, primary_key = True)
-	length = models.FloatField(default = 1.00, max_length = 5)
-	width = models.FloatField(default = 1.00, max_length = 5)
-	height = models.FloatField(default = 1.00, max_length = 5)
-	volume = models.FloatField(default = 1.00, max_length = 5)
-	storage_fees = models.FloatField(default = UNIT_STORAGE_FEE)
-	status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
-	arrival = models.DateField()
-	departure = models.DateField(null = True)
+    shipset = models.ForeignKey(Shipment)
+    owner = models.ForeignKey(Customer)
+    itemid = models.IntegerField(unique = True, primary_key = True)
+    length = models.FloatField(default = 1.00, max_length = 5)
+    width = models.FloatField(default = 1.00, max_length = 5)
+    height = models.FloatField(default = 1.00, max_length = 5)
+    volume = models.FloatField(default = 1.00, max_length = 5)
+    storage_fees = models.FloatField(default = UNIT_STORAGE_FEE)
+    status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
+    arrival = models.DateField()
+    departure = models.DateField(null = True)
 
-	objects = InventoryManager()
-	audit_log = AuditLog()
+    objects = InventoryManager()
+    audit_log = AuditLog()
 
-	def __unicode__ (self):
-		return 'Item {}'.format(self.itemid)
+    def __unicode__ (self):
+        return 'Item {}'.format(self.itemid)
 
-	def get_storage_fees(self):
-		if self.status != 4 and timezone.now().date() - self.arrival >= timedelta(days=7):
-			return self.storage_fees
-		else:
-			return 0.00
+    def get_storage_fees (self):
+        if self.status != 4 and timezone.now().date() - self.arrival >= timedelta(days = 7):
+            return self.storage_fees
+        else:
+            return 0.00
 
-	def save(self, *args, **kwargs):
-		if self.pk:
-			ItemOperation.objects.create_operation(item = self,
-												   op_code = self.status)
-		super(Inventory, self).save(*args, **kwargs)
+    def save (self, *args, **kwargs):
+        if self.pk:
+            ItemOperation.objects.create_operation(item = self,
+                                                   op_code = self.status)
+        super(Inventory, self).save(*args, **kwargs)
 
-	class Meta:
-		verbose_name_plural = 'inventory'
+    class Meta:
+        verbose_name_plural = 'inventory'
 
 
 class Operation(AuthStampedModel):
-	"""
-	Base class for ShipOperation and ItemOperation, the
-	only difference between which is the ForeignKey relation
-	"""
-	dt = models.DateTimeField()
-	op_code = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
+    """
+    Base class for ShipOperation and ItemOperation, the
+    only difference between which is the ForeignKey relation
+    """
+    dt = models.DateTimeField()
+    op_code = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
 
-	class Meta:
-		abstract = True
+    class Meta:
+        abstract = True
 
 
 class ShipOperation(Operation):
-	shipment = models.ForeignKey(Shipment)
+    shipment = models.ForeignKey(Shipment)
 
-	objects = ShipOpManager()
+    objects = ShipOpManager()
 
-	class Meta:
-		verbose_name = "shipment operation"
+    class Meta:
+        verbose_name = "shipment operation"
 
-	def __unicode__ (self):
-		return 'Item {}, Code {}'.format(self.shipment.shipid, self.op_code)
+    def __unicode__ (self):
+        return 'Item {}, Code {}'.format(self.shipment.shipid, self.op_code)
 
 
 class ItemOperation(Operation):
-	item = models.ForeignKey(Inventory)
+    item = models.ForeignKey(Inventory)
 
-	objects = ItemOpManager()
+    objects = ItemOpManager()
 
-	def __unicode__ (self):
-		return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
+    def __unicode__ (self):
+        return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
 
 
 class OptExtras(models.Model):
-	shipment = models.ForeignKey(Shipment)
-	quantity = models.IntegerField(default = 1)
-	unit_cost = models.FloatField()
-	total_cost = models.FloatField()
-	description = models.TextField()
+    shipment = models.ForeignKey(Shipment)
+    quantity = models.IntegerField(default = 1)
+    unit_cost = models.FloatField()
+    total_cost = models.FloatField()
+    description = models.TextField()
 
-	objects = OptExtraManager()
+    objects = OptExtraManager()
 
-	def __unicode__ (self):
-		return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
+    def __unicode__ (self):
+        return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
