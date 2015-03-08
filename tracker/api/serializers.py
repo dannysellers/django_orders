@@ -21,13 +21,13 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ('name', 'acct', 'email')
 
 
-class ShipmentSerializer(serializers.HyperlinkedModelSerializer):
+class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         fields = ('owner', 'shipid', 'labor_time', 'status', 'storage_fees')
 
 
-class InventorySerializer(serializers.HyperlinkedModelSerializer):
+class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         fields = ('owner', 'shipset', 'itemid', 'volume', 'get_storage_fees', 'status')

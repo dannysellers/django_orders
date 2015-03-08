@@ -2,15 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from rest_framework import routers
-from api import views as api_views
-
-router = routers.DefaultRouter()
-router.register(r'users', api_views.UserViewSet)
-router.register(r'groups', api_views.GroupViewSet)
-router.register(r'customers', api_views.CustomerViewSet)
-router.register(r'shipments', api_views.ShipmentViewSet)
-router.register(r'inventory', api_views.InventoryViewSet)
+from api import urls as api_urls
 
 # General / report patterns
 urlpatterns = patterns('tracker.views.misc_views',
@@ -53,7 +45,7 @@ urlpatterns += patterns('tracker.views.report_views',
 ) + static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)  # for deployment purposes
 
 # API patterns
-urlpatterns += patterns('tracker.api.views',
-    url(r'^api/', include(router.urls)),
-    url(r'^api-auth', include('rest_framework.urls', namespace='rest_framework')),
+urlpatterns += patterns('',
+    url(r'^api/', include(api_urls)),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 )
