@@ -1,29 +1,35 @@
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.contrib.auth.models import User
+
 from django.utils import timezone
 from datetime import timedelta
 
 from audit_log.models import AuthStampedModel
 from audit_log.models.managers import AuditLog
 
-from .managers import CustomerManager, ShipmentManager, InventoryManager, ItemOpManager, ShipOpManager, OptExtraManager
+from .managers import CustomerManager, ShipmentManager, InventoryManager, \
+    ItemOpManager, ShipOpManager, OptExtraManager
 
-UNIT_STORAGE_FEE = 0.05
+UNIT_STORAGE_FEE = 0.10
 
 CUSTOMER_STATUS_CODES = (
-('0', 'Inactive'),
-('1', 'Active'),
+    ('0', 'Inactive'),
+    ('1', 'Active'),
 )
 
 INVENTORY_STATUS_CODES = (
-('0', 'Inducted'),
-('1', 'Order received'),
-('2', 'Order started'),
-('3', 'Order completed'),
-('4', 'Shipped'),
+    ('0', 'Inducted'),
+    ('1', 'Order received'),
+    ('2', 'Order started'),
+    ('3', 'Order completed'),
+    ('4', 'Shipped'),
 )
 
 
 class Customer(models.Model):
+    user = models.OneToOneField(User)
     name = models.CharField(max_length = 128, unique = False)
     acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
     # TODO: Add hidden account ID so that the front-facing one can be changed?
@@ -63,24 +69,20 @@ class Shipment(AuthStampedModel):
     def __unicode__ (self):
         return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
 
-    def save (self, *args, **kwargs):
-        """
-        When a Shipment is first created, the ShipOperation creation is
-        handled by ShipmentManager (at that point, there is no self.pk).
-        Whenever the Shipment's status is changed after then, though,
-        a new ShipOperation should be created
-        """
-        if self.pk:
-            ShipOperation.objects.create_operation(shipment = self,
-                                                   op_code = self.status)
-        super(Shipment, self).save(*args, **kwargs)
-
     @property
     def storage_fees (self):
         fees = 0.00
         for item in self.inventory_set.exclude(status = 4):
             fees += item.get_storage_fees()
         return fees
+
+
+@receiver(post_save, sender = Shipment)
+def ship_op_signal (sender, instance, **kwargs):
+    # TODO: These post_save methods are called 3 times on creation (audit_log, probably)
+    # Convert to middleware?
+    ShipOperation.objects.create_operation(shipment = instance,
+                                           op_code = instance.status)
 
 
 class Inventory(AuthStampedModel):
@@ -103,19 +105,19 @@ class Inventory(AuthStampedModel):
         return 'Item {}'.format(self.itemid)
 
     def get_storage_fees (self):
-        if self.status != 4 and timezone.now().date() - self.arrival >= timedelta(days = 7):
+        if self.status != 4 and timezone.now().date() - self.arrival >= timedelta(days = 10):
             return self.storage_fees
         else:
             return 0.00
 
-    def save (self, *args, **kwargs):
-        if self.pk:
-            ItemOperation.objects.create_operation(item = self,
-                                                   op_code = self.status)
-        super(Inventory, self).save(*args, **kwargs)
-
     class Meta:
         verbose_name_plural = 'inventory'
+
+
+@receiver(post_save, sender = Inventory)
+def item_op_signal (sender, instance, **kwargs):
+    ItemOperation.objects.create_operation(item = instance,
+                                           op_code = instance.status)
 
 
 class Operation(AuthStampedModel):
