@@ -151,6 +151,7 @@ def acct_info (request):
             return HttpResponseRedirect('/accounts?accts=active')
 
         customer.email = request.POST['email']
+        customer.user.username = request.POST['email']
         customer.name = request.POST['name']
         customer.notes = request.POST['notes']
         customer.acct = request.POST['acct']
@@ -170,11 +171,18 @@ def add_account (request):
         form = forms.CustomerForm(request.POST)
 
         if form.is_valid():
-            name = form.cleaned_data['name']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
             acct = form.cleaned_data['acct']
-            cust = Customer.objects.create_customer(name, email, acct)
-            messages.add_message(request, messages.SUCCESS, "Account {} created successfully.".format(cust.acct))
+            cust = Customer.objects.create_customer(first_name = first_name,
+                                                    last_name = last_name,
+                                                    email = email,
+                                                    acct = acct,
+                                                    password = password)
+            messages.add_message(request, messages.SUCCESS,
+                                 "Account #{} for {} created successfully.".format(cust.acct, cust.name))
             return HttpResponseRedirect('/accounts?accts=active')
         else:
             print form.errors

@@ -11,7 +11,9 @@ class CustomerManager(Manager):
             password = User.objects.make_random_password()
 
         # TODO: Allow username as login instead of email?
-        _user = User.objects.create_user(username = email,
+        _user = User.objects.create_user(first_name = first_name,
+                                         last_name = last_name,
+                                         username = email,
                                          email = email,
                                          password = password)
         # Set permissions

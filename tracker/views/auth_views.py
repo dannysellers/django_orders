@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -9,6 +9,10 @@ from forms import UserForm
 
 
 def register (request):
+    """
+    Handles registering new Operators---backend users not
+    associated with any Customer accounts.
+    """
     context = RequestContext(request)
     context_dict = {}
 
@@ -19,6 +23,10 @@ def register (request):
             user = user_form.save()
 
             user.set_password(user.password)
+
+            operator_group = Group.objects.get_by_natural_key('Operator')
+            user.groups.add(operator_group)
+
             user.save()
 
             messages.add_message(request, messages.SUCCESS, "User {} registered successfully".format(user.username))
@@ -53,13 +61,14 @@ def user_login (request):
                 login(request, user)
                 messages.add_message(request, messages.SUCCESS,
                                      "Login successful. Welcome, {}.".format(user.first_name))
+                # Return user to the same page they were on
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
             else:
                 messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")
                 return HttpResponseRedirect('/')
 
         else:
-            messages.add_message(request, messages.ERROR, "Invalid login details for {0}".format(username))
+            messages.add_message(request, messages.ERROR, "Invalid login info")
             return HttpResponseRedirect('/')
     else:
         return render_to_response('tracker/login.html', context)

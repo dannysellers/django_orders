@@ -9,13 +9,13 @@
 
 {% block header %}
 	{% if form_type == 'customer' %}
-		Add an Account
+		<h3>Add an Account</h3>
 	{% elif form_type == 'register' %}
-		Register New User
+		<h3>Register New User</h3>
 	{% elif form_type == 'shipment' %}
-		Create New Shipment (#{{ owner.acct }})
+		<h3>Create New Shipment (#{{ owner.acct }})</h3>
 	{% else %}
-		Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}
+		<h3>Add an Item {% if owner %}&#8212; {{ owner }}{% endif %}</h3>
 	{% endif %}
 {% endblock header %}
 
@@ -25,10 +25,13 @@
 		<div class="small-12 column form">
 
 			{% if form_type == 'customer' %}
+				<p>This will create a login for the Customer.</p>
 				<form id="account_form" method="post" action="/add_account/">
 			{% elif form_type == 'item' %}
 				<form id="inventory_form" method="post" action="/accounts/{{ owner.acct }}/add_inventory/">
 			{% elif form_type == 'register' %}
+				<p>This will not create a new Customer. Click <a href="/add_account/">here</a> to
+				create a new Customer and User.</p>
 				<form id="user_form" method="post" action="/register/" enctype="multipart/form-data">
 			{% endif %}
 

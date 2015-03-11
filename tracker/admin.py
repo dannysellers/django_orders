@@ -18,12 +18,12 @@ class ShipmentInline(admin.TabularInline):
 class CustomerAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['first_name', 'last_name', 'email', 'status']}),
-        ('Account Information', {'fields': ['acct', 'notes'], 'classes': ['collapse']}),
+        ('Account Information', {'fields': ['user', 'acct', 'notes'], 'classes': ['collapse']}),
         ('Dates', {'fields': ['createdate', 'closedate'], 'classes': ['collapse']})
     ]
     inlines = [ShipmentInline]
-    readonly_fields = ('createdate', 'closedate', 'acct')
-    list_display = ('acct', 'first_name', 'last_name')
+    readonly_fields = ('user', 'createdate', 'closedate', 'acct')
+    list_display = ('acct', 'status', 'first_name', 'last_name', 'user')
     list_filter = ['status']
     search_fields = ['first_name', 'last_name', 'email', 'acct']
 

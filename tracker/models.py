@@ -29,7 +29,7 @@ INVENTORY_STATUS_CODES = (
 
 
 class Customer(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, null = True, blank = True)
     first_name = models.CharField(max_length = 128, unique = False)
     last_name = models.CharField(max_length = 128, unique = False)
     acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
@@ -46,7 +46,7 @@ class Customer(models.Model):
         return '{}: {}'.format(self.acct, self.name)
 
     @property
-    def name(self):
+    def name (self):
         return "{} {}".format(self.first_name, self.last_name)
 
     @property
