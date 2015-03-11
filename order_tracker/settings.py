@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(SETTINGS_DIR)
 
 # DATABASES = {
 # 'default': {
-#         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+# 'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
 #         'NAME': DATABASE_PATH,                      # Or path to database file if using sqlite3.
 #         # The following settings are not used with sqlite3:
 #         'USER': '',
@@ -33,16 +33,16 @@ BASE_DIR = os.path.dirname(SETTINGS_DIR)
 from keys import DJANGO_SECRET_KEY, DB_USERNAME, DB_PASSWORD
 
 DATABASES = {
-'default': {
-    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'ordertracker',
-    'USER': '',
-    # 'USER': DB_USERNAME,
-    'PASSWORD': '',
-    # 'PASSWORD': DB_PASSWORD,
-    'HOST': 'localhost',
-    'PORT': '5432',
-}
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ordertracker',
+        'USER': '',
+        # 'USER': DB_USERNAME,
+        'PASSWORD': '',
+        # 'PASSWORD': DB_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
