@@ -13,19 +13,59 @@
 
 	{% block extra_stylesheets %}
 	{% endblock extra_stylesheets %}
-
-	<script src="{% static "js/tablesort.js" %}"></script>
-	<script src="{% static "js/misc.js" %}"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	<script src="{% static "js/foundation/foundation.js" %}"></script>
-
-	{% block extra_scripts %}
-	{% endblock extra_scripts %}
 </head>
 
 <body>
-{#<div class="sticky">#}
-<!-- TODO: Navbar isn't sticking properly -->
+{#<div class="row">#}
+{#	<div class="small-12 column">#}
+{#		<div class="off-canvas-wrap" data-offcanvas>#}
+{#			<div class="inner-wrap">#}
+{#				<nav class="show-for-medium-up" data-topbar role="navigation">#}
+{#					<ul class="title-area">#}
+{#						<li class="name">#}
+{#							<h1><a href="/">Middle Man Fulfillment</a></h1>#}
+{#						</li>#}
+{#					</ul>#}
+{#					<section class="top-bar-section">#}
+{#						<ul class="left">#}
+{#							<li><a href="/accounts?accts=active">Accounts</a></li>#}
+{#							<li><a href="/inventory?status=stored">Inventory</a></li>#}
+{#							<li><a href="/reports/">Reports</a></li>#}
+{#						</ul>#}
+{#						<ul class="right">#}
+{#							{% if user.is_authenticated %}#}
+{#								<li><a href="#" class="disabled">Hi {{ user.first_name }} ({{ user.username }}</a></li>#}
+{#								<li class="divider"></li>#}
+{#								<li><a href="/logout/">Log out</a></li>#}
+{#							{% else %}#}
+{#								<li><a href="#" class="disabled">Hello anonymous</a></li>#}
+{#								<li class="divider"></li>#}
+{#								<!-- login form -->#}
+{#							{% endif %}#}
+{#						</ul>#}
+{#					</section>#}
+{#				</nav>#}
+{#				<nav class="tab-bar show-for-small">#}
+{#					<section class="title-area">#}
+{#						<h1 class="title">#}
+{#							<a href="/">Middle Man Fulfillment</a>#}
+{#						</h1>#}
+{#					</section>#}
+{#					<section class="right small">#}
+{#						<a class="left-off-canvas-toggle menu-icon" href="#">#}
+{#							<span></span>#}
+{#						</a>#}
+{#					</section>#}
+{#				</nav>#}
+{#				<aside class="left-off-canvas-menu">#}
+{##}
+{#				</aside>#}
+{#			</div>#}
+{#		</div>#}
+{#	</div>#}
+{#</div>#}
+
+
 <nav class="top-bar" data-topbar role="navigation" data-options="stick_on: [small,medium,large]">
 	<ul class="title-area">
 		<li class="name">
@@ -75,18 +115,25 @@
 		</ul>
 	</section>
 </nav>
-{#</div>#}
 
 <div class="row">
-	<div class="small-12 column">
-		<h3>
-			{% block header %}Order / Inventory Tracker{% endblock header %}
-		</h3>
+	<div class="small-12 medium-12 large-12 column">
+		{% block header %}
+			<h3>
+				Order / Inventory Tracker
+				<span class="show-for-large-only">Large screen</span>
+				<span class="show-for-medium-only">Medium screen</span>
+			</h3>
+			<h2 class="show-for-small-only">
+				Small screen
+			</h2>
+		{% endblock header %}
+
 	</div>
 </div>
 
 <div class="row">
-	<div class="small-12 column">
+	<div class="small-11 medium-12 large-12 column">
 		{% block sub_nav %}
 
 		{% endblock sub_nav %}
@@ -102,7 +149,7 @@
 
 {% block content %}
 	<div class="row">
-		<div class="small-12 column">
+		<div class="small-12 medium-12 large-12 column">
 			Active customers: {{ cust_act_count }}<br/>
 			Shipments in storage: {{ ship_count }}<br/>
 			Items currently in storage: {{ item_count }}<br/>
@@ -114,6 +161,14 @@
 	</div>
 
 {% endblock %}
+
+<script src="{% static "js/tablesort.js" %}"></script>
+<script src="{% static "js/misc.js" %}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="{% static "js/foundation/foundation.js" %}"></script>
+
+{% block extra_scripts %}
+{% endblock extra_scripts %}
 
 </body>
 </html>

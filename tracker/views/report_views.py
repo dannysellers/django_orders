@@ -31,6 +31,10 @@ def reports (request):
     context = RequestContext(request)
     context_dict = dict()
 
+    today = date.today()
+    context_dict['first_day'] = date(today.year, today.month, 1)
+    context_dict['last_day'] = date(today.year, today.month, monthrange(today.year, today.month)[1])
+
     context_dict['model_list'] = [i.__name__ for i in find_subclasses(models, Model, 'tracker.models')]
 
     return render_to_response('tracker/graphs.html', context_dict, context)
@@ -62,29 +66,31 @@ def ajax (request):
         messages.add_message(request, messages.ERROR, "That URL doesn't accept POSTs.")
         return HttpResponseRedirect('/reports/')
     else:
+        today = date.today()
+        last_day_of_month = monthrange(today.year, today.month)[1]
         returned_data = dict()
 
         # Parse dates
         start_date = request.GET.get('start')
         if not start_date:
-            start_date = date(2015, 1, 1)
+            start_date = date(today.year, today.month, 1)
         else:
             try:
                 # TODO: Add jQuery date validation/normalization
                 _year, _month, _day = start_date.split('-')
                 start_date = date(int(_year), int(_month), int(_day))
             except TypeError:
-                start_date = date(2015, 1, 1)
+                start_date = date(today.year, today.month, 1)
 
         finish_date = request.GET.get('finish')
         if not finish_date:
-            finish_date = date(2015, 1, 31)
+            finish_date = date(today.year, today.month, last_day_of_month)
         else:
             try:
                 _year, _month, _day = finish_date.split('-')
                 finish_date = date(int(_year), int(_month), int(_day))
             except TypeError:
-                finish_date = date(2015, 1, 31)
+                finish_date = date(today.year, today.month, last_day_of_month)
 
         td = finish_date - start_date
         day_labels = range(1, td.days)[::3]
