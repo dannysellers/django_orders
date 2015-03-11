@@ -12,6 +12,4 @@ router.register(r'inventory', views.InventoryViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    # url(r'^shipments/$', views.ShipmentList.as_view()),
-    # url(r'^shipments/(?P<pk>[0-9]+)$', views.ShipmentDetail.as_view()),
 ]

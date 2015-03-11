@@ -86,8 +86,8 @@ def inventory (request):
                     header_list.append('Departure')
                 else:
                     messages.add_message(request, messages.INFO, """I didn't recognize status filter '{}'.
-					You can use: <i>inducted</i>, <i>stored</i>, <i>order_received</i>, <i>order_begun,</i>
-					<i>order_completed</i>, or <i>all</i> as possible filters.""".format(status_filter))
+You can use: <i>inducted</i>, <i>stored</i>, <i>order_received</i>, <i>order_begun,</i>
+<i>order_completed</i>, or <i>all</i> as possible filters.""".format(status_filter))
                     context_filter.append('All')
                     header_list.append('Ship Date')
             else:
@@ -286,7 +286,7 @@ def change_item_status (request):
             return HttpResponseRedirect('/inventory?acct={}'.format(itemlist[0].owner.acct))
     else:
         messages.add_message(request, messages.ERROR, """No request was passed.
-				Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.
-				/inventory?acct=#####)</a>.""")
+Try visiting this page from a <a href="/inventory?status=stored">customer's inventory (e.g.
+/inventory?acct=#####)</a>.""")
 
         return HttpResponseRedirect('/inventory?status=stored')
