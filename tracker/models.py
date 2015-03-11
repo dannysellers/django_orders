@@ -30,7 +30,8 @@ INVENTORY_STATUS_CODES = (
 
 class Customer(models.Model):
     user = models.OneToOneField(User)
-    name = models.CharField(max_length = 128, unique = False)
+    first_name = models.CharField(max_length = 128, unique = False)
+    last_name = models.CharField(max_length = 128, unique = False)
     acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
     # TODO: Add hidden account ID so that the front-facing one can be changed?
     email = models.EmailField()
@@ -43,6 +44,10 @@ class Customer(models.Model):
 
     def __unicode__ (self):
         return '{}: {}'.format(self.acct, self.name)
+
+    @property
+    def name(self):
+        return "{} {}".format(self.first_name, self.last_name)
 
     @property
     def storage_fees (self):
