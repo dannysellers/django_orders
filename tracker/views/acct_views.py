@@ -201,9 +201,7 @@ def remove_account (account_num):
     try:
         _customer = Customer.objects.get(acct = account_num)
 
-        _customer.closedate = date.today()
-        _customer.status = 0
-        _customer.save()
+        _customer.close_account()
 
         return True
     except Customer.DoesNotExist:

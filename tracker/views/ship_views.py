@@ -88,10 +88,7 @@ def ship_info (request):
 
             # If all items' statuses changed, change the shipment status too
             if itemcount == _shipment.inventory_set.count():
-                for item in itemlist:
-                    item.status = _status
-                    item.save()
-                _shipment.status = _status
+                _shipment.set_status(_status)
 
             _shipment.save()
 

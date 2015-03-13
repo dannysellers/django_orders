@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
 
 from audit_log.models import AuthStampedModel
 from audit_log.models.managers import AuditLog
@@ -56,6 +56,11 @@ class Customer(models.Model):
             fees += item.get_storage_fees()
         return fees
 
+    def close_account(self):
+        self.closedate = date.today()
+        self.status = 0
+        self.save()
+
 
 class Shipment(AuthStampedModel):
     owner = models.ForeignKey(Customer)
@@ -80,6 +85,12 @@ class Shipment(AuthStampedModel):
         for item in self.inventory_set.exclude(status = 4):
             fees += item.get_storage_fees()
         return fees
+
+    def set_status(self, status):
+        for item in self.inventory_set.all():
+            item.status = status
+        self.status = status
+        return True
 
 
 @receiver(post_save, sender = Shipment)
