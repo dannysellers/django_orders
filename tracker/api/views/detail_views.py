@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User  # , Group
 from django.http import Http404
 
-from rest_framework import permissions, status  # , mixins, generics
-from ..permissions import IsOwnerOrReadOnly
+from rest_framework import status  # , mixins, generics
+from ..permissions import IsOwnerOrPrivileged
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,12 +14,11 @@ from ..serializers import UserSerializer, InventorySerializer, \
 
 class ShipmentDetail(APIView):
     """
-    Retrieve, update, or delete a Shipment instance.
+    Retrieve a Shipment instance.
     """
     # TODO: Investigate Mixins & generics.GenericAPIView
     # http://www.django-rest-framework.org/tutorial/3-class-based-views/
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly)
+    permission_classes = (IsOwnerOrPrivileged,)
     authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     @staticmethod
@@ -34,13 +33,15 @@ class ShipmentDetail(APIView):
         serializer = ShipmentSerializer(shipment)
         return Response(serializer.data)
 
-    def delete (self, request, shipid, format = None):
-        shipment = self.get_object(shipid)
-        shipment.set_status(4)
-        return Response(status = status.HTTP_204_NO_CONTENT)
-
 
 class UserDetail(APIView):
+    """
+    Retrieve or update a User instance. Users cannot be destroyed or
+    deactivated via the API, and must be removed by an Operator or Admin.
+    """
+    permission_classes = (IsOwnerOrPrivileged,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+
     @staticmethod
     def get_object (pk):
         try:
@@ -66,8 +67,11 @@ class UserDetail(APIView):
 
 class CustomerDetail(APIView):
     """
-    Retrieve, update, or delete a Customer instance
+    Retrieve or update a Customer instance. Accounts cannot be deactivated
+    via the API, and must be removed by an Operator or Admin.
     """
+    permission_classes = (IsOwnerOrPrivileged,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     @staticmethod
     def get_object (acct):
@@ -89,11 +93,6 @@ class CustomerDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-    def delete (self, request, acct, format = None):
-        customer = self.get_object(acct)
-        customer.close_account()
-        return Response(status = status.HTTP_204_NO_CONTENT)
-
     def perform_create (self, serializer):
         # Pass the request's user to the serializer's
         # create method
@@ -101,6 +100,12 @@ class CustomerDetail(APIView):
 
 
 class InventoryDetail(APIView):
+    """
+    Get information about an Inventory object.
+    """
+    permission_classes = (IsOwnerOrPrivileged,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+
     @staticmethod
     def get_object (itemid):
         try:

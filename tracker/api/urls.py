@@ -7,9 +7,6 @@ from views import detail_views, list_views
 # router = routers.DefaultRouter()
 # router.register(r'users', views.UserViewSet)
 # router.register(r'groups', views.GroupViewSet)
-# router.register(r'customers', views.CustomerViewSet)
-# router.register(r'shipments', views.ShipmentViewSet)
-# router.register(r'inventory', views.InventoryViewSet)
 
 urlpatterns = [
     # url(r'^', include(router.urls)),
