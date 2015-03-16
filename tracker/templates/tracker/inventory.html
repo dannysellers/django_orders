@@ -98,7 +98,7 @@
 					<td><a href="{% url 'shipment' shipid=item.shipset.shipid %}">{{ item.shipset.shipid }}</a></td>
 					<td>{{ item.itemid }}</td>
 					<td>
-						<a href="{% url 'accounts' account_id=item.shipset.owner.acct %}">{{ item.shipset.owner.name }}</a>
+						<a href="{% url 'account_page' account_id=item.shipset.owner.acct %}">{{ item.shipset.owner.name }}</a>
 					</td>
 					<td>{{ item.volume|length:"2" }}</td>
 					<td>${{ item.storage_fees|length:"2" }}</td>
