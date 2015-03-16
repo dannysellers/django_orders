@@ -14,7 +14,7 @@ class IsOwnerOrPrivileged(permissions.BasePermission):
         operator_group = Group.objects.get_by_natural_key('Operator')
         admin_group = Group.objects.get_by_natural_key('Admin')
 
-        if customer_group in request.user.groups:
+        if customer_group in request.user.groups.all():
             if isinstance(obj, Customer):
                 return obj.user == request.user
             else:
