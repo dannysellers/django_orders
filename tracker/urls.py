@@ -6,27 +6,27 @@ from api import urls as api_urls
 
 # Index
 urlpatterns = patterns('tracker.views.misc_views',
-   url(r'^$', 'index'),
+   url(r'^$', 'index', name = 'index'),
 )
 
 # Authentication patterns
 urlpatterns += patterns('tracker.views.auth_views',
-    url(r'^register/$', 'register'),
+    url(r'^register/$', 'register', name = 'register'),
     url(r'^login/$', 'user_login', name = 'login'),
     url(r'^logout/$', 'user_logout', name = 'logout'),
 )
 
 # Account patterns
 urlpatterns += patterns('tracker.views.acct_views',
-    url(r'^accounts$', 'accounts'),
-    url(r'^accounts/(?P<account_url>\d+)/$', 'account_page'),
-    url(r'^add_account/$', 'add_account'),
-    url(r'^acct_info$', 'acct_info'),
+    url(r'^accounts$', 'accounts', name = 'accounts'),
+    url(r'^accounts/(?P<account_id>\d+)/$', 'account_page', name = 'account_page'),
+    url(r'^add_account/$', 'add_account', name = 'add_account'),
+    url(r'^acct_info$', 'acct_info', name = 'account_info'),
 )
 
 # Inventory patterns
 urlpatterns += patterns('tracker.views.inv_views',
-    url(r'^inventory$', 'inventory'),
+    url(r'^inventory$', 'inventory', name = 'inventory'),
     # url(r'^accounts/(?P<account_url>\S+)/add_inventory/$', 'add_item'),
     # url(r'^add_inventory/$', 'add_item', name='add_inventory'),
     url(r'^manage_items$', 'change_item_status', name = 'change_item_status'),
@@ -34,24 +34,24 @@ urlpatterns += patterns('tracker.views.inv_views',
 
 # Shipment patterns
 urlpatterns += patterns('tracker.views.ship_views',
-    url(r'^shipment/(?P<shipid>\d+)$', 'shipment'),
-    url(r'^ship_info$', 'ship_info'),
-    url(r'^ship_extras$', 'ship_extras'),
-    url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment'),
+    url(r'^shipment/(?P<shipid>\d+)$', 'shipment', name = 'shipment'),
+    url(r'^ship_info$', 'ship_info', name = 'ship_info'),
+    url(r'^ship_extras$', 'ship_extras', name = 'ship_extras'),
+    url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment', name = 'add_shipment'),
 )
 
 # Report patterns
 urlpatterns += patterns('tracker.views.report_views',
-    url(r'^reports/$', 'reports'),
-    url(r'^query_ajax$', 'graph_query'),
-    url(r'^form_ajax/(?P<model_name>\w+)$', 'form_ajax'),
+    url(r'^reports/$', 'reports', name = 'reports'),
+    url(r'^query_ajax$', 'graph_query', name = 'graph_query'),
+    url(r'^form_ajax/(?P<model_name>\w+)$', 'form_ajax', name = 'form_ajax'),
 )
 
 # Invoice patterns
 urlpatterns += patterns('tracker.views.invoice_views',
-    # url(r'^shipreport2/(?P<shipid>\d+)$', 'shipment_report'),
-    url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_invoice'),
-    # url(r'^template/(?P<shipid>\d+)$', 'invoice_template'),
+    # url(r'^shipreport2/(?P<shipid>\d+)$', 'shipment_report', name = 'shipment_report'),
+    url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_invoice', name = 'shipment_invoice'),
+    # url(r'^template/(?P<shipid>\d+)$', 'invoice_template', name = 'invoice_template'),
 )
 
 # API patterns

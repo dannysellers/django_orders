@@ -97,7 +97,7 @@ def accounts (request):
     return render_to_response('tracker/accounts.html', context_dict, context)
 
 
-def account_page (request, account_url):
+def account_page (request, account_id):
     context = RequestContext(request)
     context_dict = dict()
 
@@ -105,9 +105,9 @@ def account_page (request, account_url):
     context_dict['headers'] = header_list
 
     # Get account
-    context_dict['account_url'] = account_url
+    context_dict['account_url'] = account_id
     try:
-        customer = Customer.objects.get(acct = account_url)
+        customer = Customer.objects.get(acct = account_id)
         context_dict['customer'] = customer
         # Show only items still in inventory
         if customer.inventory_set.exclude(status = 4).count():

@@ -76,7 +76,7 @@
 		<ul class="left">
 			<li><a href="/accounts?accts=active">Accounts</a></li>
 			<li><a href="/inventory?status=stored">Inventory</a></li>
-			<li><a href="/reports/">Reports</a></li>
+			<li><a href="{% url 'reports' %}">Reports</a></li>
 		</ul>
 		<ul class="right">
 			{% if user.is_authenticated %}
@@ -104,7 +104,7 @@
 							</div>
 							<div class="row">
 								<ul class="button-group">
-									<li><a href="/register/" class="button tiny secondary">Register</a></li>
+									<li><a href="{% url 'register' %}" class="button tiny secondary">Register</a></li>
 									<li><input type="submit" class="button tiny" value="Submit"></li>
 								</ul>
 							</div>

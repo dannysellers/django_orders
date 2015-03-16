@@ -28,7 +28,7 @@
 				{% endfor %}
 				</thead>
 				<tbody>
-				<td><a href="/accounts/{{ shipment.owner.acct }}">{{ shipment.owner.name }}</a></td>
+				<td><a href="{% url 'account_page' account_id=shipment.owner.acct %}">{{ shipment.owner.name }}</a></td>
 				<td>#{{ shipment.owner.acct }}</td>
 				<td>{{ shipment.palletized }}</td>
 				{% if shipment.status != '4' %}

@@ -104,7 +104,7 @@
 				{% for shipment in shipment_list %}
 					<tr id="ship_head_row">
 						<td class="ship_toggle" onclick="toggleSection(this);">-</td>
-						<td><a href="/shipment?id={{ shipment.id }}">{{ shipment.id }}</a>
+						<td><a href="{% url 'shipment' shipid=shipment.id %}">{{ shipment.id }}</a>
 							({{ shipment.inventory_set.count }})
 						</td>
 						<td>&nbsp;</td>

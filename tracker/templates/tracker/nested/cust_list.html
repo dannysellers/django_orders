@@ -14,7 +14,8 @@
 			<tbody>
 			{% for customer in customer_list %}
 				<tr>
-					<td id="account_cell"><a href="/accounts/{{ customer.acct }}">{{ customer.acct }}</a></td>
+					<td id="account_cell"><a
+							href="{% url 'account_page' account_id=customer.acct %}">{{ customer.acct }}</a></td>
 					<td id="name_cell">{{ customer.name }}</td>
 					{% if status_column %}
 						<td id="status_cell">{{ customer.get_status_display }}</td>
