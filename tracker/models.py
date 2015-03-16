@@ -57,6 +57,7 @@ class Customer(models.Model):
         return fees
 
     def close_account(self):
+        # TODO: Should this alter statuses of any existing Shipments & Inventory?
         self.closedate = date.today()
         self.status = 0
         self.save()
@@ -89,7 +90,12 @@ class Shipment(AuthStampedModel):
     def set_status(self, status):
         for item in self.inventory_set.all():
             item.status = status
+            if status == 4:
+                item.departure = date.today()
+            item.save()
         self.status = status
+        if status == 4:
+            self.departure = date.today()
         return True
 
 
@@ -128,10 +134,14 @@ class Inventory(AuthStampedModel):
 
     @property
     def get_total_fees(self):
+        """
+        Returns the total amount in fees an item has incurred
+        during its time in storage
+        """
         if not self.shipset.departure or not self.departure:
             return 0.00
         else:
-            days = (self.departure - self.arrival).days
+            days = (self.departure - self.arrival).days - 10
             return self.storage_fees * days
 
     class Meta:
