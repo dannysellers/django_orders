@@ -10,14 +10,13 @@ import re
 
 # Disable caching by browser
 @cache_control(no_cache = True)
-def shipment (request):
+def shipment (request, shipid):
     """
     Overview page for an individual shipment
     """
     context = RequestContext(request)
     context_dict = {}
 
-    shipid = request.GET['id']
     try:
         _shipment = Shipment.objects.get(shipid = shipid)
     except Shipment.DoesNotExist:

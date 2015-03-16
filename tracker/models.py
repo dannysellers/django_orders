@@ -126,6 +126,14 @@ class Inventory(AuthStampedModel):
         else:
             return 0.00
 
+    @property
+    def get_total_fees(self):
+        if not self.shipset.departure or not self.departure:
+            return 0.00
+        else:
+            days = (self.departure - self.arrival).days
+            return self.storage_fees * days
+
     class Meta:
         verbose_name_plural = 'inventory'
 

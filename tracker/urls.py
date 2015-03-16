@@ -34,7 +34,7 @@ urlpatterns += patterns('tracker.views.inv_views',
 
 # Shipment patterns
 urlpatterns += patterns('tracker.views.ship_views',
-    url(r'^shipment$', 'shipment'),
+    url(r'^shipment/(?P<shipid>\d+)$', 'shipment'),
     url(r'^ship_info$', 'ship_info'),
     url(r'^ship_extras$', 'ship_extras'),
     url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment'),
@@ -42,10 +42,16 @@ urlpatterns += patterns('tracker.views.ship_views',
 
 # Report patterns
 urlpatterns += patterns('tracker.views.report_views',
-    url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_report'),
     url(r'^reports/$', 'reports'),
-    url(r'^query_ajax$', 'ajax'),
+    url(r'^query_ajax$', 'graph_query'),
     url(r'^form_ajax/(?P<model_name>\w+)$', 'form_ajax'),
+)
+
+# Invoice patterns
+urlpatterns += patterns('tracker.views.invoice_views',
+    # url(r'^shipreport2/(?P<shipid>\d+)$', 'shipment_report'),
+    url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_invoice'),
+    # url(r'^template/(?P<shipid>\d+)$', 'invoice_template'),
 )
 
 # API patterns

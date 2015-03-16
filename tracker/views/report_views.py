@@ -1,8 +1,3 @@
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
-
 from datetime import date, timedelta
 from calendar import monthrange
 import json
@@ -14,14 +9,9 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.db.models import Model
-from django.shortcuts import get_object_or_404, render_to_response
-from django.utils import timezone
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
+from django.shortcuts import render_to_response
 from .. import models
-from ..templatetags.num_filters import length
-from ..utils import get_shipment_cost, find_subclasses
+from ..utils import find_subclasses
 
 
 def reports (request):
@@ -58,7 +48,7 @@ def form_ajax (request, model_name):
 
 
 @csrf_exempt
-def ajax (request):
+def graph_query (request):
     """
     query should be [MODEL]_[ATTRIBUTE]_[OPERATION]
     """
@@ -194,74 +184,3 @@ def ajax (request):
         # TODO: A better way to serialize data for JSON
         return HttpResponse("[{},{}]".format(json.dumps(returned_data), json.dumps(chart_args)),
                             content_type = 'application/json')
-
-
-def shipment_report (request, shipid):
-    """
-    Create a PDF for the shipment and return as an HTTP Response obj
-    :param shipid: ID for the shipment
-    :type shipid: int
-    :return: Generated PDF
-    """
-    # TODO: Change to Weasyprint
-    content_type = request.GET.get('type')
-
-    response = HttpResponse(content_type = 'application/pdf')
-
-    shipment = get_object_or_404(models.Shipment, shipid = shipid)
-    owner = str(shipment.owner.name)
-    acct = str(shipment.owner.acct)
-    items = shipment.inventory_set.all()
-    time_generated = str(timezone.now())
-
-    # 'attachment' will prompt the user to download the file. 'inline'
-    # will cause most modern browsers to display the PDF within the
-    # browser window.
-    response['Content-Disposition'] = '{0}; filename="Shipment_{1}_Invoice.pdf"'.format(content_type, shipid)
-
-    temp = StringIO()
-
-    # Page setup
-    p = canvas.Canvas(temp)
-    page_width = A4[0]
-    page_height = A4[1]
-
-    # Margins
-    top_margin = page_height - inch
-    bottom_margin = 0.75 * inch
-    left_margin = 0.75 * inch
-    right_margin = page_width - (0.75 * inch)
-
-    # Draw header
-    title = 'Shipment {} Invoice'.format(shipid)
-    p.setFont('Helvetica', 14)
-    p.drawCentredString(page_width / 2.0, top_margin,
-                        "{0}: {1} (#{2})".format(title, owner, acct))
-
-    # Post-header line
-    p.line(left_margin, page_height - (1.25 * inch), right_margin, page_height - (1.25 * inch))
-
-    # Draw body
-    y_pos = page_height - 1.5 * inch
-    for index, item in enumerate(items):
-        height = y_pos - (index * 0.5 * inch)
-        just_below = height - (0.1 * inch)
-        item_string = "{0}: {1} ft^3 -- ${2}".format(item, item.volume, length(item.storage_fees, 2))
-        p.drawString(left_margin, height, item_string)
-        p.line(left_margin, just_below, right_margin, just_below)
-
-    # Draw total cost
-    y_below_items = y_pos - (len(items) * 0.5 * inch)
-    p.drawString(left_margin, y_below_items, "Total cost: ${}".format(get_shipment_cost(shipid)))
-
-    # Draw footer
-    pageinfo = 'Virtual Warehouse Services'
-    p.setFont('Helvetica', 9)
-    p.drawString(left_margin, inch, pageinfo)
-    p.drawString(left_margin, bottom_margin, "Generated at: {}".format(time_generated))
-
-    p.showPage()
-    p.save()
-
-    response.write(temp.getvalue())
-    return response
