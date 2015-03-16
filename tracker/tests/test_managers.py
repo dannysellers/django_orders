@@ -81,3 +81,13 @@ class ItemShipmentFactoryTest(TestCase):
         item_ops = list(self.item.itemoperation_set.all())
         self.assertEqual(self.item.status, len(item_ops) - 1)
         self.assertEqual(self.item.get_status_display(), int(item_ops[-1].op_code))
+
+    def test_shipment_audit_log_entry(self):
+        ship_audit_log_entries = self.shipment.audit_log.count()
+        self.assertEqual(ship_audit_log_entries, 1)
+
+    def test_inventory_audit_log_entry(self):
+        for item in self.shipment.inventory_set.all():
+            assert isinstance(item, Inventory)
+            item_audit_log_entries = item.audit_log.count()
+            self.assertEqual(item_audit_log_entries, 1)
