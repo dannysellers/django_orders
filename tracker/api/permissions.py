@@ -19,5 +19,5 @@ class IsOwnerOrPrivileged(permissions.BasePermission):
                 return obj.user == request.user
             else:
                 return obj.owner == request.user
-        elif operator_group in request.user.groups or admin_group in request.user.groups:
+        elif operator_group in request.user.groups.all() or admin_group in request.user.groups.all():
             return True

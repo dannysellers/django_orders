@@ -119,6 +119,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -164,6 +165,9 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     # 'debug_toolbar',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'corsheaders',
     'tracker',
     'south',
 )
@@ -213,5 +217,22 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication'
     ),
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata'
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ORIGIN_WHITELIST = (
+#     'middlemanfulfillment.com',
+#     '127.0.0.1'
+# )
+
+CORS_ALLOW_METHODS = (
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+)
