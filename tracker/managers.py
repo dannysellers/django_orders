@@ -10,6 +10,8 @@ class CustomerManager(Manager):
         if not password:
             password = User.objects.make_random_password()
 
+        customer_group, created = Group.objects.get_or_create('Customer')
+
         # TODO: Allow username as login instead of email?
         _user = User.objects.create_user(first_name = first_name,
                                          last_name = last_name,
@@ -17,7 +19,6 @@ class CustomerManager(Manager):
                                          email = email,
                                          password = password)
         # Set permissions
-        customer_group = Group.objects.get_by_natural_key('Customer')
         _user.groups.add(customer_group)
 
         _customer = self.create(user = _user, first_name = first_name,

@@ -48,16 +48,17 @@ urlpatterns += patterns('tracker.views.report_views',
 )
 
 # Invoice patterns
-urlpatterns += patterns('tracker.views.invoice_views',
+# urlpatterns += patterns('tracker.views.invoice_views',
     # url(r'^shipreport2/(?P<shipid>\d+)$', 'shipment_report', name = 'shipment_report'),
-    url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_invoice', name = 'shipment_invoice'),
+    # url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_invoice', name = 'shipment_invoice'),
     # url(r'^template/(?P<shipid>\d+)$', 'invoice_template', name = 'invoice_template'),
-)
+# )
 
 # API patterns
 urlpatterns += patterns('',
     url(r'^api/', include(api_urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # url(r'^api-auth/', include('rest_auth.urls')),
 )
 
 # For deployment

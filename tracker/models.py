@@ -56,7 +56,14 @@ class Customer(models.Model):
             fees += item.get_storage_fees()
         return fees
 
-    def close_account(self):
+    @property
+    def is_active (self):
+        if self.status == 0:
+            return False
+        else:
+            return True
+
+    def close_account (self):
         # TODO: Should this alter statuses of any existing Shipments & Inventory?
         self.closedate = date.today()
         self.status = 0
@@ -87,7 +94,7 @@ class Shipment(AuthStampedModel):
             fees += item.get_storage_fees()
         return fees
 
-    def set_status(self, status):
+    def set_status (self, status):
         for item in self.inventory_set.all():
             item.status = status
             if status == 4:
@@ -133,7 +140,7 @@ class Inventory(AuthStampedModel):
             return 0.00
 
     @property
-    def get_total_fees(self):
+    def get_total_fees (self):
         """
         Returns the total amount in fees an item has incurred
         during its time in storage

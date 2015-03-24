@@ -1,12 +1,6 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from ..models import Customer, Shipment, Inventory
-
-
-class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('url', 'name')
 
 
 class InventorySerializer(serializers.ModelSerializer):
@@ -26,13 +20,15 @@ class ShipmentSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-# class CustomerModelSerializer(serializers.ModelSerializer):
-#     shipments = ShipmentSerializer(many = True, read_only = True, required=False)
+class CustomerModelSerializer(serializers.ModelSerializer):
+    # shipments = serializers.HyperlinkedRelatedField(view_name = 'shipment_detail',
+    #                                                 lookup_field = 'shipid',
+    #                                                 read_only = True)
 
-    # class Meta:
-    #     model = Customer
-    #     fields = ('shipments', 'name', 'acct', 'email')
-    #     depth = 1
+    class Meta:
+        model = Customer
+        fields = ('name', 'acct', 'email') # , 'shipments')
+        depth = 1
 
 
 class CustomerSerializer(serializers.Serializer):
@@ -46,7 +42,7 @@ class CustomerSerializer(serializers.Serializer):
         return [ShipmentSerializer(s).data for s in instance.shipment_set.all()]
 
     def to_representation(self, instance):
-        assert isinstance(instance, Customer)
+        # assert isinstance(instance, Customer)
         shipments = self.get_shipments(instance)
         return {
             'name': instance.name,
@@ -56,13 +52,18 @@ class CustomerSerializer(serializers.Serializer):
             'shipments': shipments,
         }
 
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
 
 class UserSerializer(serializers.ModelSerializer):
-    customer = CustomerSerializer(required = False)  # May be a user with no Customer
-    # customer = CustomerBaseSerializer()
+    customer = CustomerModelSerializer(required = False)  # May be a user with no Customer
 
     class Meta:
         model = User
-        lookup_field = 'id'
-        fields = ('username', 'email', 'groups', 'customer')
+        fields = ('username', 'email', 'customer')
+        extra_kwargs = {'url': {'lookup_field': 'id'}}
         # depth = 1

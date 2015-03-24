@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from views import customer_views, inventory_views, \
-    shipment_views, user_views
+    shipment_views, user_views, auth_views
 
 # router = routers.DefaultRouter()
 # router.register(r'users', views.UserViewSet)
@@ -19,6 +19,8 @@ urlpatterns = [
     url(r'^customers/(?P<acct>[0-9]+)/$', customer_views.CustomerDetail.as_view(), name = 'customer_detail'),
     url(r'^inventory/$', inventory_views.InventoryList.as_view(), name = 'inventory_list'),
     url(r'^inventory/(?P<itemid>[0-9]+)/$', inventory_views.InventoryDetail.as_view(), name = 'inventory_detail'),
+    url(r'^auth/login/$', auth_views.ObtainExpiringAuthToken.as_view(), name = 'obtain_expiring_token'),
+    url(r'^auth/', include('rest_auth.urls'))  # This URL regex can't be terminated, so rest_auth.urls can take over
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
