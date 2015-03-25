@@ -93,10 +93,10 @@ def ship_info (request):
 
         except Shipment.DoesNotExist:
             messages.add_message(request, messages.ERROR, "Shipment {} not found!".format(shipid))
-            return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+            return HttpResponseRedirect('/shipment/{}'.format(shipid))
 
         messages.add_message(request, messages.SUCCESS, "Shipment {} information updated.".format(shipid))
-        return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+        return HttpResponseRedirect('/shipment/{}'.format(shipid))
 
 
 @login_required
@@ -146,7 +146,7 @@ def add_shipment (request, account_url):
         messages.add_message(request, messages.SUCCESS,
                              "Shipment {} of {} items created successfully.".format(_shipment.shipid,
                                                                                     _shipment.inventory_set.count()))
-        return HttpResponseRedirect('/shipment?id={}'.format(_shipment.shipid))
+        return HttpResponseRedirect('/shipment/{}'.format(_shipment.shipid))
     else:
         return render_to_response('tracker/add_shipment_form.html', context_dict, context)
 
@@ -162,7 +162,7 @@ def ship_extras (request):
         _shipment = Shipment.objects.get(shipid = shipid)
     except Shipment.DoesNotExist:
         messages.add_message(request, messages.ERROR, "Shipment {} not found.".format(shipid))
-        return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+        return HttpResponseRedirect('/shipment/{}'.format(shipid))
 
     if request.method == 'POST':
         quantity = float(request.POST['quantity'])
@@ -174,4 +174,4 @@ def ship_extras (request):
     else:
         messages.add_message(request, messages.ERROR, "Invalid request received. Try submitting a form.")
 
-    return HttpResponseRedirect('/shipment?id={}'.format(shipid))
+    return HttpResponseRedirect('/shipment/{}'.format(shipid))
