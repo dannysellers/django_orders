@@ -24,7 +24,14 @@ class IsOwnerOrPrivileged(permissions.BasePermission):
         else:
             return False
 
-    def has_object_permission(self, request, view, obj):
+
+class IsOwnerOrPrivilegedObject(permissions.BasePermission):
+    """
+    Only allow owners of objects to view or edit them,
+    permit all members of Operator and Admin groups full access.
+    """
+
+    def has_object_permission (self, request, view, obj):
         """
         Permits operators, admins, and the owner of an object.
         """
@@ -33,7 +40,9 @@ class IsOwnerOrPrivileged(permissions.BasePermission):
         admin_group = Group.objects.get_by_natural_key('Admin')
 
         if request.user and request.user.is_authenticated():
-            if customer_group in request.user.groups.all():
+            if obj == request.user:
+                return True
+            elif customer_group in request.user.groups.all():
                 if isinstance(obj, Customer):
                     return obj.user == request.user
                 else:
