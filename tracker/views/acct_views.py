@@ -110,8 +110,8 @@ def account_page (request, account_id):
         customer = Customer.objects.get(acct = account_id)
         context_dict['customer'] = customer
         # Show only items still in inventory
-        if customer.inventory_set.exclude(status = 4).count():
-            cust_shipments = customer.shipment_set.all().exclude(status = 4)
+        if customer.inventory.exclude(status = 4).count():
+            cust_shipments = customer.shipments.all().exclude(status = 4)
             context_dict['shipment_list'] = cust_shipments
             context_dict['storage_fees'] = customer.storage_fees
         else:

@@ -129,7 +129,7 @@ function disableElements(eleForm) {
 }
 
 function confirmAcctRemove(itemsInStorage) {
-	// itemsInStorage should be passed as {{ customer.inventory_set.all|stored_count }}
+	// itemsInStorage should be passed as {{ customer.inventory.all|stored_count }}
 	if (itemsInStorage > 0) {
 		alert("This customer still has items in inventory! Please process those first before proceeding.")
 	} else if (itemsInStorage == 0) {

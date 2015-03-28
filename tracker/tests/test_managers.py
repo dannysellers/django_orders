@@ -87,7 +87,7 @@ class ItemShipmentFactoryTest(TestCase):
         self.assertEqual(ship_audit_log_entries, 1)
 
     def test_inventory_audit_log_entry(self):
-        for item in self.shipment.inventory_set.all():
+        for item in self.shipment.inventory.all():
             assert isinstance(item, Inventory)
             item_audit_log_entries = item.audit_log.count()
             self.assertEqual(item_audit_log_entries, 1)

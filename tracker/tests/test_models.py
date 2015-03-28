@@ -36,7 +36,7 @@ class CustomerMethodTest(TestCase):
 
     def test_customer_storage_fees (self):
         _fees = 0.00
-        for item in self.customer.inventory_set.exclude(status = 4):
+        for item in self.customer.inventory.exclude(status = 4):
             _fees += item.get_storage_fees()
         self.assertEqual(self.customer.storage_fees, _fees)
 
@@ -72,20 +72,20 @@ class ShipmentMethodTest(TestCase):
 
     def test_shipment_storage_fees (self):
         _fees = 0.00
-        for item in self.shipment.inventory_set.exclude(status = 4):
+        for item in self.shipment.inventory.exclude(status = 4):
             _fees += item.get_storage_fees()
         self.assertEqual(self.shipment.storage_fees, _fees)
-        # self.assertListEqual(self.shipment.inventory_set.all(),
-        #     self.shipment.inventory_set.exclude(status = 4))
+        # self.assertListEqual(self.shipment.inventory.all(),
+        #     self.shipment.inventory.exclude(status = 4))
 
     def test_shipment_set_status (self):
         self.assertEqual(self.shipment.status, 0)
-        for item in self.shipment.inventory_set.all():
+        for item in self.shipment.inventory.all():
             self.assertEqual(item.status, '0')
 
         self.shipment.set_status(1)
         self.assertEqual(self.shipment.status, 1)
-        for item in self.shipment.inventory_set.all():
+        for item in self.shipment.inventory.all():
             self.assertEqual(item.status, '1')
 
 
@@ -113,7 +113,7 @@ class InventoryMethodTest(TestCase):
                                                height = randint(1.0, 5.0))
 
     def test_get_item_storage_fees (self):
-        for item in self.shipment.inventory_set.all():
+        for item in self.shipment.inventory.all():
             if item.status != 4 and (date.today() - item.arrival).days >= 10:
                 _fees = item.volume * UNIT_STORAGE_FEE
             else:
@@ -122,7 +122,7 @@ class InventoryMethodTest(TestCase):
 
     def test_get_item_total_fees_incurred (self):
         self.shipment.set_status(4)
-        for item in self.shipment.inventory_set.all():
+        for item in self.shipment.inventory.all():
             # TODO: Settle how to create shipments in the past (that incur storage fees)
             days_in_paid_storage = (item.departure - item.arrival).days  # - 10
             self.assertEqual(item.get_storage_fees(), days_in_paid_storage * item.storage_fees)

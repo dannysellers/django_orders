@@ -105,15 +105,15 @@
 					<tr id="ship_head_row">
 						<td class="ship_toggle" onclick="toggleSection(this);">-</td>
 						<td><a href="{% url 'shipment' shipid=shipment.id %}">{{ shipment.id }}</a>
-							({{ shipment.inventory_set.count }})
+							({{ shipment.inventory.count }})
 						</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
-						<td>${{ shipment.inventory_set.all|storage_fee_total }}</td>
+						<td>${{ shipment.inventory.all|storage_fee_total }}</td>
 						<td>{{ shipment.get_status_display }}</td>
 						<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
 					</tr>
-					{% for item in shipment.inventory_set.all %}
+					{% for item in shipment.inventory.all %}
 						<tr>
 							<td>&nbsp;</td>
 							<!-- Toggle -->

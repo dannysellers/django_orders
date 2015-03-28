@@ -18,7 +18,7 @@ def get_shipment_cost (shipid):
     :rtype: str
     """
     shipment = Shipment.objects.get(shipid = shipid)
-    items = shipment.inventory_set.all()
+    items = shipment.inventory.all()
     labor = shipment.labor_time
     extras = shipment.optextras_set.all()
 

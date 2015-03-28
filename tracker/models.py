@@ -34,6 +34,7 @@ class Customer(models.Model):
     last_name = models.CharField(max_length = 128, unique = False)
     acct = models.IntegerField(max_length = 5, primary_key = True, unique = True)
     # TODO: Add hidden account ID so that the front-facing one can be changed?
+    # TODO: Email field necessary given email field on User?
     email = models.EmailField()
     status = models.CharField(max_length = 1, choices = CUSTOMER_STATUS_CODES)
     createdate = models.DateField()
@@ -52,7 +53,7 @@ class Customer(models.Model):
     @property
     def storage_fees (self):
         fees = 0.00
-        for item in self.inventory_set.exclude(status = 4):
+        for item in self.inventory.exclude(status = 4):
             fees += item.get_storage_fees()
         return fees
 
@@ -71,7 +72,7 @@ class Customer(models.Model):
 
 
 class Shipment(AuthStampedModel):
-    owner = models.ForeignKey(Customer)
+    owner = models.ForeignKey(Customer, related_name = 'shipments')
     shipid = models.IntegerField(unique = True)
     palletized = models.BooleanField(default = False)
     arrival = models.DateField()
@@ -87,15 +88,14 @@ class Shipment(AuthStampedModel):
     def __unicode__ (self):
         return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
 
-    @property
     def storage_fees (self):
         fees = 0.00
-        for item in self.inventory_set.exclude(status = 4):
+        for item in self.inventory.exclude(status = 4):
             fees += item.get_storage_fees()
         return fees
 
     def set_status (self, status):
-        for item in self.inventory_set.all():
+        for item in self.inventory.all():
             item.status = status
             if status == 4:
                 item.departure = date.today()
@@ -115,8 +115,8 @@ def ship_op_signal (sender, instance, **kwargs):
 
 
 class Inventory(AuthStampedModel):
-    shipset = models.ForeignKey(Shipment)
-    owner = models.ForeignKey(Customer)
+    shipset = models.ForeignKey(Shipment, related_name = 'inventory')
+    owner = models.ForeignKey(Customer, related_name = 'inventory')
     itemid = models.IntegerField(unique = True, primary_key = True)
     length = models.FloatField(default = 1.00, max_length = 5)
     width = models.FloatField(default = 1.00, max_length = 5)
@@ -174,7 +174,7 @@ class Operation(AuthStampedModel):
 
 
 class ShipOperation(Operation):
-    shipment = models.ForeignKey(Shipment)
+    shipment = models.ForeignKey(Shipment, related_name = 'operations')
 
     objects = ShipOpManager()
 
@@ -186,7 +186,7 @@ class ShipOperation(Operation):
 
 
 class ItemOperation(Operation):
-    item = models.ForeignKey(Inventory)
+    item = models.ForeignKey(Inventory, related_name = 'operations')
 
     objects = ItemOpManager()
 
@@ -195,7 +195,7 @@ class ItemOperation(Operation):
 
 
 class OptExtras(models.Model):
-    shipment = models.ForeignKey(Shipment)
+    shipment = models.ForeignKey(Shipment, related_name = 'extras')
     quantity = models.IntegerField(default = 1)
     unit_cost = models.FloatField()
     total_cost = models.FloatField()

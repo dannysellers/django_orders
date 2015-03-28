@@ -49,7 +49,7 @@
 			{% csrf_token %}
 		{% endif %}
 		<div class="small-6 columns">
-			<h4>Item List ({{ shipment.inventory_set.count }})</h4>
+			<h4>Item List ({{ shipment.inventory.count }})</h4>
 			<table class="tableItem">
 				<thead>
 				{% if shipment.status != '4' %}
@@ -63,7 +63,7 @@
 				{% endfor %}
 				</thead>
 				<tbody>
-				{% for item in shipment.inventory_set.all %}
+				{% for item in shipment.inventory.all %}
 					<tr>
 						<td id="td_checkbox">
 						{% if shipment.status != '4' %}

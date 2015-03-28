@@ -35,7 +35,7 @@ class InventoryViewTests(TestCase):
         self.assertEqual(req.status_code, 200)
         self.assertTemplateUsed(req, 'tracker/inventory.html')
         self.assertIn(self.customer.name, req.content)
-        for item in self.shipment.inventory_set.all():
+        for item in self.shipment.inventory.all():
             self.assertIn('/inventory?item={}'.format(item.itemid),
                           req.content)
         self.assertIn(reverse('shipment', kwargs = {'shipid': self.shipment.shipid}),
@@ -44,7 +44,7 @@ class InventoryViewTests(TestCase):
                       req.content)
 
     def test_inventory_detail_view(self):
-        for item in self.shipment.inventory_set.all():
+        for item in self.shipment.inventory.all():
             url = '/inventory?item={}'.format(item.itemid)
             req = self.client.get(url)
             self.assertEqual(req.status_code, 200)
