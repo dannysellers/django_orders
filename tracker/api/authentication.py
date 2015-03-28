@@ -5,7 +5,8 @@ from datetime import timedelta, datetime
 
 class ExpiringTokenAuthentication(TokenAuthentication):
     """
-    Authentication class for ExpiringToken
+    Authentication class for ExpiringToken.
+    If the token is more than 48 hours old, it is expired.
     """
 
     def authenticate_credentials (self, key):

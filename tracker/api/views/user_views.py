@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from ..serializers import UserSerializer
-from ..permissions import IsOwnerOrPrivileged
+from ..permissions import IsOwnerOrPrivileged, IsOwnerOrPrivilegedObject
 
 
 class UserList(APIView):
@@ -25,7 +25,7 @@ class UserDetail(APIView):
     Retrieve or update a User instance. Users cannot be destroyed or
     deactivated via the API, and must be removed by an Operator or Admin.
     """
-    permission_classes = (IsOwnerOrPrivileged,)
+    permission_classes = (IsOwnerOrPrivilegedObject,)
     authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     @staticmethod
