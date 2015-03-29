@@ -127,7 +127,7 @@
 	<div class="row">
 		<div class="small-12 column">
 			<hr align="left"/>
-			<h4>Operation History ({{ shipment.shipoperation_set.count }})</h4>
+			<h4>Operation History ({{ shipment.operations.count }})</h4>
 
 			<table id="shipop_history">
 				<thead>
@@ -138,7 +138,7 @@
 				</tr>
 				</thead>
 				<tbody>
-				{% for operation in shipment.shipoperation_set.all %}
+				{% for operation in shipment.operations.all %}
 					<tr>
 						<td>{{ operation.id }}</td>
 						<td>{{ operation.dt }}</td>
@@ -154,7 +154,7 @@
 	<div class="row">
 		<hr align="left"/>
 		<div class="small-6 columns">
-			<h4>Extras ({{ shipment.optextras_set.count }})</h4>
+			<h4>Extras ({{ shipment.extras.count }})</h4>
 			<table>
 				<thead>
 				<tr>
@@ -166,7 +166,7 @@
 				</tr>
 				</thead>
 				<tbody>
-				{% for extra in shipment.optextras_set.all %}
+				{% for extra in shipment.extras.all %}
 					<tr>
 						<td>&nbsp;</td>
 						<td>{{ extra.quantity }}</td>
@@ -183,8 +183,8 @@
 				<form id="ship_extras" method="post" action="/ship_extras?shipid={{ shipment.shipid }}">
 				{% csrf_token %}
 				{% if shipment.status != '4' %}
-					<a href="#" id="add-extra">Add extra</a>
-					| <a href="#" id="remove-extra">Remove extra</a>
+					<a href="#" onclick="addElement()" id="add-extra">Add extra</a>
+					| <a href="#" onclick="removeElement()" id="remove-extra">Remove extra</a>
 					<button type="submit" class="small button radius">Submit</button>
 				{% else %}
 					<a href="#" class="disabled">Add extra</a>
@@ -218,21 +218,11 @@
 				s.disabled = true;
 			}
 
-			// Optional extra form elements
-			var addButton = document.getElementById('add-extra');
-			var removeButton = document.getElementById('remove-extra');
-
 			// If the user isn't logged in or shipStatus = 4, disable the form elements
 			var loggedIn = '{{ user.is_authenticated }}';
 			// TODO: Not all form elements are being disabled when user is anonymous but shipStatus != 4
 			if (loggedIn == 'False' || shipStatus == 4) {
 				disableElements('shipForm');
-			}
-			if (loggedIn == 'True') {
-				if (shipStatus != 4) {
-					addButton.addEventListener('click', addElement, false);
-					removeButton.addEventListener('click', removeElement, false);
-				}
 			}
 		}
 	</script>

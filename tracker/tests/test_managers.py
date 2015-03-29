@@ -73,12 +73,12 @@ class ItemShipmentFactoryTest(TestCase):
         self.assertEqual(self.item.status, 0)
 
     def test_shipment_ops (self):
-        ship_ops = list(self.shipment.shipoperation_set.all())
+        ship_ops = list(self.shipment.operations.all())
         self.assertEqual(self.shipment.status, len(ship_ops) - 1)
         self.assertEqual(self.shipment.get_status_display(), int(ship_ops[-1].op_code))
 
     def test_item_ops (self):
-        item_ops = list(self.item.itemoperation_set.all())
+        item_ops = list(self.item.operations.all())
         self.assertEqual(self.item.status, len(item_ops) - 1)
         self.assertEqual(self.item.get_status_display(), int(item_ops[-1].op_code))
 

@@ -20,7 +20,7 @@ def get_shipment_cost (shipid):
     shipment = Shipment.objects.get(shipid = shipid)
     items = shipment.inventory.all()
     labor = shipment.labor_time
-    extras = shipment.optextras_set.all()
+    extras = shipment.extras.all()
 
     cost = 0.00
     # TODO: Make cost settings more easily configurable
