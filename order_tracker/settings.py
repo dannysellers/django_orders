@@ -30,16 +30,16 @@ BASE_DIR = os.path.dirname(SETTINGS_DIR)
 #     }
 # }
 
-from keys import DJANGO_SECRET_KEY, DB_USERNAME, DB_PASSWORD
+import keys
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ordertracker',
         'USER': '',
-        # 'USER': DB_USERNAME,
+        # 'USER': keys.DB_USERNAME,
         'PASSWORD': '',
-        # 'PASSWORD': DB_PASSWORD,
+        # 'PASSWORD': keys.DB_PASSWORD,
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -108,7 +108,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = DJANGO_SECRET_KEY
+SECRET_KEY = keys.DJANGO_SECRET_KEY
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -238,3 +238,9 @@ CORS_ALLOW_METHODS = (
     'DELETE',
     'OPTIONS'
 )
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = keys.EMAIL_HOST
+EMAIL_PORT = 587
+EMAIL_HOST_USER = keys.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = keys.EMAIL_HOST_PASSWORD
