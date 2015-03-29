@@ -4,8 +4,14 @@ from django.contrib.auth.models import User
 # from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import serializers, exceptions
 # from authentication import ExpiringTokenAuthentication
-from ..models import Customer, Shipment, Inventory
+from ..models import Customer, Shipment, Inventory, OptExtras
 from rest_framework.authtoken.models import Token
+
+
+class ExtrasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OptExtras
+        fields = ('quantity', 'unit_cost', 'total_cost', 'description')
 
 
 class InventorySerializer(serializers.ModelSerializer):
@@ -16,10 +22,11 @@ class InventorySerializer(serializers.ModelSerializer):
 
 class ShipmentSerializer(serializers.ModelSerializer):
     inventory = InventorySerializer(many = True)
+    extras = ExtrasSerializer(many = True)
 
     class Meta:
         model = Shipment
-        fields = ('shipid', 'labor_time', 'status', 'storage_fees', 'inventory')
+        fields = ('shipid', 'labor_time', 'status', 'storage_fees', 'inventory', 'extras')
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -27,7 +34,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ('name', 'acct', 'shipments')
+        fields = ('name', 'acct', 'createdate', 'shipments')
         depth = 1
 
 

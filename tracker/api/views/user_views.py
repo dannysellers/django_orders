@@ -1,5 +1,8 @@
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+from django.conf import settings
 
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -8,6 +11,7 @@ from rest_framework import status
 
 from ..serializers import UserSerializer
 from ..permissions import IsOwnerOrPrivileged, IsOwnerOrPrivilegedObject
+from ...models import Customer
 
 
 class UserList(APIView):
@@ -49,3 +53,38 @@ class UserDetail(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
+def receive_work_order (request, acct):
+    """
+    Receives POSTed work order form. At the moment, it just sends us an email,
+    but ultimately I'll construct a WorkOrder model to be displayed on the site
+    """
+    if request.method != 'POST':
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    else:
+        try:
+            customer = Customer.objects.get(acct = acct)
+        except Customer.DoesNotExist:
+            return Response(status = status.HTTP_404_NOT_FOUND)
+
+        _subject = "Order received from #{} ({})".format(customer.acct, customer.name)
+        _message = ""
+
+        _from_email = request.POST['email']
+        # Form elements
+        try:
+            send_mail(subject = _subject,
+                      message = _message,
+                      from_email = _from_email,
+                      recipient_list = [settings.EMAIL_HOST_USER],
+                      auth_user = settings.EMAIL_HOST_USER,
+                      auth_password = settings.EMAIL_HOST_PASSWORD,
+                      fail_silently = False)
+        except:
+            # log error
+            # try sending an email via Mandrill
+            return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status = status.HTTP_200_OK)

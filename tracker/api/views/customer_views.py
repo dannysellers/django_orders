@@ -7,7 +7,7 @@ from ..authentication import ExpiringTokenAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 
-from ..serializers import CustomerModelSerializer, CustomerSerializer
+from ..serializers import CustomerSerializer
 from ..permissions import IsOwnerOrPrivileged, IsOwnerOrPrivilegedObject
 from ...models import Customer
 
@@ -23,14 +23,13 @@ class CustomerList(APIView):
     def get (self, request, format = None):
         # customers = Customer.objects.all()
         customers = Customer.objects.all().exclude(status = 0)
-        serializer = CustomerModelSerializer(customers, many = True)
-        # serializer = CustomerModelSerializer(customers, many = True)
+        serializer = CustomerSerializer(customers, many = True)
         return Response(serializer.data)
 
 
 # class CustomerDetail(generics.RetrieveAPIView):
 #     model = Customer
-#     serializer_class = CustomerModelSerializer
+#     serializer_class = CustomerSerializer
 #     permission_classes = (IsOwnerOrPrivileged,)
 #     check_object_permissions = (IsOwnerOrPrivileged,)
 #     authentication_classes = (SessionAuthentication, ExpiringTokenAuthentication)
@@ -55,12 +54,12 @@ class CustomerDetail(APIView):
 
     def get (self, request, acct, format = None):
         customer = self.get_object(acct)
-        serializer = CustomerModelSerializer(customer, context = {'request': request})
+        serializer = CustomerSerializer(customer, context = {'request': request})
         return Response(serializer.data)
 
     # def put (self, request, acct, format = None):
     #     customer = self.get_object(acct)
-    #     serializer = CustomerModelSerializer(customer, data = request.data)
+    #     serializer = CustomerSerializer(customer, data = request.data)
     #     # serializer = CustomerSerializer(customer, data = request.data)
     #     if serializer.is_valid():
     #         serializer.save()
