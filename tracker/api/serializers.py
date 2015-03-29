@@ -17,7 +17,7 @@ class ExtrasSerializer(serializers.ModelSerializer):
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
-        fields = ('itemid', 'volume', 'get_storage_fees', 'status')
+        fields = ('itemid', 'volume', 'storage_fees', 'get_storage_fees', 'status_text')
 
 
 class ShipmentSerializer(serializers.ModelSerializer):
@@ -26,7 +26,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shipment
-        fields = ('shipid', 'labor_time', 'status', 'storage_fees', 'inventory', 'extras')
+        fields = ('shipid', 'labor_time', 'status_text', 'storage_fees', 'inventory', 'extras')
 
 
 class CustomerSerializer(serializers.ModelSerializer):

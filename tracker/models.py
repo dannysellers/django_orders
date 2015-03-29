@@ -88,6 +88,10 @@ class Shipment(AuthStampedModel):
     def __unicode__ (self):
         return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
 
+    @property
+    def status_text (self):
+        return self.get_status_display()
+
     def storage_fees (self):
         fees = 0.00
         for item in self.inventory.exclude(status = 4):
@@ -138,6 +142,10 @@ class Inventory(AuthStampedModel):
             return self.storage_fees
         else:
             return 0.00
+
+    @property
+    def status_text (self):
+        return self.get_status_display()
 
     @property
     def get_total_fees (self):
@@ -205,3 +213,17 @@ class OptExtras(models.Model):
 
     def __unicode__ (self):
         return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
+
+
+# class WorkOrder(models.Model):
+#     owner = models.ForeignKey(Customer)
+#     shipment = models.ForeignKey(Shipment)
+#     contact_phone = models.CharField(max_length = 20)
+#     quantity = models.IntegerField(max_length = 4, default = 1)
+#     description = models.TextField()
+#     tracking = models.CharField(max_length=50)
+#
+#     objects = WorkOrderManager()
+#
+#     def __unicode__(self):
+#         return 'Order {}: {}'.format(self.pk, self.owner.acct)
