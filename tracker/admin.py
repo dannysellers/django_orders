@@ -6,8 +6,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.admin import TokenAdmin
 
 READ_ONLY_FIELDS_LABEL = "Read-only fields"
-# TODO: Add Grappelli project (https://github.com/sehmaschine/django-grappelli)
 
+
+# Inline Displays
+####################
 
 class ShipmentInline(admin.TabularInline):
     model = models.Shipment
@@ -17,19 +19,6 @@ class ShipmentInline(admin.TabularInline):
         (READ_ONLY_FIELDS_LABEL, {'fields': ['arrival', 'departure']}),
     ]
     readonly_fields = ('shipid', 'owner', 'arrival', 'departure')
-
-
-class CustomerAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['first_name', 'last_name', 'email', 'status']}),
-        ('Account Information', {'fields': ['user', 'acct', 'notes'], 'classes': ['collapse']}),
-        ('Dates', {'fields': ['createdate', 'closedate'], 'classes': ['collapse']})
-    ]
-    inlines = [ShipmentInline]
-    readonly_fields = ('user', 'createdate', 'closedate', 'acct')
-    list_display = ('acct', 'status', 'first_name', 'last_name', 'user')
-    list_filter = ['status']
-    search_fields = ['first_name', 'last_name', 'email', 'acct']
 
 
 class ItemOpInline(admin.TabularInline):
@@ -45,7 +34,55 @@ class ItemOpAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['item', 'op_code', 'dt']})
     ]
+    list_display = ('item', 'op_code', 'dt')
+    list_filter = ['op_code', 'item']
     readonly_fields = ('item', 'op_code', 'dt')
+
+
+class ShipOpInline(admin.TabularInline):
+    model = models.ShipOperation
+
+    fieldsets = [
+        (None, {'fields': ['shipment', 'op_code', 'dt']})
+    ]
+    readonly_fields = ('shipment', 'op_code', 'dt')
+
+
+# Model Admin Pages
+###################
+
+class ShipOpAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['shipment', 'op_code', 'dt']})
+    ]
+    list_display = ('shipment', 'op_code', 'dt')
+    list_filter = ['op_code']
+    readonly_fields = ('shipment', 'op_code', 'dt')
+
+
+class CustomerAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['first_name', 'last_name', 'email', 'status']}),
+        ('Account Information', {'fields': ['user', 'acct', 'notes'], 'classes': ['collapse']}),
+        ('Dates', {'fields': ['createdate', 'closedate'], 'classes': ['collapse']})
+    ]
+    inlines = [ShipmentInline]
+    readonly_fields = ('user', 'createdate', 'closedate', 'acct')
+    list_display = ('acct', 'status', 'first_name', 'last_name', 'user')
+    list_filter = ['status']
+    search_fields = ['first_name', 'last_name', 'email', 'acct']
+
+
+class ShipmentAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['palletized', 'labor_time', 'tracking_number', 'status']}),
+        ('Notes', {'fields': ['notes'], 'classes': ['collapse']}),
+        (READ_ONLY_FIELDS_LABEL, {'fields': ['shipid', 'owner', 'arrival', 'departure'], 'classes': ['collapse']}),
+    ]
+    readonly_fields = ('shipid', 'owner', 'arrival', 'departure')
+    inlines = [ShipOpInline]
+    list_display = ('shipid', 'owner')
+    list_filter = ['status']
 
 
 class InventoryAdmin(admin.ModelAdmin):
@@ -68,31 +105,16 @@ class InventoryAdmin(admin.ModelAdmin):
     bool_storage_fees.short_description = 'Storage fees?'
 
 
-class ShipOpInline(admin.TabularInline):
-    model = models.ShipOperation
-
+class WorkOrderAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['shipment', 'op_code', 'dt']})
+        (None, {'fields': ['owner', 'shipment', 'contact_phone', 'contact_email']}),
+        ('Details', {'fields': ['quantity', 'description', 'tracking'], 'classes': ['collapse']}),
+        ('Extras', {'fields': ['gen_inspection', 'photo_inspection', 'item_count', 'bar_code_labeling', 'custom_boxing',
+                               'consolidation', 'palletizing', 'misc_services', 'misc_service_text'],
+                    'classes': ['collapse']})
     ]
-    readonly_fields = ('shipment', 'op_code', 'dt')
-
-
-class ShipOpAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['shipment', 'op_code', 'dt']})
-    ]
-    readonly_fields = ('shipment', 'op_code', 'dt')
-
-
-class ShipmentAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['palletized', 'labor_time', 'tracking_number', 'status']}),
-        ('Notes', {'fields': ['notes'], 'classes': ['collapse']}),
-        (READ_ONLY_FIELDS_LABEL, {'fields': ['shipid', 'owner', 'arrival', 'departure'], 'classes': ['collapse']}),
-    ]
-    readonly_fields = ('shipid', 'owner', 'arrival', 'departure')
-    inlines = [ShipOpInline]
-    list_display = ('shipid', 'owner')
+    list_display = ('owner', 'shipment', 'quantity', 'createdate', 'status')
+    readonly_fields = ('owner', 'shipment', 'createdate', 'finishdate')
     list_filter = ['status']
 
 
@@ -115,6 +137,7 @@ admin.site.register(models.Shipment, ShipmentAdmin)
 admin.site.register(models.Inventory, InventoryAdmin)
 admin.site.register(models.ShipOperation, ShipOpAdmin)
 admin.site.register(models.ItemOperation, ItemOpAdmin)
+admin.site.register(models.WorkOrder, WorkOrderAdmin)
 # TODO: Registering this customer Token model admin class required disabling rest_framework.authtoken.admin.TokenAdmin
 # One alternative is to extend rest_framework.authtoken.models.Token
 admin.site.register(Token, ExpiringTokenAdmin)

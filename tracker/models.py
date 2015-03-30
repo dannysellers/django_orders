@@ -10,7 +10,7 @@ from audit_log.models import AuthStampedModel
 from audit_log.models.managers import AuditLog
 
 from .managers import CustomerManager, ShipmentManager, InventoryManager, \
-    ItemOpManager, ShipOpManager, OptExtraManager
+    ItemOpManager, ShipOpManager, OptExtraManager, WorkOrderManager
 
 UNIT_STORAGE_FEE = 0.10
 
@@ -215,15 +215,29 @@ class OptExtras(models.Model):
         return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
 
 
-# class WorkOrder(models.Model):
-#     owner = models.ForeignKey(Customer)
-#     shipment = models.ForeignKey(Shipment)
-#     contact_phone = models.CharField(max_length = 20)
-#     quantity = models.IntegerField(max_length = 4, default = 1)
-#     description = models.TextField()
-#     tracking = models.CharField(max_length=50)
-#
-#     objects = WorkOrderManager()
-#
-#     def __unicode__(self):
-#         return 'Order {}: {}'.format(self.pk, self.owner.acct)
+class WorkOrder(AuthStampedModel):
+    owner = models.ForeignKey(Customer)
+    shipment = models.ForeignKey(Shipment)
+    contact_phone = models.CharField(max_length = 20)
+    contact_email = models.EmailField(max_length = 254)
+    quantity = models.IntegerField(max_length = 4, default = 1)
+    description = models.TextField()
+    tracking = models.CharField(max_length = 50)
+    gen_inspection = models.BooleanField(default = False)
+    photo_inspection = models.BooleanField(default = False)
+    item_count = models.BooleanField(default = False)
+    bar_code_labeling = models.BooleanField(default = False)
+    custom_boxing = models.BooleanField(default = False)
+    consolidation = models.BooleanField(default = False)
+    palletizing = models.BooleanField(default = False)
+    misc_services = models.BooleanField(default = False)
+    misc_service_text = models.CharField(max_length = 1000)
+    status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
+    createdate = models.DateField()
+    finishdate = models.DateField(null = True)
+
+    objects = WorkOrderManager()
+    audit_log = AuditLog()
+
+    def __unicode__ (self):
+        return 'Order {}: {}'.format(self.pk, self.owner.acct)

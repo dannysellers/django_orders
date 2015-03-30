@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 
 
 class CustomerManager(Manager):
-    def create_customer (self, first_name, last_name, email, acct, password=None):
+    def create_customer (self, first_name, last_name, email, acct, password = None):
         if not password:
             password = User.objects.make_random_password()
 
@@ -79,3 +79,22 @@ class OptExtraManager(Manager):
                              unit_cost = unit_cost, total_cost = _total,
                              description = description)
         return _extra
+
+
+class WorkOrderManager(Manager):
+    def create_work_order (self, owner, shipid, contact_phone, contact_email, quantity, description, tracking,
+                           gen_inspection, photo_inspection, item_count, bar_code_labeling, custom_boxing,
+                           consolidation, palletizing, misc_services, misc_services_text):
+
+        from models import Customer, Shipment
+        _owner = Customer.objects.get(acct = owner)
+        _shipment = Shipment.objects.get(shipid = shipid)
+
+        _order = self.create(owner = owner, shipment = shipid, contact_phone = contact_phone,
+                             contact_email = contact_email, quantity = quantity, description = description,
+                             tracking = tracking, gen_inspection = gen_inspection, photo_inspection = photo_inspection,
+                             item_count = item_count, bar_code_labeling = bar_code_labeling, custom_boxing = custom_boxing,
+                             consolidation = consolidation, palletizing = palletizing, misc_services = misc_services,
+                             misc_services_text = misc_services_text, createdate = date.today())
+
+        return _order

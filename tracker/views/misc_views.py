@@ -2,7 +2,7 @@ from datetime import date
 
 from django.db.models import Sum
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, HttpResponse
 from ..models import *
 
 
@@ -23,3 +23,19 @@ def index (request):
         .filter(arrival__range = (ten_days_ago, date.today())).count()
 
     return render_to_response('tracker/index.html', context_dict, context)
+
+
+def work_orders (request):
+    # context = RequestContext(request)
+    # context_dict = dict()
+
+    orders = WorkOrder.objects.all()
+
+    return HttpResponse("There are {} work orders on file".format(len(orders)), content_type = 'application/json')
+
+
+def submit_work_order (request):
+    # context = RequestContext(request)
+    # context_dict = ()
+
+    return HttpResponse("This is the method to create a work order", content_type='application/json')

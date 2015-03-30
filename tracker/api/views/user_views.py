@@ -11,7 +11,7 @@ from rest_framework import status
 
 from ..serializers import UserSerializer
 from ..permissions import IsOwnerOrPrivileged, IsOwnerOrPrivilegedObject
-from ...models import Customer
+from ...models import Customer, WorkOrder
 
 
 class UserList(APIView):
@@ -73,7 +73,33 @@ def receive_work_order (request, acct):
         _message = ""
 
         _from_email = request.POST['email']
-        # Form elements
+
+        order_dict = dict()
+        for key, value in request.POST.iteritems():
+            order_dict[key] = value
+
+        WorkOrder.objects.create_work_order(**order_dict)
+        """
+        order_dict contents
+        Key             | Description
+        ----------------|-----------------------------------
+        tracking	    | Tracking number
+        miscservices	| Miscellaneous services
+        miscservicetext	| Miscellaneous service description
+        description	    | Shipment description
+        quantity	    | Quantity of cartons in shipment
+        boxing	        | Custom product boxing
+        geninspection	| General inspection
+        consolidation	| Shipment consolidation / re-boxing
+        phone	        | Contact phone number
+        palletization	| Palletizing (service)
+        photoinspection	| Photographic inspection
+        acct	        | Account number
+        itemcount	    | Full item count (service)
+        email	        | Contact email
+        barcodes	    | FNSKU / Bar code labeling
+        """
+
         try:
             send_mail(subject = _subject,
                       message = _message,
@@ -85,6 +111,8 @@ def receive_work_order (request, acct):
         except:
             # log error
             # try sending an email via Mandrill
-            return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return HttpResponse("Error sending message", content_type='application/json')
 
-        return Response(status = status.HTTP_200_OK)
+        # return Response(status = status.HTTP_200_OK)
+        # return True
+        return HttpResponse("Message sent successfully", content_type='application/json')
