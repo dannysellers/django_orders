@@ -27,7 +27,7 @@ def shipment_report (request, shipid):
     response = HttpResponse(content_type = 'application/pdf')
     _canvas, temp = render_report(shipment)
 
-    # Second methd
+    # Second method
     # response = render_report_second(shipment, request.user, content_type)
 
     # 'attachment' will prompt the user to download the file. 'inline'

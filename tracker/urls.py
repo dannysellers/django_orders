@@ -8,7 +8,7 @@ from api import urls as api_urls
 urlpatterns = patterns('tracker.views.misc_views',
    url(r'^$', 'index', name = 'index'),
    url(r'^workorders/$', 'work_orders', name = 'work_orders'),
-   url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order')
+   url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order'),
 )
 
 # Authentication patterns
@@ -52,7 +52,6 @@ urlpatterns += patterns('tracker.views.report_views',
 # Invoice patterns
 urlpatterns += patterns('tracker.views.invoice_views',
     url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_report', name = 'shipment_report'),
-    url(r'^shipreport2/(?P<shipid>\d+)$', 'shipment_invoice', name = 'shipment_invoice'),
     # url(r'^template/(?P<shipid>\d+)$', 'invoice_template', name = 'invoice_template'),
 )
 
