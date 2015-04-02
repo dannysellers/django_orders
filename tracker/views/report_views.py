@@ -66,7 +66,6 @@ def graph_query (request):
             start_date = date(today.year, today.month, 1)
         else:
             try:
-                # TODO: Add jQuery date validation/normalization
                 _year, _month, _day = start_date.split('-')
                 start_date = date(int(_year), int(_month), int(_day))
             except TypeError:

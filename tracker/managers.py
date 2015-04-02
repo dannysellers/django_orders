@@ -76,7 +76,6 @@ class ItemOpManager(Manager):
 
 class OptExtraManager(Manager):
     def create_optextra (self, shipment, quantity, unit_cost, description):
-        # TODO: Write tests to verify all attributes set by managers
         _total = unit_cost * quantity
         _extra = self.create(shipment = shipment, quantity = quantity,
                              unit_cost = unit_cost, total_cost = _total,

@@ -140,4 +140,4 @@ admin.site.register(models.ItemOperation, ItemOpAdmin)
 admin.site.register(models.WorkOrder, WorkOrderAdmin)
 # TODO: Registering this customer Token model admin class required disabling rest_framework.authtoken.admin.TokenAdmin
 # One alternative is to extend rest_framework.authtoken.models.Token
-admin.site.register(Token, ExpiringTokenAdmin)
+# admin.site.register(Token, ExpiringTokenAdmin)
