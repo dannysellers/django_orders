@@ -14,24 +14,23 @@
 			<tbody>
 			{% for customer in customer_list %}
 				<tr>
-					<td id="account_cell"><a
-							href="{% url 'account_page' account_id=customer.acct %}">{{ customer.acct }}</a></td>
-					<td id="name_cell">{{ customer.name }}</td>
+					<td><a href="{% url 'account_page' account_id=customer.acct %}">{{ customer.acct }}</a></td>
+					<td>{{ customer.name }}</td>
 					{% if status_column %}
-						<td id="status_cell">{{ customer.get_status_display }}</td>
+						<td>{{ customer.get_status_display }}</td>
 					{% endif %}
-					<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
+					<td>{{ customer.createdate|date:"M d, Y" }}</td>
 					{% if 'Active' not in head_text %}
 						{% if customer.status == "0" %}
-							<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
+							<td>{{ customer.closedate|date:"M d, Y" }}</td>
 						{% else %}
 							<td class="inactive"></td>
 						{% endif %}
 					{% endif %}
 					{% if 'Inactive' not in head_text %}
-						<td id="ship_count">{{ customer.shipments.all|stored_count }}</td>
+						<td>{{ customer.shipments.all|stored_count }}</td>
 					{% endif %}
-					<td id="storage_fees">${{ customer.inventory.all|storage_fee_total }}</td>
+					<td>${{ customer.inventory.all|storage_fee_total }}</td>
 				</tr>
 			{% endfor %}
 			</tbody>

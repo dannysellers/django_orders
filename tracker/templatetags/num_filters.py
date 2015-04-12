@@ -32,7 +32,7 @@ def storage_fee_total (item_list, stored = True):
     _sum = float(0)
     for item in item_list:
         if stored:
-            if item.status != 4:
+            if item.status != '4':
                 _sum += item.storage_fees
         else:
             _sum += item.storage_fees
