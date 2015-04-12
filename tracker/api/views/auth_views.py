@@ -29,8 +29,8 @@ class CustomTokenLogin(Login):
 #     serializer_class = AuthTokenSerializer
 #
 #     def post (self, request):
-#         serializer = self.serializer_class(data = request.DATA)
-#         # serializer = AuthTokenSerializer(data = request.DATA)
+#         serializer = self.serializer_class(data = request.data)
+#         # serializer = AuthTokenSerializer(data = request.data)
 #         serializer.is_valid(raise_exception = True)
 #
 #         token, created = Token.objects.get_or_create(user = serializer.object['user'])
@@ -63,7 +63,7 @@ class CustomTokenLogin(Login):
 #
 #     @csrf_exempt
 #     def post (self, request, *args, **kwargs):
-#         self.serializer = self.get_serializer(data = self.request.DATA)
+#         self.serializer = self.get_serializer(data = self.request.data)
 #         if not self.serializer.is_valid():
 #             return self.get_error_response()
 #         self.login()
