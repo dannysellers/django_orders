@@ -75,7 +75,7 @@ td.ship_toggle:hover {
  /*// TABLE > row coloring //*/
 /*//////////////////////////*/
 
-#ship_head_row {
+.ship_head_row {
 	background-color : #dcdcdc;
 	font-weight      : 500;
 }

@@ -13,13 +13,13 @@
 			</thead>
 			<tbody>
 			<tr>
-				<td id="name_cell">{{ customer.name }}</td>
-				<td id="account_cell">#{{ customer.acct }}</td>
-				<td id="email_cell">{{ customer.email }}</td>
-				<td id="status_cell">{{ customer.get_status_display }}</td>
-				<td id="open_date">{{ customer.createdate|date:"M d, Y" }}</td>
+				<td>{{ customer.name }}</td>
+				<td>#{{ customer.acct }}</td>
+				<td>{{ customer.email }}</td>
+				<td>{{ customer.get_status_display }}</td>
+				<td>{{ customer.createdate|date:"M d, Y" }}</td>
 				{% if customer.status == '0' %}
-					<td id="close_date">{{ customer.closedate|date:"M d, Y" }}</td>
+					<td>{{ customer.closedate|date:"M d, Y" }}</td>
 				{% endif %}
 			</tr>
 			</tbody>
@@ -102,7 +102,7 @@
 			<tbody>
 			{% if shipment_list %}
 				{% for shipment in shipment_list %}
-					<tr id="ship_head_row">
+					<tr class="ship_head_row">
 						<td class="ship_toggle" onclick="toggleSection(this);">-</td>
 						<td><a href="{% url 'shipment' shipid=shipment.id %}">{{ shipment.id }}</a>
 							({{ shipment.inventory.count }})
