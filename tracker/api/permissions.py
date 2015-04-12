@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from ..models import Customer
 
 
@@ -45,6 +45,10 @@ class IsOwnerOrPrivilegedObject(permissions.BasePermission):
             elif customer_group in request.user.groups.all():
                 if isinstance(obj, Customer):
                     return obj.user == request.user
+                elif isinstance(obj, User):
+                    # TODO: This isn't working correctly
+                    # Customer users should only have access to their own User obj
+                    return False
                 else:
                     return obj.owner == request.user
             elif operator_group in request.user.groups.all() or admin_group in request.user.groups.all():

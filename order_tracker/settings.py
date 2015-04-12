@@ -241,6 +241,8 @@ CORS_ALLOW_METHODS = (
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = keys.EMAIL_HOST
+# EMAIL_PORT = 465
 EMAIL_PORT = 587
+EMAIL_LIST = keys.EMAIL_LIST  # Default list of email addresses, used for /contact/ API endpoint
 EMAIL_HOST_USER = keys.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = keys.EMAIL_HOST_PASSWORD
