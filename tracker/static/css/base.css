@@ -114,3 +114,16 @@ select:not(.disabled):hover {
 div.small-12.column.form > form > input:not([type="submit"]) {
 	width : 40%;
 }
+
+  /*///////////////////*/
+ /*// FORM ELEMENTS //*/
+/*///////////////////*/
+
+div.small-4.columns > label {
+    /* Remove unnecessary mouseover effect from form labels */
+    cursor: default;
+}
+
+select:disabled:hover {
+    cursor: default;
+}

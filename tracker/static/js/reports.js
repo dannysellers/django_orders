@@ -40,21 +40,25 @@ function drawGraph(data, options, graph) {
 }
 
 $("#model-select").change(function () {
+    getModelData();
+});
+
+function getModelData() {
     $.ajax({
         url: "/form_ajax/" + $("#model-select").val(),
         dataType: "text",
         type: "GET",
-        error: function (err) {
+        error: function(err) {
             alert("Error: " + err.statusText.toString())
         },
-        success: function (data) {
+        success: function(data) {
             var attrs = JSON.parse(data).attr_list;
             var modelSelect = $("#model-attr-select");
             modelSelect.children().remove();
             for (var i = 0; i < attrs.length; i++) modelSelect.append("<option id=" + i + ">" + attrs[i] + "</option>");
         }
     })
-});
+}
 
 $("#op-select").change(function () {
     if ($("#op-select").val().toLowerCase() == 'count') {
@@ -71,5 +75,6 @@ window.onload = function () {
         // Chart.js relies on <canvas> support
         document.write("HTML5 Canvas not supported by your browser!")
     }
+    getModelData();
     $('.datepicker').pikaday({format: 'YYYY-MM-DD'});
 };
