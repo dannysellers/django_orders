@@ -3,29 +3,29 @@ var extraCartonSetElement = "<label>Quantity<input type='number' name='quantity'
 var holdingArea = document.getElementById('extras-holder');
 
 function addElement() {
-	console.log('addElement called');
-	var newExtra = document.createElement('div');
-	newExtra.className = 'extra-row';
-	newExtra.innerHTML = extraElement;
-	holdingArea.appendChild(newExtra);
+    console.log('addElement called');
+    var newExtra = document.createElement('div');
+    newExtra.className = 'extra-row';
+    newExtra.innerHTML = extraElement;
+    holdingArea.appendChild(newExtra);
 }
 
 function removeElement() {
-	//console.log('removeElement called');
-	var childExtras = document.getElementsByClassName('extra-row');
-	if (childExtras.length > 0) {
-		var lastChild = childExtras[childExtras.length - 1];
-		lastChild.remove();
-	} else {
-		alert('No more elements to remove!');
-		return false;
-	}
+    //console.log('removeElement called');
+    var childExtras = document.getElementsByClassName('extra-row');
+    if (childExtras.length > 0) {
+        var lastChild = childExtras[childExtras.length - 1];
+        lastChild.remove();
+    } else {
+        alert('No more elements to remove!');
+        return false;
+    }
 }
 
 function addCartonSetElement() {
-	//console.log('addCartonSetElement called');
-	var newExtra = document.createElement('div');
-	newExtra.className = 'extra-row';
-	newExtra.innerHTML = extraCartonSetElement;
-	holdingArea.appendChild(newExtra);
+    //console.log('addCartonSetElement called');
+    var newExtra = document.createElement('div');
+    newExtra.className = 'extra-row';
+    newExtra.innerHTML = extraCartonSetElement;
+    holdingArea.appendChild(newExtra);
 }

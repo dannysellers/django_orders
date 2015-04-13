@@ -39,8 +39,8 @@ function makeAllSortable(parent) {
 	}
 }
 
-var oldEvt = window.onload;
+//var oldEvt = window.onload;
 window.onload = function () {
-	if (oldEvt) oldEvt();
+	//if (oldEvt) oldEvt();
 	makeAllSortable();
 };
