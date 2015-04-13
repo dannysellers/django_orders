@@ -48,10 +48,10 @@ function getModelData() {
         url: "/form_ajax/" + $("#model-select").val(),
         dataType: "text",
         type: "GET",
-        error: function(err) {
+        error: function (err) {
             alert("Error: " + err.statusText.toString())
         },
-        success: function(data) {
+        success: function (data) {
             var attrs = JSON.parse(data).attr_list;
             var modelSelect = $("#model-attr-select");
             modelSelect.children().remove();

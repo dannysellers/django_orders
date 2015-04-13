@@ -55,17 +55,25 @@ def user_login (request):
 
         # If no user is returned, login was unsuccessful
         if user:
-            if user.is_active:
-                if not request.POST.get('remember_me', None):
-                    request.session.set_expiry(0)
-                login(request, user)
-                messages.add_message(request, messages.SUCCESS,
-                                     "Login successful. Welcome, {}.".format(user.first_name))
-                # Return user to the same page they were on
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            # Users in the Customer Group cannot log in
+            # Users with no groups are improperly configured, and cannot log in
+            customer_group = Group.objects.get_by_natural_key('Customer')
+            if customer_group not in user.groups.all() and user.groups.count() > 0:
+                # TODO: Possible security issue verifying User Group status *after* verifying credentials?
+                if user.is_active:
+                    if not request.POST.get('remember_me', None):
+                        request.session.set_expiry(0)
+                    login(request, user)
+                    messages.add_message(request, messages.SUCCESS,
+                                         "Login successful. Welcome, {}.".format(user.first_name))
+                    # Return user to the same page they were on
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                else:
+                    messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")
+                    return HttpResponseRedirect('/')
             else:
-                messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")
-                return HttpResponseRedirect('/')
+                messages.add_message(request, messages.ERROR, "This account cannot be used to log in.")
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         else:
             messages.add_message(request, messages.ERROR, "Invalid login info")
