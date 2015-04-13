@@ -1,0 +1,30 @@
+{% extends 'tracker/index.html' %}
+{% load static %}
+{% load num_filters %}
+
+{% block title %}
+	<title>
+		Work Orders
+	</title>
+{% endblock title %}
+
+{% block header %}
+	View Open Work Orders <span class="subheader">({{ count }})</span>
+{% endblock header %}
+
+{% block sub_nav %}
+
+	<a href="/workorders?status=incomplete">Open Orders</a>
+	| <a href="/workorder?status=complete" disabled>Closed Orders</a>
+
+{% endblock sub_nav %}
+
+{% block content %}
+
+	{% for order in orders %}
+	<div class="row">
+		Order {{ order.pk }}
+	</div>
+	{% endfor %}
+
+{% endblock content %}

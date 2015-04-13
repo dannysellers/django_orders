@@ -1,8 +1,8 @@
 from datetime import date, timedelta
 from calendar import monthrange
 import json
-
 import psycopg2
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib import messages
@@ -10,10 +10,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.db.models import Model
 from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import login_required
+
 from .. import models
 from ..utils import find_subclasses
 
 
+@login_required
 def reports (request):
     """
     Initial page view for /reports/

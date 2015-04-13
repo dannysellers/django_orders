@@ -4,161 +4,82 @@
 {% load num_filters %}
 
 <head>
-	{% block title %}
-		<title>Inventory&#8212;Order Tracker</title>
-	{% endblock title %}
-	<link rel="stylesheet" href="{% static "css/normalize.css" %}"/>
-	<link rel="stylesheet" href="{% static "css/base.css" %}"/>
-	<link rel="stylesheet" href="{% static "css/foundation.css" %}"/>
+    {% block title %}
+        <title>Inventory&#8212;Order Tracker</title>
+    {% endblock title %}
+    <link rel="stylesheet" href="{% static "css/normalize.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/base.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/foundation.css" %}"/>
 
-	{% block extra_stylesheets %}
-	{% endblock extra_stylesheets %}
+    {% block extra_stylesheets %}
+    {% endblock extra_stylesheets %}
 </head>
 
 <body>
-{#<div class="row">#}
-{#	<div class="small-12 column">#}
-{#		<div class="off-canvas-wrap" data-offcanvas>#}
-{#			<div class="inner-wrap">#}
-{#				<nav class="show-for-medium-up" data-topbar role="navigation">#}
-{#					<ul class="title-area">#}
-{#						<li class="name">#}
-{#							<h1><a href="/">Middle Man Fulfillment</a></h1>#}
-{#						</li>#}
-{#					</ul>#}
-{#					<section class="top-bar-section">#}
-{#						<ul class="left">#}
-{#							<li><a href="/accounts?accts=active">Accounts</a></li>#}
-{#							<li><a href="/inventory?status=stored">Inventory</a></li>#}
-{#							<li><a href="/reports/">Reports</a></li>#}
-{#						</ul>#}
-{#						<ul class="right">#}
-{#							{% if user.is_authenticated %}#}
-{#								<li><a href="#" class="disabled">Hi {{ user.first_name }} ({{ user.username }}</a></li>#}
-{#								<li class="divider"></li>#}
-{#								<li><a href="/logout/">Log out</a></li>#}
-{#							{% else %}#}
-{#								<li><a href="#" class="disabled">Hello anonymous</a></li>#}
-{#								<li class="divider"></li>#}
-{#								<!-- login form -->#}
-{#							{% endif %}#}
-{#						</ul>#}
-{#					</section>#}
-{#				</nav>#}
-{#				<nav class="tab-bar show-for-small">#}
-{#					<section class="title-area">#}
-{#						<h1 class="title">#}
-{#							<a href="/">Middle Man Fulfillment</a>#}
-{#						</h1>#}
-{#					</section>#}
-{#					<section class="right small">#}
-{#						<a class="left-off-canvas-toggle menu-icon" href="#">#}
-{#							<span></span>#}
-{#						</a>#}
-{#					</section>#}
-{#				</nav>#}
-{#				<aside class="left-off-canvas-menu">#}
-{##}
-{#				</aside>#}
-{#			</div>#}
-{#		</div>#}
-{#	</div>#}
-{#</div>#}
-
-
 <nav class="top-bar" data-topbar role="navigation" data-options="stick_on: [small,medium,large]">
-	<ul class="title-area">
-		<li class="name">
-			<h1><a href="/">Middle Man Fulfillment</a></h1>
-		</li>
-	</ul>
-	<section class="top-bar-section">
-		<ul class="left">
-			<li><a href="/accounts?accts=active">Accounts</a></li>
-			<li><a href="/inventory?status=stored">Inventory</a></li>
-			<li><a href="{% url 'reports' %}">Reports</a></li>
-		</ul>
-		<ul class="right">
-			{% if user.is_authenticated %}
-				<li><a href="#" class="disabled">Hi {{ user.first_name }} ({{ user.username }})</a></li>
-				<li class="divider"></li>
-				<li><a href="/logout/">Log out</a></li>
-			{% else %}
-				<li><a href="#" class="disabled">Hello anonymous.</a></li>
-				<li class="divider"></li>
-				<li class="has-dropdown">
-					<a data-dropdown="logindrop" aria-controls="logindrop" aria-expanded="false">Log in</a>
-					<!-- TODO: Fix this -->
-					<!-- 	Line
-							Line
-					   Button | Button-->
-					<div id="logindrop" data-dropdown-content class="f-dropdown small content" aria-hidden="true"
-						 tabindex="-1">
-						<form id="login_form" method="post" action="/login/">
-							{% csrf_token %}
-							<div class="row">
-								<input type="text" name="username" placeholder="Username"/>
-							</div>
-							<div class="row">
-								<input type="password" name="password" placeholder="Password"/>
-							</div>
-							<div class="row">
-								<ul class="button-group">
-									<li><a href="{% url 'register' %}" class="button tiny secondary">Register</a></li>
-									<li><input type="submit" class="button tiny" value="Submit"></li>
-								</ul>
-							</div>
-						</form>
-					</div>
-				</li>
-			{% endif %}
-		</ul>
-	</section>
+    <ul class="title-area">
+        <li class="name">
+            <h1><a href="/">Middle Man Fulfillment</a></h1>
+        </li>
+    </ul>
+    <section class="top-bar-section">
+        <ul class="left">
+            <li><a href="/accounts?accts=active">Accounts</a></li>
+            <li><a href="/inventory?status=stored">Inventory</a></li>
+            <li><a href="{% url 'reports' %}">Reports</a></li>
+            <li><a href="{% url 'work_orders' %}">Work Orders</a></li>
+        </ul>
+        <ul class="right">
+            <li><a href="#" class="disabled">Hi {{ user.first_name }} ({{ user.username }})</a></li>
+            <li class="divider"></li>
+            <li><a href="/logout/">Log out</a></li>
+        </ul>
+    </section>
 </nav>
 
 <div class="row">
-	<div class="small-12 medium-12 large-12 column">
-		{% block header %}
-			<h3>
-				Order / Inventory Tracker
-				<span class="show-for-large-only">Large screen</span>
-				<span class="show-for-medium-only">Medium screen</span>
-			</h3>
-			<h2 class="show-for-small-only">
-				Small screen
-			</h2>
-		{% endblock header %}
+    <div class="small-12 medium-12 large-12 column">
+        {% block header %}
+            <h3>
+                Order / Inventory Tracker
+{#                <span class="show-for-large-only">Large screen</span>#}
+{#                <span class="show-for-medium-only">Medium screen</span>#}
+            </h3>
+{#            <h2 class="show-for-small-only">#}
+{#                Small screen#}
+{#            </h2>#}
+        {% endblock header %}
 
-	</div>
+    </div>
 </div>
 
 <div class="row">
-	<div class="small-11 medium-12 large-12 column">
-		{% block sub_nav %}
+    <div class="small-11 medium-12 large-12 column">
+        {% block sub_nav %}
 
-		{% endblock sub_nav %}
-		{% if messages %}
-			<ul class="messages">
-				{% for message in messages %}
-					<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
-				{% endfor %}
-			</ul>
-		{% endif %}
-	</div>
+        {% endblock sub_nav %}
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 </div>
 
 {% block content %}
-	<div class="row">
-		<div class="small-12 medium-12 large-12 column">
-			Active customers: {{ cust_act_count }}<br/>
-			Shipments in storage: {{ ship_count }}<br/>
-			Items currently in storage: {{ item_count }}<br/>
-			Total volume of items currently in storage: {{ total_item_volume|length:"2" }} <br/>
-			<a href="/inventory?storage_fees=yes">Items currently incurring storage
-												  fees: {{ item_storage_count }}</a><br/>
-			<a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
-		</div>
-	</div>
+    <div class="row">
+        <div class="small-12 medium-12 large-12 column">
+            Active customers: {{ cust_act_count }}<br/>
+            Shipments in storage: {{ ship_count }}<br/>
+            Items currently in storage: {{ item_count }}<br/>
+            Total volume of items currently in storage: {{ total_item_volume|length:"2" }} <br/>
+            <a href="/inventory?storage_fees=yes">Items currently incurring storage
+                                                  fees: {{ item_storage_count }}</a><br/>
+            <a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+        </div>
+    </div>
 
 {% endblock %}
 
@@ -171,20 +92,20 @@
 {% endblock extra_scripts %}
 
 <script>
-	(function (i, s, o, g, r, a, m) {
-		i['GoogleAnalyticsObject'] = r;
-		i[r] = i[r] || function () {
-			(i[r].q = i[r].q || []).push(arguments)
-		}, i[r].l = 1 * new Date();
-		a = s.createElement(o),
-				m = s.getElementsByTagName(o)[0];
-		a.async = 1;
-		a.src = g;
-		m.parentNode.insertBefore(a, m)
-	})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-	ga('create', 'UA-60702927-2', 'auto');
-	ga('send', 'pageview');
+    ga('create', 'UA-60702927-2', 'auto');
+    ga('send', 'pageview');
 
 </script>
 

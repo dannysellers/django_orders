@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<head>
+    <title>Inventory&#8212;Order Tracker</title>
+    <link rel="stylesheet" href="{% static "css/normalize.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/base.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/foundation.css" %}"/>
+</head>
+
+<body>
+<nav class="top-bar" data-topbar role="navigation" data-options="stick_on: [small,medium,large]">
+    <ul class="title-area">
+        <li class="name">
+            <h1><a href="#" class="disabled">Middle Man Fulfillment</a></h1>
+        </li>
+    </ul>
+</nav>
+
+<div class="row">
+
+    <div class="small-12 medium-12 large-12 column">
+        <h3>Log In</h3>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="small-12 column form">
+        <form id="login_form" method="post" action="/login/">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username"/>
+            <input type="password" name="password" placeholder="Password"/>
+            {#            <a href="{% url 'register' %}" class="button small secondary">Register</a>#}
+            <input type="submit" class="button small" value="Submit">
+        </form>
+    </div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="{% static "js/foundation/foundation.js" %}"></script>
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-60702927-2', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+</body>

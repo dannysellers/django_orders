@@ -17,6 +17,7 @@ from ..models import Customer, Inventory, ItemOperation
 import re
 
 
+@login_required
 @cache_control(no_cache = True)
 def inventory (request):
     context = RequestContext(request)

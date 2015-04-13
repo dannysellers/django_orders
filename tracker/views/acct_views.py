@@ -6,6 +6,8 @@ from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
+from django.contrib.auth.decorators import login_required
+
 from ..models import Customer
 import forms
 
@@ -18,6 +20,7 @@ def decode_url (url):
     return url.replace('_', ' ')
 
 
+@login_required
 @cache_control(no_cache = True)
 def accounts (request):
     context = RequestContext(request)
@@ -97,6 +100,7 @@ def accounts (request):
     return render_to_response('tracker/accounts.html', context_dict, context)
 
 
+@login_required
 def account_page (request, account_id):
     context = RequestContext(request)
     context_dict = dict()

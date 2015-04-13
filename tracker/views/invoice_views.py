@@ -1,10 +1,12 @@
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from .. import models
 from ..pdf_utils.utils import render_report, render_report_second
 
 
+@login_required
 def shipment_report (request, shipid):
     """
     Create a PDF for the shipment and return as an HTTP Response obj

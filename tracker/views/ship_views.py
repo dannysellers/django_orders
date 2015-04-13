@@ -10,6 +10,7 @@ import re
 
 # Disable caching by browser
 @cache_control(no_cache = True)
+@login_required
 def shipment (request, shipid):
     """
     Overview page for an individual shipment
