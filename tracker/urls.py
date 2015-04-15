@@ -7,7 +7,8 @@ from api import urls as api_urls
 # Index
 urlpatterns = patterns('tracker.views.misc_views',
    url(r'^$', 'index', name = 'index'),
-   url(r'^workorders/$', 'work_orders', name = 'work_orders'),
+   url(r'^workorders/$', 'work_orders', name = 'work_order_list'),
+   url(r'^workorders/(?P<id>\d+)/$', 'work_order_detail', name = 'work_order_detail'),
    url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order'),
 )
 
@@ -20,15 +21,15 @@ urlpatterns += patterns('tracker.views.auth_views',
 
 # Account patterns
 urlpatterns += patterns('tracker.views.acct_views',
-    url(r'^accounts$', 'accounts', name = 'accounts'),
-    url(r'^accounts/(?P<account_id>\d+)/$', 'account_page', name = 'account_page'),
+    url(r'^accounts$', 'accounts', name = 'account_list'),
+    url(r'^accounts/(?P<account_id>\d+)/$', 'account_page', name = 'account_detail'),
     url(r'^add_account/$', 'add_account', name = 'add_account'),
     url(r'^acct_info$', 'acct_info', name = 'account_info'),
 )
 
 # Inventory patterns
 urlpatterns += patterns('tracker.views.inv_views',
-    url(r'^inventory$', 'inventory', name = 'inventory'),
+    url(r'^inventory$', 'inventory', name = 'inventory_detail'),
     # url(r'^accounts/(?P<account_url>\S+)/add_inventory/$', 'add_item'),
     # url(r'^add_inventory/$', 'add_item', name='add_inventory'),
     url(r'^manage_items$', 'change_item_status', name = 'change_item_status'),
@@ -36,7 +37,7 @@ urlpatterns += patterns('tracker.views.inv_views',
 
 # Shipment patterns
 urlpatterns += patterns('tracker.views.ship_views',
-    url(r'^shipment/(?P<shipid>\d+)$', 'shipment', name = 'shipment'),
+    url(r'^shipment/(?P<shipid>\d+)$', 'shipment', name = 'shipment_detail'),
     url(r'^ship_info$', 'ship_info', name = 'ship_info'),
     url(r'^ship_extras$', 'ship_extras', name = 'ship_extras'),
     url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment', name = 'add_shipment'),

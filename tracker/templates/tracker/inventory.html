@@ -28,9 +28,9 @@
 
 	<a href="/inventory?status=stored">All Items</a>
 	| Status: <a href="/inventory?status=inducted">Inducted</a>
-	| <a href="/inventory?status=order_received">Order Received</a>
-	| <a href="/inventory?status=order_begun">Order Begun</a>
-	| <a href="/inventory?status=order_completed">Order Completed</a>
+	&ndash; <a href="/inventory?status=order_received">Order Received</a>
+	&ndash; <a href="/inventory?status=order_begun">Order Begun</a>
+	&ndash; <a href="/inventory?status=order_completed">Order Completed</a>
 	{% if customer %}
 		<br/>
 {#		{% if user.is_authenticated %}#}
@@ -40,7 +40,7 @@
 {#				<a href="#" class="disabled">Add Inventory</a>#}
 {#			{% endif %}#}
 {#		{% endif %}#}
-		<a href="{% url 'account_page' account_id=customer.acct %}">Manage Account</a>
+		<a href="{% url 'account_detail' account_id=customer.acct %}">Manage Account</a>
 		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
 	{% endif %}
 
@@ -76,7 +76,7 @@
 			{% endif %}
 			<thead>
 			<tr>
-				{% if user.is_authenticated and customer and inventory_list %}
+				{% if customer and inventory_list %}
 					{% if customer %}
 						<th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
 					{% else %}
@@ -84,21 +84,21 @@
 					{% endif %}
 				{% endif %}
 				{% for item in headers %}
-					{% if item == 'Arrival' or item == 'Departure' %}
+{#					{% if item == 'Arrival' or item == 'Departure' %}#}
 						<th>{{ item }}</th>
-					{% else %}
-						<th>{{ item }}</th>
-					{% endif %}
+{#					{% else %}#}
+{#						<th>{{ item }}</th>#}
+{#					{% endif %}#}
 				{% endfor %}
 			</tr>
 			</thead>
 			<tbody>
 			{% if item %}
 				<tr>
-					<td><a href="{% url 'shipment' shipid=item.shipset.shipid %}">{{ item.shipset.shipid }}</a></td>
+					<td><a href="{% url 'shipment_detail' shipid=item.shipset.shipid %}">{{ item.shipset.shipid }}</a></td>
 					<td>{{ item.itemid }}</td>
 					<td>
-						<a href="{% url 'account_page' account_id=item.shipset.owner.acct %}">{{ item.shipset.owner.name }}</a>
+						<a href="{% url 'account_detail' account_id=item.shipset.owner.acct %}">{{ item.shipset.owner.name }}</a>
 					</td>
 					<td>{{ item.volume|length:"2" }}</td>
 					<td>${{ item.storage_fees|length:"2" }}</td>
@@ -115,13 +115,13 @@
 							{% endif %}
 						{% endif %}
 						<td>
-							<a href="{% url 'shipment' shipid=item.shipset.shipid %}">{{ item.shipset.shipid }}</a>
+							<a href="{% url 'shipment_detail' shipid=item.shipset.shipid %}">{{ item.shipset.shipid }}</a>
 						</td>
 						<td>
 							<a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a>
 						</td>
 						<td>
-							<a href="{% url 'account_page' account_id=item.shipset.owner.acct %}">{{ item.shipset.owner.name }}</a>
+							<a href="{% url 'account_detail' account_id=item.shipset.owner.acct %}">{{ item.shipset.owner.name }}</a>
 						</td>
 						<td>{{ item.volume|length:"2" }}</td>
 						{% if not item.status == '4' %}
