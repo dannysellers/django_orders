@@ -2,7 +2,7 @@ from django.contrib import admin
 import models
 from datetime import timedelta
 from django.utils import timezone
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.admin import TokenAdmin
 
 READ_ONLY_FIELDS_LABEL = "Read-only fields"
@@ -114,22 +114,22 @@ class WorkOrderAdmin(admin.ModelAdmin):
                     'classes': ['collapse']})
     ]
     list_display = ('owner', 'shipment', 'quantity', 'createdate', 'status')
-    readonly_fields = ('owner', 'shipment', 'createdate', 'finishdate')
+    readonly_fields = ('owner', 'createdate', 'finishdate')
     list_filter = ['status']
 
 
-class ExpiringTokenAdmin(TokenAdmin):
-    def has_expired (self, instance):
-        """
-        If the token is more than 48 hours old, it is expired
-        """
-        now = timezone.now()
-        if instance.created < now - timedelta(hours = 48):
-            return True
-        else:
-            return False
-
-    list_display = ('key', 'user', 'created', 'has_expired')
+# class ExpiringTokenAdmin(TokenAdmin):
+#     def has_expired (self, instance):
+#         """
+#         If the token is more than 48 hours old, it is expired
+#         """
+#         now = timezone.now()
+#         if instance.created < now - timedelta(hours = 48):
+#             return True
+#         else:
+#             return False
+#
+#     list_display = ('key', 'user', 'created', 'has_expired')
 
 
 admin.site.register(models.Customer, CustomerAdmin)
