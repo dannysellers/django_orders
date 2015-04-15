@@ -36,6 +36,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ordertracker',
+        # 'NAME': keys.DB_NAME,
         'USER': '',
         # 'USER': keys.DB_USERNAME,
         'PASSWORD': '',
@@ -48,6 +49,7 @@ DATABASES = {
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = keys.ALLOWED_HOSTS
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -86,6 +88,7 @@ MEDIA_URL = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
 # STATIC_ROOT = '/home/ubuntu/static'
+# STATIC_ROOT = keys.STATIC_ROOT
 STATIC_ROOT = ''
 
 # URL prefix for static files.
