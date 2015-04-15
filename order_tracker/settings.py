@@ -30,14 +30,16 @@ BASE_DIR = os.path.dirname(SETTINGS_DIR)
 #     }
 # }
 
+import keys
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ordertracker',
         'USER': '',
-        # 'USER': os.environ['DB_USERNAME'],
+        # 'USER': keys.DB_USERNAME,
         'PASSWORD': '',
-        # 'PASSWORD': os.environ['DB_PASSWORD'],
+        # 'PASSWORD': keys.DB_PASSWORD,
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -106,7 +108,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+SECRET_KEY = keys.DJANGO_SECRET_KEY
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -185,22 +187,7 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugFalse'
         }
     },
-    'formatters': {
-        'verbose': {
-            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt': "%d/%b/%Y %H:%M:%S",
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        }
-    },
     'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'django_orders.log',
-            'formatter': 'verbose'
-        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -208,19 +195,10 @@ LOGGING = {
         }
     },
     'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'propagate': True,
-            'level': 'INFO',
-        },
         'django.request': {
-            'handlers': ['file'],
+            'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
-        },
-        'tracker': {
-            'handlers': ['file'],
-            'level': 'INFO',
         },
     }
 }
@@ -262,9 +240,9 @@ CORS_ALLOW_METHODS = (
 )
 
 EMAIL_USE_TLS = True
-EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_HOST = keys.EMAIL_HOST
 # EMAIL_PORT = 465
 EMAIL_PORT = 587
-EMAIL_LIST = os.environ['EMAIL_LIST']  # Default list of email addresses, used for /contact/ API endpoint
-EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_LIST = keys.EMAIL_LIST  # Default list of email addresses, used for /contact/ API endpoint
+EMAIL_HOST_USER = keys.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = keys.EMAIL_HOST_PASSWORD
