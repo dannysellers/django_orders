@@ -1,0 +1,150 @@
+{% extends 'tracker/index.html' %}
+{% load static %}
+{% load num_filters %}
+
+{% block title %}
+    <title>
+        Work Order #{{ order.id }}
+    </title>
+{% endblock title %}
+
+{% block header %}
+    Work Order #{{ order.id }} &#8212; {{ order.owner.name }}, #{{ order.owner.acct }}
+{% endblock header %}
+
+{% block sub_nav %}
+    <a href="/workorderreport/{{ order.id }}?type=attachment" class="disabled">Download Work Order</a>
+    | <a href="/workorderreport/{{ order.id }}?type=inline" class="disabled">Generate Work Order</a>
+{% endblock sub_nav %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="small-12 column">
+            <table>
+                <thead>
+                {% for item in headers %}
+                    <th>{{ item }}</th>
+                {% endfor %}
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <a href="{% url 'account_detail' account_id=order.owner.acct %}">
+                            {{ order.owner.name }}
+                        </a>
+                    </td>
+                    <td>
+                        #{{ order.owner.acct }}
+                    </td>
+                    <td>
+                        {{ order.createdate }}
+                    </td>
+                    <td>
+                        {{ order.quantity }}
+                    </td>
+                    <td>
+                        {{ order.get_status_display }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-6 columns">
+            <h4>Optional Services</h4>
+            <table>
+                <thead>
+                <tr>
+                    <td>Service</td>
+                    <td>Requested</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>General Inspection</td>
+                    <td>{{ order.gen_inspection }}</td>
+                </tr>
+                <tr>
+                    <td>Photo Inspection</td>
+                    <td>{{ order.photo_inspection }}</td>
+                </tr>
+                <tr>
+                    <td>Item Count</td>
+                    <td>{{ order.item_count }}</td>
+                </tr>
+                <tr>
+                    <td>FNSKU / Bar code labeling</td>
+                    <td>{{ order.bar_code_labeling }}</td>
+                </tr>
+                <tr>
+                    <td>Custom boxing</td>
+                    <td>{{ order.custom_boxing }}</td>
+                </tr>
+                <tr>
+                    <td>Consolidation</td>
+                    <td>{{ order.consolidation }}</td>
+                </tr>
+                <tr>
+                    <td>Palletization</td>
+                    <td>{{ order.palletizing }}</td>
+                </tr>
+                <tr>
+                    <td>Misc Services</td>
+                    <td>{{ order.misc_services }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="small-4 columns">
+            <h4>Details</h4>
+
+            <label>Tracking Info:
+                <input type="text" name="tracking" value="{{ order.tracking }}" disabled/>
+            </label>
+            <label>Contact Phone:
+                <input type="number" name="phone" value="{{ order.contact_phone }}" disabled/>
+            </label>
+            <label>Contact Email:
+                <input type="email" name="email" value="{{ order.contact_email }}" disabled/>
+            </label>
+        </div>
+        <!-- A div to push the other divs left -->
+        <div class="small-2 columns"></div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 column">
+            <hr align="left"/>
+            <h4>Operation History ({{ order.operations.count }})</h4>
+
+            <table id="orderop_history">
+                <thead>
+                <tr>
+                    {% for item in orderop_headers %}
+                        <th>{{ item }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for operation in order.operations.all %}
+                    <tr>
+                    <td>{{ operation.id }}</td>
+                    <td>{{ operation.dt }}</td>
+                    <td>{{ operation.get_op_code_display }}</td>
+                    {% if operation.created_by %}
+                        <td>{{ operation.created_by }}</td>
+                    {% else %}
+                        <td>Customer</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock content %}

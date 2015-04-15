@@ -10,7 +10,8 @@ from audit_log.models import AuthStampedModel
 from audit_log.models.managers import AuditLog
 
 from .managers import CustomerManager, ShipmentManager, InventoryManager, \
-    ItemOpManager, ShipOpManager, OptExtraManager, WorkOrderManager
+    ItemOpManager, ShipOpManager, OptExtraManager, WorkOrderManager, \
+    WorkOrderOpManager
 
 UNIT_STORAGE_FEE = 0.10
 
@@ -169,6 +170,56 @@ def item_op_signal (sender, instance, **kwargs):
                                            op_code = instance.status)
 
 
+class OptExtras(models.Model):
+    shipment = models.ForeignKey(Shipment, related_name = 'extras')
+    quantity = models.IntegerField(default = 1)
+    unit_cost = models.FloatField()
+    total_cost = models.FloatField()
+    description = models.TextField()
+
+    objects = OptExtraManager()
+
+    def __unicode__ (self):
+        return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
+
+
+class WorkOrder(AuthStampedModel):
+    owner = models.ForeignKey(Customer)
+    # Work orders should correspond to a given Shipment
+    # But an order may be received prior to the creation of a Shipment
+    shipment = models.ForeignKey(Shipment, null = True)
+    contact_phone = models.CharField(max_length = 20)
+    contact_email = models.EmailField(max_length = 254)
+    quantity = models.IntegerField(max_length = 4, default = 1)
+    description = models.TextField()
+    tracking = models.CharField(max_length = 50)
+    # Services desired
+    gen_inspection = models.BooleanField(default = False, help_text = "General inspection")
+    photo_inspection = models.BooleanField(default = False, help_text = "Photographic inspection")
+    item_count = models.BooleanField(default = False, help_text = "Count of items")
+    bar_code_labeling = models.BooleanField(default = False, help_text = "FNSKU / Bar code labeling")
+    custom_boxing = models.BooleanField(default = False, help_text = "Custom product boxing")
+    consolidation = models.BooleanField(default = False, help_text = "Consolidation / repacking")
+    palletizing = models.BooleanField(default = False, help_text = "Palletizing")
+    misc_services = models.BooleanField(default = False, help_text = "Additional miscellaneous services")
+    misc_service_text = models.CharField(max_length = 1000, help_text = "Add'l misc service description")
+    status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
+    createdate = models.DateField()
+    finishdate = models.DateField(null = True)
+
+    objects = WorkOrderManager()
+    audit_log = AuditLog()
+
+    def __unicode__ (self):
+        return 'Order {}: {}'.format(self.pk, self.owner.acct)
+
+
+@receiver(post_save, sender = WorkOrder)
+def workorder_op_signal (sender, instance, **kwargs):
+    WorkOrderOperation.objects.create_operation(order = instance,
+                                                op_code=instance.status)
+
+
 class Operation(AuthStampedModel):
     """
     Base class for ShipOperation and ItemOperation, the
@@ -202,42 +253,10 @@ class ItemOperation(Operation):
         return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
 
 
-class OptExtras(models.Model):
-    shipment = models.ForeignKey(Shipment, related_name = 'extras')
-    quantity = models.IntegerField(default = 1)
-    unit_cost = models.FloatField()
-    total_cost = models.FloatField()
-    description = models.TextField()
+class WorkOrderOperation(Operation):
+    order = models.ForeignKey(WorkOrder, related_name = 'operations')
 
-    objects = OptExtraManager()
+    objects = WorkOrderOpManager()
 
     def __unicode__ (self):
-        return '{} x {}: ${}'.format(self.quantity, self.description, self.unit_cost)
-
-
-class WorkOrder(AuthStampedModel):
-    owner = models.ForeignKey(Customer)
-    shipment = models.ForeignKey(Shipment)
-    contact_phone = models.CharField(max_length = 20)
-    contact_email = models.EmailField(max_length = 254)
-    quantity = models.IntegerField(max_length = 4, default = 1)
-    description = models.TextField()
-    tracking = models.CharField(max_length = 50)
-    gen_inspection = models.BooleanField(default = False)
-    photo_inspection = models.BooleanField(default = False)
-    item_count = models.BooleanField(default = False)
-    bar_code_labeling = models.BooleanField(default = False)
-    custom_boxing = models.BooleanField(default = False)
-    consolidation = models.BooleanField(default = False)
-    palletizing = models.BooleanField(default = False)
-    misc_services = models.BooleanField(default = False)
-    misc_service_text = models.CharField(max_length = 1000)
-    status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
-    createdate = models.DateField()
-    finishdate = models.DateField(null = True)
-
-    objects = WorkOrderManager()
-    audit_log = AuditLog()
-
-    def __unicode__ (self):
-        return 'Order {}: {}'.format(self.pk, self.owner.acct)
+        return ''

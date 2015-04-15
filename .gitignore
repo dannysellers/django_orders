@@ -53,5 +53,8 @@ docs/_build/
 # PyBuilder
 target/
 
+# PyCharm
+.idea/
+
 # Secret keys
 order_tracker/keys.py

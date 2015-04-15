@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 
 
 class CustomerManager(Manager):
-    def create_customer (self, first_name, last_name, email, acct, password = None):
+    def create_customer (self, first_name, last_name, email, acct, password=None):
         if not password:
             password = User.objects.make_random_password()
 
@@ -62,6 +62,41 @@ class InventoryManager(Manager):
         return _item
 
 
+class OptExtraManager(Manager):
+    def create_optextra (self, shipment, quantity, unit_cost, description):
+        _total = unit_cost * quantity
+        _extra = self.create(shipment = shipment, quantity = quantity,
+                             unit_cost = unit_cost, total_cost = _total,
+                             description = description)
+        return _extra
+
+
+class WorkOrderManager(Manager):
+    def create_work_order (self, *args, **kwargs):
+        from models import Customer
+
+        _owner = Customer.objects.get(acct = kwargs['acct'])
+
+        _order = self.create(owner = _owner,
+                             contact_phone = kwargs['phone'],
+                             contact_email = kwargs['email'],
+                             quantity = kwargs['quantity'],
+                             description = kwargs['description'],
+                             tracking = kwargs['tracking'],
+                             gen_inspection = kwargs['geninspection'],
+                             photo_inspection = kwargs['photoinspection'],
+                             item_count = kwargs['itemcount'],
+                             bar_code_labeling = kwargs['barcodes'],
+                             custom_boxing = kwargs['boxing'],
+                             consolidation = kwargs['consolidation'],
+                             palletizing = kwargs['palletization'],
+                             misc_services = kwargs['miscservices'],
+                             misc_service_text = kwargs['miscservicetext'],
+                             createdate = timezone.now().date())
+
+        return _order
+
+
 class ShipOpManager(Manager):
     def create_operation (self, shipment, op_code):
         _op = self.create(shipment = shipment, dt = timezone.now(), op_code = op_code)
@@ -74,29 +109,7 @@ class ItemOpManager(Manager):
         return _op
 
 
-class OptExtraManager(Manager):
-    def create_optextra (self, shipment, quantity, unit_cost, description):
-        _total = unit_cost * quantity
-        _extra = self.create(shipment = shipment, quantity = quantity,
-                             unit_cost = unit_cost, total_cost = _total,
-                             description = description)
-        return _extra
-
-
-class WorkOrderManager(Manager):
-    def create_work_order (self, owner, shipid, contact_phone, contact_email, quantity, description, tracking,
-                           gen_inspection, photo_inspection, item_count, bar_code_labeling, custom_boxing,
-                           consolidation, palletizing, misc_services, misc_services_text):
-
-        from models import Customer, Shipment
-        _owner = Customer.objects.get(acct = owner)
-        _shipment = Shipment.objects.get(shipid = shipid)
-
-        _order = self.create(owner = owner, shipment = shipid, contact_phone = contact_phone,
-                             contact_email = contact_email, quantity = quantity, description = description,
-                             tracking = tracking, gen_inspection = gen_inspection, photo_inspection = photo_inspection,
-                             item_count = item_count, bar_code_labeling = bar_code_labeling, custom_boxing = custom_boxing,
-                             consolidation = consolidation, palletizing = palletizing, misc_services = misc_services,
-                             misc_services_text = misc_services_text, createdate = date.today())
-
-        return _order
+class WorkOrderOpManager(Manager):
+    def create_operation (self, order, op_code):
+        _op = self.create(order = order, dt = timezone.now(), op_code = op_code)
+        return _op

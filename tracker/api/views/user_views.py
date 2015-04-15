@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -70,7 +70,6 @@ def receive_work_order (request, acct):
         return Response(status = status.HTTP_404_NOT_FOUND)
 
     _subject = "Order received from #{} ({})".format(customer.acct, customer.name)
-    # _message = ""
 
     _from_email = request.POST['email']
 
@@ -78,7 +77,9 @@ def receive_work_order (request, acct):
     for key, value in request.POST.iteritems():
         order_dict[key] = value
 
-    # WorkOrder.objects.create_work_order(**order_dict)
+    _message = "".join("{}:\t{}\n".format(key, value) for key, value in order_dict.iteritems())
+
+    WorkOrder.objects.create_work_order(**order_dict)
     """
     order_dict contents
     Key             | Description
@@ -102,8 +103,7 @@ def receive_work_order (request, acct):
 
     try:
         send_mail(subject = _subject,
-                  # message = _message,
-                  message = str(order_dict),
+                  message = _message,
                   from_email = _from_email,
                   recipient_list = [settings.EMAIL_HOST_USER],
                   auth_user = settings.EMAIL_HOST_USER,

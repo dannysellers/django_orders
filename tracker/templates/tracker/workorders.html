@@ -3,28 +3,61 @@
 {% load num_filters %}
 
 {% block title %}
-	<title>
-		Work Orders
-	</title>
+    <title>
+        Work Orders
+    </title>
 {% endblock title %}
 
 {% block header %}
-	View Open Work Orders <span class="subheader">({{ count }})</span>
+    Open Work Orders <span class="subheader">({{ count }})</span>
 {% endblock header %}
 
 {% block sub_nav %}
 
-	<a href="/workorders?status=incomplete">Open Orders</a>
-	| <a href="/workorder?status=complete" disabled>Closed Orders</a>
+    <a href="/workorders?status=incomplete">Open Orders</a>
+    | <a href="/workorders?status=complete" disabled>Closed Orders</a>
 
 {% endblock sub_nav %}
 
 {% block content %}
 
-	{% for order in orders %}
-	<div class="row">
-		Order {{ order.pk }}
-	</div>
-	{% endfor %}
+    <div class="row">
+        <div class="small-12 column">
+            <table class="sortable">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
+                    {% for item in headers %}
+                        <th>{{ item }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td class="checkbox">
+                            <input type="checkbox" class="checkbox" name="{{ order.id }}">
+                        </td>
+                        <td>
+                            <a href="{% url 'work_order_detail' id=order.id %}">{{ order.id }}</a>
+                        </td>
+                        <td>
+                            {% if order.shipment %}
+                                <a href="{% url 'shipment_detail' shipid=order.shipment.shipid %}">{{ order.shipment.shipid }}</a>
+                            {% else %}
+                                <a href="#" class="disabled">N/A</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'account_detail' account_id=order.owner.acct %}">{{ order.owner.name }}</a>
+                        </td>
+                        <td>{{ order.createdate }}</td>
+                        <td>{{ order.get_status_display }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 {% endblock content %}

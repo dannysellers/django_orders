@@ -39,7 +39,21 @@ def work_orders (request):
     context_dict['orders'] = completed_orders
     context_dict['count'] = completed_orders.count()
 
+    context_dict['headers'] = ['Order ID', 'Ship ID', 'Owner', 'Create Date', 'Status']
+
     return render_to_response('tracker/workorders.html', context_dict, context)
+
+
+@login_required
+def work_order_detail(request, id):
+    context = RequestContext(request)
+    context_dict = dict()
+
+    context_dict['order'] = WorkOrder.objects.get(id = id)
+    context_dict['headers'] = ['Owner', 'Owner Acct', 'Create Date', 'Quantity', 'Status']
+    context_dict['orderop_headers'] = ['Op ID', 'Time', 'Status', 'User']
+
+    return render_to_response('tracker/workorder_detail.html', context_dict, context)
 
 
 @login_required

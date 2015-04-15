@@ -40,7 +40,7 @@ def shipment (request, shipid):
     context_dict['item_headers'] = ['Item ID', 'Volume', 'Storage Fees', 'Status']
 
     # Shipment Operation table
-    context_dict['shipop_headers'] = ['Op ID', 'Time', 'Code', 'User']
+    context_dict['shipop_headers'] = ['Op ID', 'Time', 'Status', 'User']
 
     # Extras table
     context_dict['extras_headers'] = ['Quantity', 'Unit Cost', 'Total Cost', 'Description']
