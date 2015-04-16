@@ -75,9 +75,14 @@
             Shipments in storage: {{ ship_count }}<br/>
             Items currently in storage: {{ item_count }}<br/>
             Total volume of items currently in storage: {{ total_item_volume|length:"2" }} <br/>
+            <hr/>
             <a href="/inventory?storage_fees=yes">Items currently incurring storage
                                                   fees: {{ item_storage_count }}</a><br/>
-            <a href="/inventory?storage_fees=no">Items not yet incurring storage fees: {{ item_no_storage_count }}</a>
+            <a href="/inventory?storage_fees=no">Items not yet incurring storage
+                                                 fees: {{ item_no_storage_count }}</a><br/>
+            <hr/>
+            <a href="{% url 'work_order_list' %}">Open Work Orders: {{ work_order_count }}</a><br/>
+            <a href="#">Unmatched Work Orders: {{ unmatched_orders }}</a>
         </div>
     </div>
 

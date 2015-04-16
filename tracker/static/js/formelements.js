@@ -29,3 +29,41 @@ function addCartonSetElement() {
     newExtra.innerHTML = extraCartonSetElement;
     holdingArea.appendChild(newExtra);
 }
+
+  /////////////////////////////
+ // Workorder_list behavior //
+/////////////////////////////
+
+function matchShipment(ele, idSelect) {
+    $.ajax({
+        url: "/unmatched_shipments/" + idSelect + "/",
+        dataType: "text",
+        type: "GET",
+        error: function (err) {
+            alert("Error: " + err.statusText.toString())
+        },
+        success: function (data) {
+            // Parse data
+            var _data = JSON.parse(data).list;
+            if (!_data.length) {
+                alert("This customer does not have any unmatched shipments. Try creating one instead.");
+                // Disable the Associate button
+                $(ele).addClass('disabled');
+                return false
+            }
+
+            // Hide the initial button group
+            var btnGroup = $(ele.parentElement.parentElement);
+            btnGroup.hide();
+
+            // Display form
+            var shipForm = $("#match-order-" + idSelect);
+            shipForm.css('display', '');
+
+            // Populate select options
+            var sibSelect = $("#" + idSelect);
+            sibSelect.children().remove();
+            for (var i = 0; i < _data.length; i++) sibSelect.append("<option id=" + i + ">" + _data[i] + "</option>");
+        }
+    })
+}

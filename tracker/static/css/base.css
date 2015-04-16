@@ -71,6 +71,21 @@ td.ship_toggle:hover {
 	text-decoration : none;
 }
 
+#workorder-list-table > tbody > tr > td > ul.button-group > li > a.button {
+    font-size     : small;
+    padding-left  : 1.5rem;
+    padding-right : 1.5rem;
+}
+
+.button-group > li.shipment-button {
+    margin-top    : 0.5rem;
+    margin-bottom : -0.5rem;
+}
+
+select.unmatched-shipment-select {
+    width : 85%;
+}
+
   /*//////////////////////////*/
  /*// TABLE > row coloring //*/
 /*//////////////////////////*/

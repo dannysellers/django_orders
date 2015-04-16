@@ -187,7 +187,7 @@ class WorkOrder(AuthStampedModel):
     owner = models.ForeignKey(Customer)
     # Work orders should correspond to a given Shipment
     # But an order may be received prior to the creation of a Shipment
-    shipment = models.ForeignKey(Shipment, null = True)
+    shipment = models.ForeignKey(Shipment, null = True, related_name = 'workorder')
     contact_phone = models.CharField(max_length = 20)
     contact_email = models.EmailField(max_length = 254)
     quantity = models.IntegerField(max_length = 4, default = 1)

@@ -7,8 +7,13 @@ from api import urls as api_urls
 # Index
 urlpatterns = patterns('tracker.views.misc_views',
    url(r'^$', 'index', name = 'index'),
+)
+
+# Work Order patterns
+urlpatterns += patterns('tracker.views.workorder_views',
    url(r'^workorders/$', 'work_orders', name = 'work_order_list'),
    url(r'^workorders/(?P<id>\d+)/$', 'work_order_detail', name = 'work_order_detail'),
+   url(r'^unmatched_shipments/(?P<order_id>\d+)/$', 'get_unmatched_shipments', name = 'get_unmatched_shipments'),
    url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order'),
 )
 
