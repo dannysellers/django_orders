@@ -2,146 +2,146 @@
 {% load static %}
 {% load num_filters %}
 <div class="row">
-	<div class="small-12 large-12 column">
-		<table>
-			<thead>
-			<tr>
-				{% for item in headers %}
-					<th>{{ item }}</th>
-				{% endfor item %}
-			</tr>
-			</thead>
-			<tbody>
-			<tr>
-				<td>{{ customer.name }}</td>
-				<td>#{{ customer.acct }}</td>
-				<td>{{ customer.email }}</td>
-				<td>{{ customer.get_status_display }}</td>
-				<td>{{ customer.createdate|date:"M d, Y" }}</td>
-				{% if customer.status == '0' %}
-					<td>{{ customer.closedate|date:"M d, Y" }}</td>
-				{% endif %}
-			</tr>
-			</tbody>
-		</table>
-	</div>
+    <div class="small-12 large-12 column">
+        <table>
+            <thead>
+            <tr>
+                {% for item in headers %}
+                    <th>{{ item }}</th>
+                {% endfor item %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{ customer.name }}</td>
+                <td>#{{ customer.acct }}</td>
+                <td>{{ customer.email }}</td>
+                <td>{{ customer.get_status_display }}</td>
+                <td>{{ customer.createdate|date:"M d, Y" }}</td>
+                {% if customer.status == '0' %}
+                    <td>{{ customer.closedate|date:"M d, Y" }}</td>
+                {% endif %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% if user.is_authenticated %}
-	<div id="acctForm" style="display:none;">
-		<div class="row">
-			<div class="small-10 columns">
-				<form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
-					{% csrf_token %}
+    <div id="acctForm" style="display:none;">
+        <div class="row">
+            <div class="small-10 columns">
+                <form id="acct_info" method="post" action="/acct_info?acct={{ customer.acct }}">
+                    {% csrf_token %}
 
-					<div class="small-4 columns">
-						<label>Name:
-							<input type="text" name="name" value="{{ customer.name }}"/>
-						</label>
-					</div>
-					<div class="small-4 columns">
-						<label>Account:
-							<input type="text" name="acct" value="{{ customer.acct }}" disabled/>
-						</label>
-					</div>
-					<div class="small-4 columns">
-						<label>Email:
-							<input type="email" name="email" value="{{ customer.email }}"/>
-						</label>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="small-10 column">
-				<div class="small-12 column">
-					<!-- TODO: Some way to align this with above w/out nested columns? -->
-					<label>Notes
-						<textarea name="notes">{{ customer.notes }}</textarea>
-					</label>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="small-2 small-offset-8 columns">
-				<input type="button" class="button small" value="Submit">
-			</div>
-		</div>
-	</div>
+                    <div class="small-4 columns">
+                        <label>Name:
+                            <input type="text" name="name" value="{{ customer.name }}"/>
+                        </label>
+                    </div>
+                    <div class="small-4 columns">
+                        <label>Account:
+                            <input type="text" name="acct" value="{{ customer.acct }}" disabled/>
+                        </label>
+                    </div>
+                    <div class="small-4 columns">
+                        <label>Email:
+                            <input type="email" name="email" value="{{ customer.email }}"/>
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-10 column">
+                <div class="small-12 column">
+                    <!-- TODO: Some way to align this with above w/out nested columns? -->
+                    <label>Notes
+                        <textarea name="notes">{{ customer.notes }}</textarea>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-2 small-offset-8 columns">
+                <input type="button" class="button small" value="Submit">
+            </div>
+        </div>
+    </div>
 {% endif %}
 
 <div class="row">
-	<div class="small-12 column">
-		<hr width="85%" align="left">
-		<a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
-		| <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
-		{% if customer.status != '0' %}
-		| <a href="/accounts/{{ customer.acct }}/add_shipment">Add Shipment</a>
-		{% else %}
-		| <a href="#" class="disabled">Add Shipment</a>
-		{% endif %}
-		{% if storage_fees %}
-		| Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>
-		{% else %}
-		| Daily storage fees as of today: $0.00<br/>
-		{% endif %}
-	</div>
+    <div class="small-12 column">
+        <hr width="85%" align="left">
+        <a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
+        | <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
+        {% if customer.status != '0' %}
+        | <a href="/accounts/{{ customer.acct }}/add_shipment">Add Shipment</a>
+        {% else %}
+        | <a href="#" class="disabled">Add Shipment</a>
+        {% endif %}
+        {% if storage_fees %}
+        | Daily storage fees as of today: ${{ storage_fees|length:"2" }}<br/>
+        {% else %}
+        | Daily storage fees as of today: $0.00<br/>
+        {% endif %}
+    </div>
 </div>
 
 <div class="row">
-	<div class="small-12 large-12 column">
-		<table>
-			<thead>
-			<tr>
-				<th>&nbsp;</th>
-				{% for item in inv_headers %}
-					<th>{{ item }}</th>
-				{% endfor %}
-			</tr>
-			</thead>
-			<tbody>
-			{% if shipment_list %}
-				{% for shipment in shipment_list %}
-					<tr class="ship_head_row">
-						<td class="ship_toggle" onclick="toggleSection(this);">-</td>
-						<td><a href="{% url 'shipment_detail' shipid=shipment.id %}">{{ shipment.id }}</a>
-							({{ shipment.inventory.count }})
-						</td>
-						<td>&nbsp;</td>
-						<td>&nbsp;</td>
-						<td>${{ shipment.inventory.all|storage_fee_total }}</td>
-						<td>{{ shipment.get_status_display }}</td>
-						<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
-					</tr>
-					{% for item in shipment.inventory.all %}
-						<tr>
-							<td>&nbsp;</td>
-							<!-- Toggle -->
-							<td><span style="visibility:hidden;">{{ shipment.id }}</span></td>
-							<td><a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a></td>
-							<td>{{ item.volume|length:"2" }}</td>
-							<td>${{ item.storage_fees|length:"2" }}</td>
-							<td>{{ item.get_status_display }}</td>
-							<td>{{ shipment.arrival|date:"m-d-Y" }}</td>
-						</tr>
-					{% endfor %}
-				{% endfor %}
-			{% endif %}
-			</tbody>
-		</table>
-	</div>
+    <div class="small-12 large-12 column">
+        <table>
+            <thead>
+            <tr>
+                <th>&nbsp;</th>
+                {% for item in inv_headers %}
+                    <th>{{ item }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% if shipment_list %}
+                {% for shipment in shipment_list %}
+                    <tr class="ship_head_row">
+                        <td class="ship_toggle" onclick="toggleSection(this);">-</td>
+                        <td><a href="{% url 'shipment_detail' shipid=shipment.id %}">{{ shipment.id }}</a>
+                            ({{ shipment.inventory.count }})
+                        </td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>${{ shipment.inventory.all|storage_fee_total }}</td>
+                        <td>{{ shipment.get_status_display }}</td>
+                        <td>{{ shipment.arrival|date:"m-d-Y" }}</td>
+                    </tr>
+                    {% for item in shipment.inventory.all %}
+                        <tr>
+                            <td>&nbsp;</td>
+                            <!-- Toggle -->
+                            <td><span style="visibility:hidden;">{{ shipment.id }}</span></td>
+                            <td><a href="/inventory?item={{ item.itemid }}">{{ item.itemid }}</a></td>
+                            <td>{{ item.volume|length:"2" }}</td>
+                            <td>${{ item.storage_fees|length:"2" }}</td>
+                            <td>{{ item.get_status_display }}</td>
+                            <td>{{ shipment.arrival|date:"m-d-Y" }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-	var oldEvt = window.onload;
-	window.onload = function () {
-		if (oldEvt) oldEvt();
+    var oldEvt = window.onload;
+    window.onload = function () {
+        if (oldEvt) oldEvt();
 
-		var custStatus = ({{ customer.status }});
+        var custStatus = ({{ customer.status }});
 
-		var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
-		if (t == 'Log in' || custStatus == 0) {
-			disableElements('acctForm');
-		}
-	};
+        var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
+        if (t == 'Log in' || custStatus == 0) {
+            disableElements('acctForm');
+        }
+    };
 </script>
