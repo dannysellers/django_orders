@@ -3,80 +3,84 @@
 {% load num_filters %}
 
 {% block title %}
-	<title>Add New Shipment</title>
+    <title>Add New Shipment</title>
 {% endblock title %}
 
 {% block header %}
-	Add New Shipment &#8212; <a href="/accounts/{{ customer.acct }}">{{ customer.name }} (#{{ customer.acct }})</a>
+    Add New Shipment &#8212; <a href="/accounts/{{ customer.acct }}">{{ customer.name }} (#{{ customer.acct }})</a>
 {% endblock header %}
 
 {% block sub_nav %}
 
-	<a href="/accounts?accts=all">All accounts</a>
-	| <a href="/accounts?accts=active">Active accounts</a>
-	| <a href="/accounts?accts=inactive">Inactive accounts</a>
-	{% if user.is_authenticated %}
-		| <a href="{% url 'add_account' %}">Add new account</a>
-	{% endif %}
-	{% if user.is_authenticated and customer %}
-		{% if customer.status == '1' %}
-			| <a id="remove-link" onclick="confirmAcctRemove({{ customer.inventory.all|stored_count }})" href="#">Remove account</a>
-		{% else %}
-			| <a href="#" class="disabled">Remove account</a>
-		{% endif %}
-	{% endif %}
+    <a href="/accounts?accts=all">All accounts</a>
+    | <a href="/accounts?accts=active">Active accounts</a>
+    | <a href="/accounts?accts=inactive">Inactive accounts</a>
+    {% if user.is_authenticated %}
+        | <a href="{% url 'add_account' %}">Add new account</a>
+    {% endif %}
+    {% if user.is_authenticated and customer %}
+        {% if customer.status == '1' %}
+            | <a id="remove-link"
+                onclick="confirmAcctRemove({{ customer.inventory.all|stored_count }}, {{ customer.acct }})" href="#">Remove
+                                                                                                                     account</a>
+        {% else %}
+            | <a href="#" class="disabled">Remove account</a>
+        {% endif %}
+    {% endif %}
 
 {% endblock sub_nav %}
 
 {% block content %}
 
-	<div class="row">
+    <div class="row">
 
-		<form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
-			{% csrf_token %}
+        <form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
+            {% csrf_token %}
 
-			<div class="small-5 columns">
+            <div class="small-5 columns">
 
-				<label>Labor time:
-					<input type="text" id="labor_time" class="number" name="labor_time" value="0"/>
-				</label>
+                <label>Labor time:
+                    <input type="text" id="labor_time" class="number" name="labor_time" value="0"/>
+                </label>
 
-				<label>Tracking number:
-					<input type="text" id="tracking_number" name="tracking_number"
-						   placeholder="Tracking number"/>
-				</label>
+                <label>Tracking number:
+                    <input type="text" id="tracking_number" name="tracking_number"
+                           placeholder="Tracking number"/>
+                </label>
 
-				<label>Palletized:
-					<input type="checkbox" id="palletized" name="palletized"/>
-				</label>
+                <label>Palletized:
+                    <input type="checkbox" id="palletized" name="palletized"/>
+                </label>
 
-				<label>Notes:
-					<textarea name="notes" placeholder="Notes"></textarea>
-				</label>
+                <label>Notes:
+                    <textarea name="notes" placeholder="Notes"></textarea>
+                </label>
 
-				<button class="small button radius" type="reset" name="reset">Reset</button>
-				<button class="small button radius" type="submit" name="submit">Submit</button>
+                <button class="small button radius" type="reset" name="reset">Reset</button>
+                <button class="small button radius" type="submit" name="submit">Submit</button>
 
-			</div>
-			<div class="small-7 columns">
-				<input type="button" class="small button radius" id="add-extra" onclick="addCartonSetElement()" value="Add Carton Set">
-				<input type="button" class="small button radius" id="remove-extra" onclick="removeElement()" value="Remove Carton Set">
+            </div>
+            <div class="small-7 columns">
+                <input type="button" class="small button radius" id="add-extra" onclick="addCartonSetElement()"
+                       value="Add Carton Set">
+                <input type="button" class="small button radius" id="remove-extra" onclick="removeElement()"
+                       value="Remove Carton Set">
 
-				<div id="extras-holder">
-					<div class="extra-row">
-						<label>Quantity
-							<input type='number' name='quantity' placeholder='Quantity'>
-						</label>
-						<input id='dim-input' type='number' name='length' step='any' placeholder='Length'>
-						x <input id='dim-input' type='number' name='width' step='any' placeholder='Width'>
-						x <input id='dim-input' type='number' name='height' step='any' placeholder='Height'>
-					</div>
-				</div>
-			</div>
+                <div id="extras-holder">
+                    <div class="extra-row">
+                        <label>Quantity
+                            <input type='number' name='quantity' placeholder='Quantity'>
+                        </label>
+                        <input id='dim-input' type='number' name='length' step='any' placeholder='Length'>
+                        x <input id='dim-input' type='number' name='width' step='any' placeholder='Width'>
+                        x <input id='dim-input' type='number' name='height' step='any' placeholder='Height'>
+                    </div>
+                </div>
+            </div>
 
-		</form>
+        </form>
 
-		<script src="{% static "js/formelements.js" %}"></script>
-	</div>
+        <script src="{% static "js/formelements.js" %}"></script>
+    </div>
 
 {% endblock content %}

@@ -3,49 +3,53 @@
 {% load num_filters %}
 
 {% block title %}
-	<title>
-		{% if customer %}
-			Account #{{ customer.acct }} - {{ customer.name }}
-		{% else %}
-			Tracker - {{ head_text }} ({{ num_accts }})
-		{% endif %}
-	</title>
+    <title>
+        {% if customer %}
+            Account #{{ customer.acct }} - {{ customer.name }}
+        {% else %}
+            Tracker - {{ head_text }} ({{ num_accts }})
+        {% endif %}
+    </title>
 {% endblock %}
 
+{% block extra_scripts %}
+    <script src="{% static "js/formelements.js" %}"></script>
+{% endblock extra_scripts %}
+
 {% block header %}
-	{% if customer %}
-		{{ customer.name }} <span class="subheader">&#8212; #{{ customer.acct }}</span>
-	{% else %}
-		Tracker <span class="subheader">&#8212; {{ head_text }} ({{ num_accts }})</span>
-	{% endif %}
+    {% if customer %}
+        {{ customer.name }} <span class="subheader">&#8212; #{{ customer.acct }}</span>
+    {% else %}
+        Tracker <span class="subheader">&#8212; {{ head_text }} ({{ num_accts }})</span>
+    {% endif %}
 {% endblock header %}
 
 {% block sub_nav %}
 
-	<a href="/accounts?accts=all">All accounts</a>
-	| <a href="/accounts?accts=active">Active accounts</a>
-	| <a href="/accounts?accts=inactive">Inactive accounts</a>
-	{% if user.is_authenticated %}
-		| <a href="{% url 'add_account' %}">Add new account</a>
-	{% endif %}
-	{% if user.is_authenticated and customer %}
-		{% if customer.status == '1' %}
-			| <a id="remove_link" href="#" onclick="confirmAcctRemove({{ customer.inventory.all|stored_count }})">Remove
-																													 account</a>
-		{% else %}
-			| <a href="#" class="disabled">Remove account</a>
-		{% endif %}
-		| <a id="acctFormToggle" href="javascript:togglePane('acctForm', 'acctFormToggle');">Edit Account Info</a>
-	{% endif %}
+    <a href="/accounts?accts=all">All accounts</a>
+    | <a href="/accounts?accts=active">Active accounts</a>
+    | <a href="/accounts?accts=inactive">Inactive accounts</a>
+    {% if user.is_authenticated %}
+        | <a href="{% url 'add_account' %}">Add new account</a>
+    {% endif %}
+    {% if user.is_authenticated and customer %}
+        {% if customer.status == '1' %}
+            | <a id="remove_link" href="#"
+                onclick="confirmAcctRemove({{ customer.inventory.all|stored_count }}, {{ customer.acct }})">Remove account</a>
+        {% else %}
+            | <a href="#" class="disabled">Remove account</a>
+        {% endif %}
+        | <a id="acctFormToggle" href="javascript:togglePane('acctForm', 'acctFormToggle');">Edit Account Info</a>
+    {% endif %}
 
 {% endblock sub_nav %}
 
 {% block content %}
 
-	{% if customer_list %}
-		{% include 'tracker/nested/cust_list.html' %}
-	{% elif customer %}
-		{% include 'tracker/nested/customer.html' %}
-	{% endif %}
+    {% if customer_list %}
+        {% include 'tracker/nested/cust_list.html' %}
+    {% elif customer %}
+        {% include 'tracker/nested/customer.html' %}
+    {% endif %}
 
 {% endblock content %}
