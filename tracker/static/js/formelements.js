@@ -3,16 +3,18 @@ var extraCartonSetElement = "<label>Quantity<input type='number' name='quantity'
 var holdingArea = document.getElementById('extras-holder');
 
 function addElement() {
-    console.log('addElement called');
     var newExtra = document.createElement('div');
+
+    //console.log('addElement called');
     newExtra.className = 'extra-row';
     newExtra.innerHTML = extraElement;
     holdingArea.appendChild(newExtra);
 }
 
 function removeElement() {
-    //console.log('removeElement called');
     var childExtras = document.getElementsByClassName('extra-row');
+
+    //console.log('removeElement called');
     if (childExtras.length > 0) {
         var lastChild = childExtras[childExtras.length - 1];
         lastChild.remove();
@@ -23,18 +25,22 @@ function removeElement() {
 }
 
 function addCartonSetElement() {
-    //console.log('addCartonSetElement called');
     var newExtra = document.createElement('div');
+
+    //console.log('addCartonSetElement called');
     newExtra.className = 'extra-row';
     newExtra.innerHTML = extraCartonSetElement;
     holdingArea.appendChild(newExtra);
 }
 
-  /////////////////////////////
- // Workorder_list behavior //
+/////////////////////////////
+// Workorder_list behavior //
 /////////////////////////////
 
 function matchShipment(ele, idSelect) {
+    /* Fxn to populate select widget with unmatched shipments
+      (Shipments that have no Work Order)
+     */
     $.ajax({
         url: "/unmatched_shipments/" + idSelect + "/",
         dataType: "text",
@@ -45,25 +51,74 @@ function matchShipment(ele, idSelect) {
         success: function (data) {
             // Parse data
             var _data = JSON.parse(data).list;
+            var btnGroup = $(ele).parent().parent();
+            var shipForm = $("#match-order-" + idSelect);
+            var sibSelect = $("#" + idSelect);
+
             if (!_data.length) {
                 alert("This customer does not have any unmatched shipments. Try creating one instead.");
-                // Disable the Associate button
+                // Disable the Link button
                 $(ele).addClass('disabled');
                 return false
             }
 
             // Hide the initial button group
-            var btnGroup = $(ele.parentElement.parentElement);
             btnGroup.hide();
 
             // Display form
-            var shipForm = $("#match-order-" + idSelect);
             shipForm.css('display', '');
 
             // Populate select options
-            var sibSelect = $("#" + idSelect);
             sibSelect.children().remove();
             for (var i = 0; i < _data.length; i++) sibSelect.append("<option id=" + i + ">" + _data[i] + "</option>");
         }
     })
+}
+
+
+function matchOrder(ele, idSelect) {
+    /* Fxn to populate select widget with unmatched work orders
+       (Work Orders that have no Shipment)
+     */
+    $.ajax({
+        url: '/unmatched_orders/' + idSelect + '/',
+        dataType: 'text',
+        type: 'GET',
+        error: function(err) {
+            alert("Error: " + err.statusText.toString())
+        },
+        success: function(data) {
+            // Parse data
+            var _data = JSON.parse(data).list;
+            var btnGroup = $(ele).parent().parent();
+            var orderForm = $("#match-shipment-" + idSelect);
+            var sibSelect = $("#" + idSelect);
+
+            if (!_data.length) {
+                alert("This customer does not have any unmatched work orders. Try creating one instead.");
+                // Disable the Link button
+                $(ele).addClass('disabled');
+                return false
+            }
+
+            // Hide the initial button group
+            btnGroup.hide();
+
+            // Display form
+            orderForm.css('display', '');
+
+            // Populate select options
+            sibSelect.children().remove();
+            for (var i = 0; i < _data.length; i++) sibSelect.append("<option id=" + i + ">" + _data[i] + "</option>");
+        }
+    })
+}
+
+
+function removeOrder (orderID) {
+    var r = confirm("Would you really like to delete Work Order " + orderID + "?");
+    if (r) {
+        // Navigate to address.com/workorders/#/remove/
+        location.href = window.location.origin + window.location.pathname + '/' + orderID + '/remove/';
+    }
 }

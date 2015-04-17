@@ -17,11 +17,15 @@
     | <a href="/shipreport/{{ shipment.shipid }}?type=inline">Generate Report</a>
 {% endblock sub_nav %}
 
+{% block extra_scripts %}
+    <script src="{% static "js/formelements.js" %}"></script>
+{% endblock extra_scripts %}
+
 {% block content %}
 
     <div class="row">
         <div class="small-12 column">
-            <table>
+            <table id="shipment-overview">
                 <thead>
                 {% for item in headers %}
                     <th>{{ item }}</th>
@@ -29,7 +33,8 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><a href="{% url 'account_detail' account_id=shipment.owner.acct %}">{{ shipment.owner.name }}</a>
+                    <td>
+                        <a href="{% url 'account_detail' account_id=shipment.owner.acct %}">{{ shipment.owner.name }}</a>
                     </td>
                     <td>#{{ shipment.owner.acct }}</td>
                     <td>{{ shipment.palletized }}</td>
@@ -38,7 +43,31 @@
                     {% else %}
                         <td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
                     {% endif %}
-                    <td>{{ shipment.labor_time }}</td>
+                    {% if shipment.workorder.exists %}
+                        <td>{{ shipment.workorder.id }}</td>
+                    {% else %}
+                        <td>
+                            <ul class="button-group">
+                                <li class="shipment-button">
+                                    <a href="#" class="tiny button info"
+                                       onclick="matchOrder(this, {{ shipment.shipid }})">Link</a>
+                                </li>
+                                <li class="shipment-button">
+                                    <a href="/accounts/{{ shipment.owner.acct }}/add_shipment/"
+                                       class="tiny button">Create</a>
+                                </li>
+                            </ul>
+                            <form method="post" id="match-shipment-{{ shipment.shipid }}" action="" style="display:none;">
+                                {% csrf_token %}
+                                <select class="unmatched-shipment-select" id="{{ shipment.shipid }}">
+                                    {% for order in list %}
+                                        <option id="{{ order.id }}">{{ order }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="tiny button" type="submit" name="submit">Submit</button>
+                            </form>
+                        </td>
+                    {% endif %}
                     <td>{{ shipment.get_status_display }}</td>
                     <td>{{ shipment.tracking_number }}</td>
                 </tr>

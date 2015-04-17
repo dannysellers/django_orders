@@ -26,8 +26,8 @@
         <ul class="left">
             <li><a href="/accounts?accts=active">Accounts</a></li>
             <li><a href="/inventory?status=stored">Inventory</a></li>
-            <li><a href="{% url 'reports' %}">Reports</a></li>
             <li><a href="{% url 'work_order_list' %}">Work Orders</a></li>
+            <li><a href="{% url 'reports' %}">Reports</a></li>
         </ul>
         <ul class="right">
             <li><a href="#" class="disabled">Hi {{ user.first_name }} ({{ user.username }})</a></li>

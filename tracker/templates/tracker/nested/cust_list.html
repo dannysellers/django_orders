@@ -29,6 +29,7 @@
 					{% endif %}
 					{% if 'Inactive' not in head_text %}
 						<td>{{ customer.shipments.all|stored_count }}</td>
+                        <td>{{ customer.workorders.all|stored_count }}</td>
 					{% endif %}
 					<td>${{ customer.inventory.all|storage_fee_total }}</td>
 				</tr>

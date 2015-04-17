@@ -22,7 +22,7 @@ def decode_url (url):
 
 @login_required
 @cache_control(no_cache = True)
-def accounts (request):
+def account_list (request):
     context = RequestContext(request)
     context_dict = dict()
 
@@ -42,16 +42,17 @@ def accounts (request):
 
     """ Capture /accounts?remove=<acct> """
     if remove:
-        if request.user.is_authenticated:
-            if remove_account(account_num = remove):
+        if request.user.is_authenticated():
+            if remove_account(account_num = int(remove)):
                 messages.add_message(request, messages.SUCCESS,
                                      "Account {} deactivated successfully.".format(remove))
+                return HttpResponseRedirect('/accounts?accts=active')
         else:
             messages.add_message(request, messages.ERROR, "You are not logged in.")
             return HttpResponseRedirect('/accounts?accts=active', context_dict)
 
     else:
-        header_list = ['Account', 'Name', 'Create Date', 'Stored Shipments', 'Storage Fees']
+        header_list = ['Account', 'Name', 'Create Date', 'Stored Shipments', 'Work Orders', 'Storage Fees']
         if accts:
             try:
                 # Parse accts argument, retrieve list of customers
@@ -69,6 +70,7 @@ def accounts (request):
                 elif accts == "inactive":
                     customer_list = Customer.objects.order_by('acct').filter(status__exact = 0)
                     header_list.remove('Stored Shipments')
+                    header_list.remove('Work Orders')
                     header_list.insert(-1, 'Close Date')
                     context_dict['head_text'] = 'Inactive '
 
@@ -101,7 +103,7 @@ def accounts (request):
 
 
 @login_required
-def account_page (request, account_id):
+def account_detail (request, account_id):
     context = RequestContext(request)
     context_dict = dict()
 
@@ -113,6 +115,9 @@ def account_page (request, account_id):
     try:
         customer = Customer.objects.get(acct = account_id)
         context_dict['customer'] = customer
+
+        context_dict['order_list'] = customer.workorders.exclude(status = 999).exclude(status = 4)
+
         # Show only items still in inventory
         if customer.inventory.exclude(status = 4).count():
             cust_shipments = customer.shipments.all().exclude(status = 4)
@@ -121,7 +126,7 @@ def account_page (request, account_id):
         else:
             messages.add_message(request, messages.INFO, "This customer has no items stored in inventory.")
     except Customer.DoesNotExist:
-        messages.add_message(request, messages.ERROR, "Account {} not found.".format(account_url))
+        messages.add_message(request, messages.ERROR, "Account {} not found.".format(account_id))
         return render_to_response('tracker/accounts.html', context_dict, context)
 
     # Table cells
@@ -198,7 +203,6 @@ def add_account (request):
     return render_to_response('tracker/form.html', context_dict, context)
 
 
-@login_required
 def remove_account (account_num):
     print("remove_account(): {}".format(account_num))
 

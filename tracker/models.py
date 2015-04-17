@@ -26,6 +26,7 @@ INVENTORY_STATUS_CODES = (
     ('2', 'Order started'),
     ('3', 'Order completed'),
     ('4', 'Shipped'),
+    ('999', 'Terminated'),
 )
 
 
@@ -184,7 +185,7 @@ class OptExtras(models.Model):
 
 
 class WorkOrder(AuthStampedModel):
-    owner = models.ForeignKey(Customer)
+    owner = models.ForeignKey(Customer, related_name = 'workorders')
     # Work orders should correspond to a given Shipment
     # But an order may be received prior to the creation of a Shipment
     shipment = models.ForeignKey(Shipment, null = True, related_name = 'workorder')
@@ -213,11 +214,20 @@ class WorkOrder(AuthStampedModel):
     def __unicode__ (self):
         return 'Order {}: {}'.format(self.pk, self.owner.acct)
 
+    def remove_order (self):
+        """
+        Fxn to remove work orders (i.e. duplicate submissions) while
+        preserving their record
+        """
+        self.finishdate = date.today()
+        self.description += "\nOrder terminated on " + str(self.finishdate)
+        self.status = 999
+
 
 @receiver(post_save, sender = WorkOrder)
 def workorder_op_signal (sender, instance, **kwargs):
     WorkOrderOperation.objects.create_operation(order = instance,
-                                                op_code=instance.status)
+                                                op_code = instance.status)
 
 
 class Operation(AuthStampedModel):

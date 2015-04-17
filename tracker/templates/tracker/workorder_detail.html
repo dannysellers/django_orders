@@ -9,7 +9,7 @@
 {% endblock title %}
 
 {% block header %}
-    Work Order #{{ order.id }} &#8212; {{ order.owner.name }}, #{{ order.owner.acct }}
+    Work Order #{{ order.id }} &#8212; <a href="{% url 'account_detail' account_id=order.owner.acct %}">{{ order.owner.name }}, #{{ order.owner.acct }}</a>
 {% endblock header %}
 
 {% block sub_nav %}
@@ -34,18 +34,13 @@
                             {{ order.owner.name }}
                         </a>
                     </td>
-                    <td>
-                        #{{ order.owner.acct }}
-                    </td>
-                    <td>
-                        {{ order.createdate }}
-                    </td>
-                    <td>
-                        {{ order.quantity }}
-                    </td>
-                    <td>
-                        {{ order.get_status_display }}
-                    </td>
+                    <td>#{{ order.owner.acct }}</td>
+                    <td>{{ order.createdate }}</td>
+                    {% if order.status == '4'  %}
+                        <td>{{ order.finishdate }}</td>
+                    {% endif %}
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.get_status_display }}</td>
                 </tr>
                 </tbody>
             </table>

@@ -11,9 +11,11 @@ urlpatterns = patterns('tracker.views.misc_views',
 
 # Work Order patterns
 urlpatterns += patterns('tracker.views.workorder_views',
-   url(r'^workorders/$', 'work_orders', name = 'work_order_list'),
+   url(r'^workorders/(?P<id>\d+)/remove/$', 'remove_work_order', name = 'remove_order'),
    url(r'^workorders/(?P<id>\d+)/$', 'work_order_detail', name = 'work_order_detail'),
+   url(r'^workorders', 'work_orders', name = 'work_order_list'),
    url(r'^unmatched_shipments/(?P<order_id>\d+)/$', 'get_unmatched_shipments', name = 'get_unmatched_shipments'),
+   url(r'^unmatched_orders/(?P<ship_id>\d+)/$', 'get_unmatched_orders', name = 'get_unmatched_orders'),
    url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order'),
 )
 
@@ -26,8 +28,8 @@ urlpatterns += patterns('tracker.views.auth_views',
 
 # Account patterns
 urlpatterns += patterns('tracker.views.acct_views',
-    url(r'^accounts$', 'accounts', name = 'account_list'),
-    url(r'^accounts/(?P<account_id>\d+)/$', 'account_page', name = 'account_detail'),
+    url(r'^accounts$', 'account_list', name = 'account_list'),
+    url(r'^accounts/(?P<account_id>\d+)/$', 'account_detail', name = 'account_detail'),
     url(r'^add_account/$', 'add_account', name = 'add_account'),
     url(r'^acct_info$', 'acct_info', name = 'account_info'),
 )

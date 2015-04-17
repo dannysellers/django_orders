@@ -7,13 +7,17 @@
 {% endblock title %}
 
 {% block header %}
-    Open Work Orders <span class="subheader">({{ count }})</span>
+    {% if 'Finish Date' in headers %}
+        Closed Work Orders <span class="subheader">({{ count }})</span>
+    {% else %}
+        Open Work Orders <span class="subheader">({{ count }})</span>
+    {% endif %}
 {% endblock header %}
 
 {% block sub_nav %}
 
     <a href="/workorders?status=incomplete">Open Orders</a>
-    | <a href="/workorders?status=complete" class="disabled">Closed Orders</a>
+    | <a href="/workorders?status=complete">Closed Orders</a>
 
 {% endblock sub_nav %}
 
@@ -29,11 +33,13 @@
                 <thead>
                 <tr>
                     <th><input type="checkbox" class="checkbox" onclick="checkAll(this);"></th>
-                    <th>Order ID</th>
-                    <th style="width:30%;">Shipment</th>
-                    <th>Owner</th>
-                    <th>Create Date</th>
-                    <th>Status</th>
+                    {% for item in headers %}
+                        {% if item == 'Shipment' %}
+                            <th style="width:25%;">{{ item }}</th>
+                        {% else %}
+                            <th>{{ item }}</th>
+                        {% endif %}
+                    {% endfor %}
                 </tr>
                 </thead>
                 <tbody>
@@ -51,11 +57,11 @@
                             {% else %}
                                 <ul class="button-group">
                                     <li class="shipment-button">
-                                        <a href="#" class="button" onclick="matchShipment(this, {{ order.id }})">Associate</a>
+                                        <a href="#" class="small button info" onclick="matchShipment(this, {{ order.id }})">Link</a>
                                     </li>
                                     <li class="shipment-button">
                                         <a href="/accounts/{{ order.owner.acct }}/add_shipment/"
-                                           class="button">Create</a>
+                                           class="small button">Create</a>
                                     </li>
                                 </ul>
                                 <form method="post" id="match-order-{{ order.id }}" action="" style="display:none;">
@@ -74,6 +80,7 @@
                         </td>
                         <td>{{ order.createdate }}</td>
                         <td>{{ order.get_status_display }}</td>
+                        <td><a href="#" class="delete-order tiny button alert" onclick="removeOrder({{ order.id }})">Delete</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>

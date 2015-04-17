@@ -128,12 +128,12 @@ function disableElements(eleForm) {
     }
 }
 
-function confirmAcctRemove(itemsInStorage) {
+function confirmAcctRemove(itemsInStorage, intAcct) {
     // itemsInStorage should be passed as {{ customer.inventory.all|stored_count }}
     if (itemsInStorage > 0) {
         alert("This customer still has items in inventory! Please process those first before proceeding.")
     } else if (itemsInStorage == 0) {
-        document.location.href = "/accounts?remove={{ customer.acct }}";
+        document.location.href = "/accounts?remove=" + intAcct;
     } else {
         alert("No itemsInStorage passed to confirmAcctRemove(). Check the onclick of the Remove Account link.")
     }

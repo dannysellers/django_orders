@@ -71,8 +71,64 @@
 {% endif %}
 
 <div class="row">
+    <div class="small-12 large-12 column">
+        <hr width="85%" align="left">
+        <h5>Open Orders</h5>
+        <table>
+            <thead>
+            <tr>
+                <th><input type="checkbox" class="checkbox" disabled></th>
+                <th>Order ID</th>
+                <th style="width:33%;">Shipment</th>
+                <th>Create Date</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for order in order_list %}
+                <tr>
+                    <td class="checkbox">
+                        <input type="checkbox" class="checkbox" disabled>
+                    </td>
+                    <td><a href="{% url 'work_order_detail' id=order.id %}">{{ order.id }}</a></td>
+                    <td>
+                        {% if order.shipment %}
+                            <a href="{% url 'shipment_detail' shipid=order.shipment.shipid %}">{{ order.shipment.shipid }}</a>
+                        {% else %}
+                            <ul class="button-group">
+                                <li class="shipment-button">
+                                    <a href="#" class="small button info" onclick="matchShipment(this, {{ order.id }})">Link</a>
+                                </li>
+                                <li class="shipment-button">
+                                    <a href="/accounts/{{ order.owner.acct }}/add_shipment/"
+                                       class="small button">Create</a>
+                                </li>
+                            </ul>
+                            <form method="post" id="match-order-{{ order.id }}" action="" style="display:none;">
+                                {% csrf_token %}
+                                <select class="unmatched-shipment-select" id="{{ order.id }}">
+                                    {% for shipment in list %}
+                                        <option id="{{ shipment.shipid }}">{{ shipment }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="tiny button" type="submit" name="submit">Submit</button>
+                            </form>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ order.createdate }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
     <div class="small-12 column">
         <hr width="85%" align="left">
+        <h5>Shipments</h5>
         <a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
         | <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
         {% if customer.status != '0' %}

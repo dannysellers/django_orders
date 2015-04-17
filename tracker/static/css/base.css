@@ -71,10 +71,19 @@ td.ship_toggle:hover {
 	text-decoration : none;
 }
 
-#workorder-list-table > tbody > tr > td > ul.button-group > li > a.button {
+table#workorder-list-table > tbody > tr > td > ul.button-group > li > a.button {
     font-size     : small;
     padding-left  : 1.5rem;
     padding-right : 1.5rem;
+}
+
+table#workorder-list-table > tbody > tr > td > a.tiny.button.alert {
+    margin-top : 10%;
+    margin-left : 15%;
+}
+
+table#workorder-list-table > tbody > tr > td:last-child {
+    border-left : 2px solid rgba(85, 85, 85, 0.1);
 }
 
 .button-group > li.shipment-button {
@@ -84,6 +93,11 @@ td.ship_toggle:hover {
 
 select.unmatched-shipment-select {
     width : 85%;
+}
+
+table#shipment-overview > tbody > tr > td > a.button {
+    margin-bottom : 0;
+    font-size     : 0.8rem;
 }
 
   /*//////////////////////////*/

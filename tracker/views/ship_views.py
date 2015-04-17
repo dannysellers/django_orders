@@ -28,7 +28,7 @@ def shipment (request, shipid):
 
     # Overview table
     header_list = ['Owner', 'Owner Acct', 'Palletized', 'Arrival', 'Departure',
-                   'Labor time', 'Status', 'Tracking #']
+                   'Work Order', 'Status', 'Tracking #']
     if int(_shipment.status) != 4:
         header_list.remove('Departure')
     else:
