@@ -3,31 +3,38 @@ from django.shortcuts import render_to_response, HttpResponse, HttpResponseRedir
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 
 import json
 from ..models import WorkOrder, Shipment
 
 
 @login_required
-def work_orders (request):
+def work_orders (request, status = 'incomplete'):
     context = RequestContext(request)
     context_dict = dict()
 
-    wo_filter = request.GET.get('status')
+    # wo_filter = request.GET.get('status')
 
     open_orders = WorkOrder.objects.exclude(status = 4).exclude(status = 999)
     finished_orders = WorkOrder.objects.filter(status = 4)
+    terminated_orders = WorkOrder.objects.filter(status = 999)
 
     header_list = ['Order ID', 'Shipment', 'Owner', 'Create Date', 'Status', '']
 
-    if wo_filter == 'incomplete' or not wo_filter:
+    if status == 'incomplete':
         context_dict['orders'] = open_orders
         context_dict['count'] = open_orders.count()
-    elif wo_filter == 'complete':
+    elif status == 'complete':
         context_dict['orders'] = finished_orders
         header_list.pop()  # Remove the blank column header over the Delete buttons
         header_list.insert(3, 'Finish Date')
         context_dict['count'] = finished_orders.count()
+    elif status == 'terminated':
+        context_dict['orders'] = terminated_orders
+        header_list.pop()
+        header_list.insert(4, 'Termination Date')
+        context_dict['count'] = terminated_orders.count()
     else:
         context_dict['orders'] = open_orders
         context_dict['count'] = open_orders.count()
@@ -64,7 +71,7 @@ def remove_work_order (request, id):
     except WorkOrder.DoesNotExist:
         messages.add_message(request, messages.ERROR, "Can't find any Work Order with ID {}".format(id))
 
-    return HttpResponseRedirect('/workorders/')
+    return HttpResponseRedirect(reverse('work_order_list', args=['incomplete']))
 
 
 @login_required

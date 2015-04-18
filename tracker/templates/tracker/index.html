@@ -26,7 +26,7 @@
         <ul class="left">
             <li><a href="/accounts?accts=active">Accounts</a></li>
             <li><a href="/inventory?status=stored">Inventory</a></li>
-            <li><a href="{% url 'work_order_list' %}">Work Orders</a></li>
+            <li><a href="{% url 'work_order_list' status='incomplete' %}">Work Orders</a></li>
             <li><a href="{% url 'reports' %}">Reports</a></li>
         </ul>
         <ul class="right">
@@ -81,16 +81,17 @@
             <a href="/inventory?storage_fees=no">Items not yet incurring storage
                                                  fees: {{ item_no_storage_count }}</a><br/>
             <hr/>
-            <a href="{% url 'work_order_list' %}">Open Work Orders: {{ work_order_count }}</a><br/>
+            <a href="{% url 'work_order_list' status='incomplete' %}">Open Work Orders: {{ work_order_count }}</a><br/>
             <a href="#">Unmatched Work Orders: {{ unmatched_orders }}</a>
         </div>
     </div>
 
 {% endblock %}
 
+{#<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>#}
+<script src="{% static "js/vendor/jquery.js" %}"></script>
 <script src="{% static "js/tablesort.js" %}"></script>
 <script src="{% static "js/misc.js" %}"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="{% static "js/foundation/foundation.js" %}"></script>
 
 {% block extra_scripts %}

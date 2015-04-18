@@ -1,7 +1,7 @@
 // TODO: Load sample graphs on pageload
 var elemCanvas = document.createElement('canvas');
 
-function getData() {
+$("#get-data").on('click', function() {
     var startDate = $('#start-date');
     var endDate = $('#end-date');
     var queryList = [$("#model-select").val().toLowerCase(), $("#model-attr-select").val(), $("#op-select").val().toLowerCase()];
@@ -28,7 +28,7 @@ function getData() {
                 .show();
         }
     });
-}
+});
 
 function drawGraph(data, options, graph) {
     var ctx = document.getElementById(graph).getContext("2d");

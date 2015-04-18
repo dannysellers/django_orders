@@ -57,17 +57,17 @@ table.sortable th:not(.checkbox):hover {
 	text-align   : center;
 }
 
-td.ship_toggle {
+td.ship-toggle {
 	min-width : .5em;
 }
 
-td.ship_toggle:hover {
+td.ship-toggle:hover {
 	background-color : #bebebe;
 	cursor           : pointer;
 }
 
 /* Shipment toggle + \ - */
-.ship_toggle a:link {
+.ship-toggle a:link {
 	text-decoration : none;
 }
 
@@ -104,7 +104,7 @@ table#shipment-overview > tbody > tr > td > a.button {
  /*// TABLE > row coloring //*/
 /*//////////////////////////*/
 
-.ship_head_row {
+.ship-head-row {
 	background-color : #dcdcdc;
 	font-weight      : 500;
 }

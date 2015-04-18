@@ -1,25 +1,17 @@
-function togglePane(idToggleDiv, toggleLink) {
-    // Function to toggle account info form pane
-    var curDiv = document.getElementById(idToggleDiv);
-    var objToggle = document.getElementById(toggleLink);
+$("a#acctFormToggle").on('click', function() {
+    // Toggle account info form pane
+    var curDiv = $("#acctForm");
+    var self = $(this);
 
-    if (idToggleDiv == 'acctForm') {
-        var preEleText = 'Edit Account Info';
-        var postEleText = 'Hide Account Info'
-    } else if (idToggleDiv == 'toggleDiv') {
-        preEleText = 'Log in';
-        postEleText = 'hide'
-    } else if (idToggleDiv == 'shipForm') {
-        preEleText = 'Show Notes';
-        postEleText = 'Hide Notes'
-    }
+    var showText = 'Edit Account Info';
+    var hideText = 'Hide Account Info';
 
-    var eleText = (curDiv.style.display == 'block') ? preEleText : postEleText;
-    var styleDisplay = (curDiv.style.display == 'block') ? 'none' : 'block';
+    var eleText = (curDiv.css('display') === 'block') ? showText : hideText;
+    var styleDisplay = (curDiv.css('display') === 'block') ? 'none' : 'block';
 
-    objToggle.innerHTML = eleText;
-    curDiv.style.display = styleDisplay;
-}
+    self.html(eleText);
+    curDiv.css('display', styleDisplay);
+});
 
 function getParent(_element, strTagName) {
     // From http://js-code.blogspot.com/p/table-tr-td-th-border-stylesolid-border.html
@@ -31,16 +23,16 @@ function getParent(_element, strTagName) {
         return getParent(_element.parentNode, strTagName);
 }
 
-function checkAll(source) {
+$('th > input.checkbox').on('click', function () {
     // Check all boxes in the table (of class 'checkbox')
     var table = getParent(source.parentNode, 'table');
     var checkboxes = table.getElementsByClassName('checkbox');
     for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = source.checked;
     }
-}
+});
 
-function toggleSection(lnk) {
+$('td.ship-toggle').on('click', function () {
     // Toggles sections of a table, as for folding of shipment <tr>s
     var th = lnk.parentNode;
     var table = getParent(th, 'table');
@@ -67,7 +59,7 @@ function toggleSection(lnk) {
             table.rows[i].cells[1].children[0].style.visibility = "hidden";
         }
     }
-}
+});
 
 function simpleTableToggle(lnk) {
     var th = lnk.parentNode;
@@ -128,13 +120,12 @@ function disableElements(eleForm) {
     }
 }
 
-function confirmAcctRemove(itemsInStorage, intAcct) {
-    // itemsInStorage should be passed as {{ customer.inventory.all|stored_count }}
-    if (itemsInStorage > 0) {
+$('a.remove-link').on('click', function () {
+    // this.id should be {{ customer.inventory.all|stored_count }}
+    if (this.id > 0) {
         alert("This customer still has items in inventory! Please process those first before proceeding.")
-    } else if (itemsInStorage == 0) {
-        document.location.href = "/accounts?remove=" + intAcct;
     } else {
-        alert("No itemsInStorage passed to confirmAcctRemove(). Check the onclick of the Remove Account link.")
+        // Allow the browser to navigate normally
+        return true;
     }
-}
+});

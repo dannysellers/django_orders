@@ -34,12 +34,12 @@
     {% endif %}
     {% if user.is_authenticated and customer %}
         {% if customer.status == '1' %}
-            | <a id="remove_link" href="#"
-                onclick="confirmAcctRemove({{ customer.inventory.all|stored_count }}, {{ customer.acct }})">Remove account</a>
+            | <a class="remove-link" href="/accounts?remove={{ customer.acct }}"
+                id="{{ customer.inventory.all|stored_count }}">Remove account</a>
         {% else %}
             | <a href="#" class="disabled">Remove account</a>
         {% endif %}
-        | <a id="acctFormToggle" href="javascript:togglePane('acctForm', 'acctFormToggle');">Edit Account Info</a>
+        | <a id="acctFormToggle" href="#">Edit Account Info</a>
     {% endif %}
 
 {% endblock sub_nav %}

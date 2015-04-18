@@ -10,6 +10,10 @@
     Add New Shipment &#8212; <a href="/accounts/{{ customer.acct }}">{{ customer.name }} (#{{ customer.acct }})</a>
 {% endblock header %}
 
+{% block extra_scripts %}
+    <script src="{% static "js/formelements.js" %}"></script>
+{% endblock extra_scripts %}
+
 {% block sub_nav %}
 
     <a href="/accounts?accts=all">All accounts</a>
@@ -20,9 +24,7 @@
     {% endif %}
     {% if user.is_authenticated and customer %}
         {% if customer.status == '1' %}
-            | <a id="remove-link"
-                onclick="confirmAcctRemove({{ customer.inventory.all|stored_count }}, {{ customer.acct }})" href="#">Remove
-                                                                                                                     account</a>
+            | <a class="remove-link" href="/accounts?remove={{ customer.acct }}" id="{{ customer.inventory.all|stored_count }}">Remove account</a>
         {% else %}
             | <a href="#" class="disabled">Remove account</a>
         {% endif %}
@@ -61,10 +63,8 @@
 
             </div>
             <div class="small-7 columns">
-                <input type="button" class="small button radius" id="add-extra" onclick="addCartonSetElement()"
-                       value="Add Carton Set">
-                <input type="button" class="small button radius" id="remove-extra" onclick="removeElement()"
-                       value="Remove Carton Set">
+                <input type="button" class="small button radius" id="add-extra" value="Add Carton Set">
+                <input type="button" class="small button radius" id="remove-extra" value="Remove Carton Set">
 
                 <div id="extras-holder">
                     <div class="extra-row">
@@ -79,8 +79,6 @@
             </div>
 
         </form>
-
-        <script src="{% static "js/formelements.js" %}"></script>
     </div>
 
 {% endblock content %}

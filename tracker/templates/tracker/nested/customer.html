@@ -97,7 +97,7 @@
                         {% else %}
                             <ul class="button-group">
                                 <li class="shipment-button">
-                                    <a href="#" class="small button info" onclick="matchShipment(this, {{ order.id }})">Link</a>
+                                    <a href="#" class="small button info" id="{{ order.id }}">Link</a>
                                 </li>
                                 <li class="shipment-button">
                                     <a href="/accounts/{{ order.owner.acct }}/add_shipment/"
@@ -158,8 +158,8 @@
             <tbody>
             {% if shipment_list %}
                 {% for shipment in shipment_list %}
-                    <tr class="ship_head_row">
-                        <td class="ship_toggle" onclick="toggleSection(this);">-</td>
+                    <tr class="ship-head-row">
+                        <td class="ship-toggle">-</td>
                         <td><a href="{% url 'shipment_detail' shipid=shipment.id %}">{{ shipment.id }}</a>
                             ({{ shipment.inventory.count }})
                         </td>

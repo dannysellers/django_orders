@@ -11,10 +11,9 @@ function addElement() {
     holdingArea.appendChild(newExtra);
 }
 
-function removeElement() {
+$("input#remove-extra").on('click', function() {
     var childExtras = document.getElementsByClassName('extra-row');
 
-    //console.log('removeElement called');
     if (childExtras.length > 0) {
         var lastChild = childExtras[childExtras.length - 1];
         lastChild.remove();
@@ -22,25 +21,28 @@ function removeElement() {
         alert('No more elements to remove!');
         return false;
     }
-}
+});
 
-function addCartonSetElement() {
+$("input#add-extra").on('click', function() {
     var newExtra = document.createElement('div');
+    var holdingArea = $("div#extras-holder");
 
-    //console.log('addCartonSetElement called');
     newExtra.className = 'extra-row';
     newExtra.innerHTML = extraCartonSetElement;
-    holdingArea.appendChild(newExtra);
-}
+    holdingArea.append(newExtra);
+});
 
 /////////////////////////////
 // Workorder_list behavior //
 /////////////////////////////
 
-function matchShipment(ele, idSelect) {
+$('li.shipment-button > a.small.button.info').on('click', function() {
     /* Fxn to populate select widget with unmatched shipments
       (Shipments that have no Work Order)
      */
+    var idSelect = this.id;
+    var self = $(this);
+
     $.ajax({
         url: "/unmatched_shipments/" + idSelect + "/",
         dataType: "text",
@@ -51,14 +53,14 @@ function matchShipment(ele, idSelect) {
         success: function (data) {
             // Parse data
             var _data = JSON.parse(data).list;
-            var btnGroup = $(ele).parent().parent();
+            var btnGroup = self.parent().parent();
             var shipForm = $("#match-order-" + idSelect);
             var sibSelect = $("#" + idSelect);
 
             if (!_data.length) {
                 alert("This customer does not have any unmatched shipments. Try creating one instead.");
                 // Disable the Link button
-                $(ele).addClass('disabled');
+                self.addClass('disabled');
                 return false
             }
 
@@ -73,7 +75,7 @@ function matchShipment(ele, idSelect) {
             for (var i = 0; i < _data.length; i++) sibSelect.append("<option id=" + i + ">" + _data[i] + "</option>");
         }
     })
-}
+});
 
 
 function matchOrder(ele, idSelect) {
@@ -114,11 +116,6 @@ function matchOrder(ele, idSelect) {
     })
 }
 
-
-function removeOrder (orderID) {
-    var r = confirm("Would you really like to delete Work Order " + orderID + "?");
-    if (r) {
-        // Navigate to address.com/workorders/#/remove/
-        location.href = window.location.origin + window.location.pathname + '/' + orderID + '/remove/';
-    }
-}
+$(".delete-order").on('click', function() {
+    return confirm("Would you really like to delete Work Order " + this.id + "?");
+});

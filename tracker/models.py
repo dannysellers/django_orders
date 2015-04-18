@@ -14,6 +14,7 @@ from .managers import CustomerManager, ShipmentManager, InventoryManager, \
     WorkOrderOpManager
 
 UNIT_STORAGE_FEE = 0.10
+STORAGE_FEES_DAYS = 10
 
 CUSTOMER_STATUS_CODES = (
     ('0', 'Inactive'),
@@ -26,6 +27,8 @@ INVENTORY_STATUS_CODES = (
     ('2', 'Order started'),
     ('3', 'Order completed'),
     ('4', 'Shipped'),
+    # Status codes above 1 digit length are
+    # only used for Work Orders & WorkOrderOps
     ('999', 'Terminated'),
 )
 
@@ -140,7 +143,8 @@ class Inventory(AuthStampedModel):
         return 'Item {}'.format(self.itemid)
 
     def get_storage_fees (self):
-        if self.status != 4 and timezone.now().date() - self.arrival >= timedelta(days = 10):
+        age = timezone.now().date() - self.arrival
+        if self.status != 4 and age >= timedelta(days = STORAGE_FEES_DAYS):
             return self.storage_fees
         else:
             return 0.00
@@ -158,7 +162,7 @@ class Inventory(AuthStampedModel):
         if not self.shipset.departure or not self.departure:
             return 0.00
         else:
-            days = (self.departure - self.arrival).days - 10
+            days = (self.departure - self.arrival).days - STORAGE_FEES_DAYS
             return self.storage_fees * days
 
     class Meta:
@@ -204,7 +208,7 @@ class WorkOrder(AuthStampedModel):
     palletizing = models.BooleanField(default = False, help_text = "Palletizing")
     misc_services = models.BooleanField(default = False, help_text = "Additional miscellaneous services")
     misc_service_text = models.CharField(max_length = 1000, help_text = "Add'l misc service description")
-    status = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
+    status = models.CharField(max_length = 3, choices = INVENTORY_STATUS_CODES, default = 0)
     createdate = models.DateField()
     finishdate = models.DateField(null = True)
 
@@ -221,7 +225,8 @@ class WorkOrder(AuthStampedModel):
         """
         self.finishdate = date.today()
         self.description += "\nOrder terminated on " + str(self.finishdate)
-        self.status = 999
+        self.status = '999'
+        self.save()
 
 
 @receiver(post_save, sender = WorkOrder)
@@ -236,7 +241,7 @@ class Operation(AuthStampedModel):
     only difference between which is the ForeignKey relation
     """
     dt = models.DateTimeField()
-    op_code = models.CharField(max_length = 1, choices = INVENTORY_STATUS_CODES, default = 0)
+    op_code = models.CharField(max_length = 3, choices = INVENTORY_STATUS_CODES, default = 0)
 
     class Meta:
         abstract = True
@@ -251,7 +256,7 @@ class ShipOperation(Operation):
         verbose_name = "shipment operation"
 
     def __unicode__ (self):
-        return 'Item {}, Code {}'.format(self.shipment.shipid, self.op_code)
+        return 'Item {}, {}'.format(self.shipment.shipid, self.get_op_code_display())
 
 
 class ItemOperation(Operation):
@@ -259,8 +264,11 @@ class ItemOperation(Operation):
 
     objects = ItemOpManager()
 
+    class Meta:
+        verbose_name = "item operation"
+
     def __unicode__ (self):
-        return 'Item {}, Code {}'.format(self.item.itemid, self.op_code)
+        return 'Item {}, {}'.format(self.item.itemid, self.get_op_code_display())
 
 
 class WorkOrderOperation(Operation):
@@ -268,5 +276,8 @@ class WorkOrderOperation(Operation):
 
     objects = WorkOrderOpManager()
 
+    class Meta:
+        verbose_name = "work order operation"
+
     def __unicode__ (self):
-        return ''
+        return 'Order {}, {}'.format(self.order.id, self.get_op_code_display())
