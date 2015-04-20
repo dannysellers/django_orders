@@ -49,21 +49,18 @@
                         <td>
                             <ul class="button-group">
                                 <li class="shipment-button">
-                                    <a href="#" class="tiny button info"
-                                       onclick="matchOrder(this, {{ shipment.shipid }})">Link</a>
+                                    <a href="#" class="tiny button info link-order"
+                                       id="{{ shipment.shipid }}">Link</a>
                                 </li>
                                 <li class="shipment-button">
                                     <a href="/accounts/{{ shipment.owner.acct }}/add_shipment/"
                                        class="tiny button">Create</a>
                                 </li>
                             </ul>
-                            <form method="post" id="match-shipment-{{ shipment.shipid }}" action="" style="display:none;">
+                            <form method="post" class="match-shipment-form" id="{{ shipment.shipid }}"
+                                  action="" style="display:none;">
                                 {% csrf_token %}
-                                <select class="unmatched-shipment-select" id="{{ shipment.shipid }}">
-                                    {% for order in list %}
-                                        <option id="{{ order.id }}">{{ order }}</option>
-                                    {% endfor %}
-                                </select>
+                                <select class="unmatched-order-select" id="{{ shipment.shipid }}"></select>
                                 <button class="tiny button" type="submit" name="submit">Submit</button>
                             </form>
                         </td>
@@ -232,7 +229,6 @@
         </div>
     </div>
 
-    <script src="{% static "js/formelements.js" %}"></script>
     <script>
         var oldEvt = window.onload;
         window.onload = function () {

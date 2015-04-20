@@ -64,19 +64,17 @@
                             {% else %}
                                 <ul class="button-group">
                                     <li class="shipment-button">
-                                        <a href="#" class="small button info" id="{{ order.id }}">Link</a>
+                                        <a href="#" class="small button info link-shipment" id="{{ order.id }}">Link</a>
                                     </li>
                                     <li class="shipment-button">
-                                        <a href="/accounts/{{ order.owner.acct }}/add_shipment/"
+                                        <a href="/accounts/{{ order.owner.acct }}/add_shipment/0/"
                                            class="small button">Create</a>
                                     </li>
                                 </ul>
-                                <form method="post" id="match-order-{{ order.id }}" action="" style="display:none;">
+                                <form method="post" class="match-order-form" id="{{ order.id }}"
+                                      action="" style="display:none;">
                                     {% csrf_token %}
                                     <select class="unmatched-shipment-select" id="{{ order.id }}">
-                                        {% for shipment in list %}
-                                            <option id="{{ shipment.shipid }}">{{ shipment }}</option>
-                                        {% endfor %}
                                     </select>
                                     <button class="tiny button" type="submit" name="submit">Submit</button>
                                 </form>

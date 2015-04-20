@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 
+import re
 import json
 from ..models import WorkOrder, Shipment
 
@@ -13,8 +14,6 @@ from ..models import WorkOrder, Shipment
 def work_orders (request, status = 'incomplete'):
     context = RequestContext(request)
     context_dict = dict()
-
-    # wo_filter = request.GET.get('status')
 
     open_orders = WorkOrder.objects.exclude(status = 4).exclude(status = 999)
     finished_orders = WorkOrder.objects.filter(status = 4)
@@ -75,12 +74,32 @@ def remove_work_order (request, id):
 
 
 @login_required
-def submit_work_order (request):
-    # TODO: Will work orders ever be created/submitted not by the API?
-    # context = RequestContext(request)
-    # context_dict = ()
+def link_work_order (request, orderid):
+    """
+    Function to handle linking WorkOrder and Shipment objects
+    """
+    if request.method != 'POST':
+        pass
+    else:
+        order = WorkOrder.objects.get(id = orderid)
 
-    return HttpResponse("This is the method to create a work order", content_type = 'application/json')
+        ship_desc = request.POST['shipid']
+        ship_id = re.findall('#(\d+):', ship_desc)[0]
+        shipment = Shipment.objects.get(shipid = ship_id)
+
+        order.shipment = shipment
+        order.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+# @login_required
+# def submit_work_order (request):
+#     # TODO: Will work orders ever be created/submitted not by the API?
+#     # context = RequestContext(request)
+#     # context_dict = ()
+#
+#     return HttpResponse("This is the method to create a work order", content_type = 'application/json')
 
 
 @csrf_exempt

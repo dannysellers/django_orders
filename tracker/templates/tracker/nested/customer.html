@@ -97,19 +97,17 @@
                         {% else %}
                             <ul class="button-group">
                                 <li class="shipment-button">
-                                    <a href="#" class="small button info" id="{{ order.id }}">Link</a>
+                                    <a href="#" class="small button info link-shipment" id="{{ order.id }}">Link</a>
                                 </li>
                                 <li class="shipment-button">
                                     <a href="/accounts/{{ order.owner.acct }}/add_shipment/"
                                        class="small button">Create</a>
                                 </li>
                             </ul>
-                            <form method="post" id="match-order-{{ order.id }}" action="" style="display:none;">
+                            <form method="post" class="match-order-form"
+                                  id="{{ order.id }}" action="/workorders/{{ order.id }}/link/" style="display:none;">
                                 {% csrf_token %}
-                                <select class="unmatched-shipment-select" id="{{ order.id }}">
-                                    {% for shipment in list %}
-                                        <option id="{{ shipment.shipid }}">{{ shipment }}</option>
-                                    {% endfor %}
+                                <select name="shipid" class="unmatched-shipment-select" id="{{ order.id }}">
                                 </select>
                                 <button class="tiny button" type="submit" name="submit">Submit</button>
                             </form>
@@ -132,7 +130,7 @@
         <a href="/inventory?acct={{ customer.acct }}&status=stored">Manage Inventory</a>
         | <a href="/inventory?acct={{ customer.acct }}&status=all">Inventory Report</a>
         {% if customer.status != '0' %}
-        | <a href="/accounts/{{ customer.acct }}/add_shipment">Add Shipment</a>
+        | <a href="/accounts/{{ customer.acct }}/add_shipment/0/">Add Shipment</a>
         {% else %}
         | <a href="#" class="disabled">Add Shipment</a>
         {% endif %}

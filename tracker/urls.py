@@ -12,11 +12,12 @@ urlpatterns = patterns('tracker.views.misc_views',
 # Work Order patterns
 urlpatterns += patterns('tracker.views.workorder_views',
    url(r'^workorders/(?P<id>\d+)/remove/$', 'remove_work_order', name = 'remove_order'),
+   url(r'^workorders/(?P<orderid>\d+)/link/$', 'link_work_order', name = 'link_work_order'),
    url(r'^workorders/(?P<id>\d+)/$', 'work_order_detail', name = 'work_order_detail'),
    url(r'^workorders/(?P<status>\w+)/$', 'work_orders', name = 'work_order_list'),
    url(r'^unmatched_shipments/(?P<order_id>\d+)/$', 'get_unmatched_shipments', name = 'get_unmatched_shipments'),
    url(r'^unmatched_orders/(?P<ship_id>\d+)/$', 'get_unmatched_orders', name = 'get_unmatched_orders'),
-   url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order'),
+   # url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order'),
 )
 
 # Authentication patterns
@@ -45,6 +46,7 @@ urlpatterns += patterns('tracker.views.inv_views',
 # Shipment patterns
 urlpatterns += patterns('tracker.views.ship_views',
     url(r'^shipment/(?P<shipid>\d+)$', 'shipment', name = 'shipment_detail'),
+    url(r'^shipment/(?P<shipid>\d+)/link/$', 'link_shipment', name = 'link_shipment'),
     url(r'^ship_info$', 'ship_info', name = 'ship_info'),
     url(r'^ship_extras$', 'ship_extras', name = 'ship_extras'),
     url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment', name = 'add_shipment'),

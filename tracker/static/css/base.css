@@ -91,8 +91,16 @@ table#workorder-list-table > tbody > tr > td:last-child {
     margin-bottom : -0.5rem;
 }
 
-select.unmatched-shipment-select {
-    width : 85%;
+select.unmatched-shipment-select,
+select.unmatched-order-select {
+    width        : 55%;
+    margin-right : 0.5rem;
+}
+
+form.match-shipment-form,
+form.match-order-form {
+    margin-top    : 0.5rem;
+    margin-bottom : -0.5rem;
 }
 
 table#shipment-overview > tbody > tr > td > a.button {

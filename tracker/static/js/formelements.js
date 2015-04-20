@@ -11,7 +11,7 @@ function addElement() {
     holdingArea.appendChild(newExtra);
 }
 
-$("input#remove-extra").on('click', function() {
+$("input#remove-extra").on('click', function () {
     var childExtras = document.getElementsByClassName('extra-row');
 
     if (childExtras.length > 0) {
@@ -23,7 +23,7 @@ $("input#remove-extra").on('click', function() {
     }
 });
 
-$("input#add-extra").on('click', function() {
+$("input#add-extra").on('click', function () {
     var newExtra = document.createElement('div');
     var holdingArea = $("div#extras-holder");
 
@@ -32,19 +32,18 @@ $("input#add-extra").on('click', function() {
     holdingArea.append(newExtra);
 });
 
-/////////////////////////////
-// Workorder_list behavior //
-/////////////////////////////
+  //////////////////////////////
+ // Order - Shipment Linking //
+//////////////////////////////
 
-$('li.shipment-button > a.small.button.info').on('click', function() {
+$("a.link-shipment").on('click', function () {
     /* Fxn to populate select widget with unmatched shipments
-      (Shipments that have no Work Order)
+     (Shipments that have no Work Order)
      */
-    var idSelect = this.id;
     var self = $(this);
 
     $.ajax({
-        url: "/unmatched_shipments/" + idSelect + "/",
+        url: "/unmatched_shipments/" + self.prop('id') + "/",
         dataType: "text",
         type: "GET",
         error: function (err) {
@@ -54,8 +53,8 @@ $('li.shipment-button > a.small.button.info').on('click', function() {
             // Parse data
             var _data = JSON.parse(data).list;
             var btnGroup = self.parent().parent();
-            var shipForm = $("#match-order-" + idSelect);
-            var sibSelect = $("#" + idSelect);
+            var shipForm = $("form#" + self.prop('id') + ".match-order-form");
+            var sibSelect = $("select#" + self.prop('id') + ".unmatched-shipment-select");
 
             if (!_data.length) {
                 alert("This customer does not have any unmatched shipments. Try creating one instead.");
@@ -78,28 +77,29 @@ $('li.shipment-button > a.small.button.info').on('click', function() {
 });
 
 
-function matchOrder(ele, idSelect) {
+$("a.link-order").on('click', function () {
     /* Fxn to populate select widget with unmatched work orders
-       (Work Orders that have no Shipment)
+     (Work Orders that have no Shipment)
      */
+    var self = $(this);
     $.ajax({
-        url: '/unmatched_orders/' + idSelect + '/',
+        url: '/unmatched_orders/' + self.prop('id') + '/',
         dataType: 'text',
         type: 'GET',
-        error: function(err) {
+        error: function (err) {
             alert("Error: " + err.statusText.toString())
         },
-        success: function(data) {
+        success: function (data) {
             // Parse data
             var _data = JSON.parse(data).list;
-            var btnGroup = $(ele).parent().parent();
-            var orderForm = $("#match-shipment-" + idSelect);
-            var sibSelect = $("#" + idSelect);
+            var btnGroup = $(self).parent().parent();
+            var orderForm = $("form#" + self.prop('id') + ".match-shipment-form");
+            var sibSelect = $("select#" + self.prop('id') + ".unmatched-order-select");
 
             if (!_data.length) {
                 alert("This customer does not have any unmatched work orders. Try creating one instead.");
                 // Disable the Link button
-                $(ele).addClass('disabled');
+                $(self).addClass('disabled');
                 return false
             }
 
@@ -114,8 +114,18 @@ function matchOrder(ele, idSelect) {
             for (var i = 0; i < _data.length; i++) sibSelect.append("<option id=" + i + ">" + _data[i] + "</option>");
         }
     })
-}
+});
 
-$(".delete-order").on('click', function() {
+$("form.match-order-form").on('submit', function (evt) {
+    console.log(evt);
+    //evt.preventDefault();
+});
+
+$("form.match-shipment-form").on('submit', function(evt) {
+    console.log(evt);
+    //evt.preventDefault();
+});
+
+$(".delete-order").on('click', function () {
     return confirm("Would you really like to delete Work Order " + this.id + "?");
 });

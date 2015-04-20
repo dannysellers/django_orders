@@ -137,12 +137,10 @@ def add_shipment (request, account_url):
                 _length = length_set[index]
                 _width = width_set[index]
                 _height = height_set[index]
-                item = Inventory.objects.create_inventory(shipset = _shipment,
-                                                          length = _length,
-                                                          width = _width,
-                                                          height = _height)
-                print("Created Item {}, Shipment {}, Acct {}".format(item.itemid, item.shipset.shipid,
-                                                                     item.owner.acct))
+                Inventory.objects.create_inventory(shipset = _shipment,
+                                                   length = _length,
+                                                   width = _width,
+                                                   height = _height)
 
         messages.add_message(request, messages.SUCCESS,
                              "Shipment {}, containing {} items created successfully.".format(_shipment.shipid,
@@ -176,3 +174,23 @@ def ship_extras (request):
         messages.add_message(request, messages.ERROR, "Invalid request received. Try submitting a form.")
 
     return HttpResponseRedirect('/shipment/{}'.format(shipid))
+
+
+@login_required
+def link_shipment(request, shipid):
+    """
+    Function to handle linking Shipment and WorkOrder objects
+    """
+    if request.method != 'POST':
+        pass
+    else:
+        _shipment = Shipment.objects.get(shipid = shipid)
+
+        order_desc = request.POST['orderid']
+        order_id = re.findall('#(\d+):', order_desc)[0]
+        order = WorkOrder.objects.get(id = order_id)
+
+        order.shipment = _shipment
+        order.save()
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

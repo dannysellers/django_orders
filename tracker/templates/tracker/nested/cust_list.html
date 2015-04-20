@@ -28,6 +28,7 @@
 						{% endif %}
 					{% endif %}
 					{% if 'Inactive' not in head_text %}
+{#                        TODO: Display Matched and Unmatched Work Orders? #}
 						<td>{{ customer.shipments.all|stored_count }}</td>
                         <td>{{ customer.workorders.all|stored_count }}</td>
 					{% endif %}
