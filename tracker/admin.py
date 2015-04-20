@@ -30,15 +30,6 @@ class ItemOpInline(admin.TabularInline):
     readonly_fields = ('item', 'op_code', 'dt')
 
 
-class ItemOpAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['item', 'op_code', 'dt']})
-    ]
-    list_display = ('item', 'op_code', 'dt')
-    list_filter = ['op_code', 'item']
-    readonly_fields = ('item', 'op_code', 'dt')
-
-
 class ShipOpInline(admin.TabularInline):
     model = models.ShipOperation
 
@@ -51,12 +42,21 @@ class ShipOpInline(admin.TabularInline):
 # Model Admin Pages
 ###################
 
+class ItemOpAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['item', 'op_code', 'dt']})
+    ]
+    list_display = ('item', 'op_code', 'dt')
+    list_filter = ['op_code', 'item']
+    readonly_fields = ('item', 'op_code', 'dt')
+
+
 class ShipOpAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['shipment', 'op_code', 'dt']})
     ]
     list_display = ('shipment', 'op_code', 'dt')
-    list_filter = ['op_code']
+    list_filter = ['op_code', 'shipment']
     readonly_fields = ('shipment', 'op_code', 'dt')
 
 
@@ -74,6 +74,17 @@ class CustomerAdmin(admin.ModelAdmin):
 
 
 class ShipmentAdmin(admin.ModelAdmin):
+    @staticmethod
+    def has_workorder (instance):
+        if instance.workorder.exists():
+            return instance.workorder
+        else:
+            return False
+
+    @staticmethod
+    def inventory_count(instance):
+        return instance.inventory.exclude(status = 4).count()
+
     fieldsets = [
         (None, {'fields': ['palletized', 'labor_time', 'tracking_number', 'status']}),
         ('Notes', {'fields': ['notes'], 'classes': ['collapse']}),
@@ -81,7 +92,7 @@ class ShipmentAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ('shipid', 'owner', 'arrival', 'departure')
     inlines = [ShipOpInline]
-    list_display = ('shipid', 'owner')
+    list_display = ('shipid', 'owner', 'inventory_count', 'has_workorder')
     list_filter = ['status']
 
 
@@ -119,7 +130,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
 
 
 # class ExpiringTokenAdmin(TokenAdmin):
-#     def has_expired (self, instance):
+# def has_expired (self, instance):
 #         """
 #         If the token is more than 48 hours old, it is expired
 #         """

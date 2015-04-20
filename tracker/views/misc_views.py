@@ -16,11 +16,12 @@ def index (request):
         context_dict['cust_act_count'] = Customer.objects.filter(status = 1).count()
         context_dict['item_count'] = Inventory.objects.exclude(status = 4).count()
         context_dict['ship_count'] = Shipment.objects.exclude(status = 4).count()
-        context_dict['total_item_volume'] = Inventory.objects.exclude(status = 4).aggregate(Sum('volume'))[
-            'volume__sum']
-        context_dict['work_order_count'] = WorkOrder.objects.exclude(status = 4).count()
+        context_dict['total_item_volume'] = Inventory.objects.exclude(status = 4).aggregate(
+            Sum('volume'))['volume__sum']
+        context_dict['work_order_count'] = WorkOrder.objects.exclude(status = 4).exclude(
+            status = 999).count()
         context_dict['unmatched_orders'] = WorkOrder.objects.exclude(status = 4).exclude(
-            shipment__isnull = False).count()
+            status = 999).exclude(shipment__isnull = False).count()
 
         ten_days_ago = date.today() - timedelta(days = 10)
 

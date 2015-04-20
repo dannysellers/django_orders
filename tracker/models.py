@@ -91,11 +91,8 @@ class Shipment(AuthStampedModel):
     audit_log = AuditLog()
 
     def __unicode__ (self):
-        return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
-
-    @property
-    def status_text (self):
-        return self.get_status_display()
+        # return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
+        return 'Shipment #{}: {}'.format(self.shipid, self.arrival)
 
     def storage_fees (self):
         fees = 0.00
@@ -209,6 +206,7 @@ class WorkOrder(AuthStampedModel):
     misc_services = models.BooleanField(default = False, help_text = "Additional miscellaneous services")
     misc_service_text = models.CharField(max_length = 1000, help_text = "Add'l misc service description")
     status = models.CharField(max_length = 3, choices = INVENTORY_STATUS_CODES, default = 0)
+    # TODO: Change to DateTimes?
     createdate = models.DateField()
     finishdate = models.DateField(null = True)
 
@@ -216,7 +214,8 @@ class WorkOrder(AuthStampedModel):
     audit_log = AuditLog()
 
     def __unicode__ (self):
-        return 'Order {}: {}'.format(self.pk, self.owner.acct)
+        # return 'Order {}: {}'.format(self.pk, self.owner.acct)
+        return 'Order #{}: {}'.format(self.pk, self.createdate)
 
     def remove_order (self):
         """
