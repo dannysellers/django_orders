@@ -25,10 +25,10 @@ function getParent(_element, strTagName) {
 
 $('th > input.checkbox').on('click', function () {
     // Check all boxes in the table (of class 'checkbox')
-    var table = getParent(source.parentNode, 'table');
+    var table = getParent(this.parentNode, 'table');
     var checkboxes = table.getElementsByClassName('checkbox');
     for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = source.checked;
+        checkboxes[i].checked = this.checked;
     }
 });
 

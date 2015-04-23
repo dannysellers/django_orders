@@ -67,14 +67,3 @@ $("#op-select").change(function () {
         $("#model-attr-select").attr('disabled', false);
     }
 });
-
-var oldEvt = window.onload;
-window.onload = function () {
-    if (oldEvt) oldEvt();
-    if (!elemCanvas.getContext) {
-        // Chart.js relies on <canvas> support
-        document.write("HTML5 Canvas not supported by your browser!")
-    }
-    getModelData();
-    $('.datepicker').pikaday({format: 'YYYY-MM-DD'});
-};

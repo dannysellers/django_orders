@@ -19,6 +19,35 @@
 
 {% block extra_scripts %}
     <script src="{% static "js/formelements.js" %}"></script>
+
+    <script>
+        var oldEvt = window.onload;
+        window.onload = function() {
+            if (oldEvt) oldEvt;
+
+            var shipStatus = {{ shipment.status }};
+            var s = document.getElementsByName('item_status')[0];
+            var btns = document.getElementsByClassName('tiny button');
+
+            // Set the form select widget to the current value + 1
+            // Except if shipment.status = 4, disable the select widget
+            if (shipStatus < 4) {
+                s.selectedIndex = shipStatus + 1;
+            } else {
+                s.selectedIndex = 4;
+                s.disabled = true;
+                for (var i = 0; i < btns.length; i++) {
+                    btns[i].classList.add('disabled');
+                }
+            }
+
+            // If the user isn't logged in or shipStatus = 4, disable the form elements
+            var loggedIn = '{{ user.is_authenticated }}';
+            if (loggedIn == 'False' || shipStatus == 4) {
+                disableElements('shipForm');
+            }
+        };
+    </script>
 {% endblock extra_scripts %}
 
 {% block content %}
@@ -228,31 +257,4 @@
             {% endif %}
         </div>
     </div>
-
-    <script>
-        var oldEvt = window.onload;
-        window.onload = function () {
-            if (oldEvt) oldEvt();
-
-            var shipStatus = parseInt('{{ shipment.status }}');
-            var s = document.getElementsByName('item_status')[0];
-
-            // Set the form select widget to the current value + 1
-            // Except if shipment.status = 4, disable the select widget
-            if (shipStatus < 4) {
-                s.selectedIndex = shipStatus + 1;
-            } else {
-                s.selectedIndex = 4;
-                s.disabled = true;
-            }
-
-            // If the user isn't logged in or shipStatus = 4, disable the form elements
-            var loggedIn = '{{ user.is_authenticated }}';
-            // TODO: Not all form elements are being disabled when user is anonymous but shipStatus != 4
-            if (loggedIn == 'False' || shipStatus == 4) {
-                disableElements('shipForm');
-            }
-        }
-    </script>
-
 {% endblock content %}

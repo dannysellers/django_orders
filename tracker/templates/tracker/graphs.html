@@ -15,11 +15,22 @@
 {% endblock extra_stylesheets %}
 
 {% block extra_scripts %}
-    <script src="{% static "js/Chart.js" %}"></script>
-    <script src="{% static "js/moment.min.js" %}"></script>
-    <script src="{% static "js/pikaday.js" %}"></script>
-    <script src="{% static "js/pikaday.jquery.js" %}"></script>
+    <script src="{% static "js/vendor/Chart.js" %}"></script>
+    <script src="{% static "js/vendor/moment.min.js" %}"></script>
+    <script src="{% static "js/vendor/pikaday.js" %}"></script>
+    <script src="{% static "js/vendor/pikaday.jquery.js" %}"></script>
     <script src="{% static "js/reports.js" %}"></script>
+
+    <script>
+        (function () {
+            if (!elemCanvas.getContext) {
+                // Chart.js relies on <canvas> support
+                document.write("HTML5 Canvas not supported by your browser!")
+            }
+            getModelData();
+            $('.datepicker').pikaday({format: 'YYYY-MM-DD'});
+        })();
+    </script>
 {% endblock extra_scripts %}
 
 {% block content %}
