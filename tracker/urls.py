@@ -7,6 +7,10 @@ from api import urls as api_urls
 # Index
 urlpatterns = patterns('tracker.views.misc_views',
    url(r'^$', 'index', name = 'index'),
+   url(r'^reset/$', 'reset', name = 'password_reset'),
+   url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+       'reset_confirm', name = 'password_reset_confirm'),
+   url(r'^success/', 'success', name = 'password_reset_success'),
 )
 
 # Work Order patterns

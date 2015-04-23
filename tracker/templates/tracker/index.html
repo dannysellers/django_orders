@@ -31,6 +31,7 @@
         </ul>
         <ul class="right">
             <li><a href="#" class="disabled">Hi {{ user.first_name }} ({{ user.username }})</a></li>
+            <li><a href="/reset/">Password Reset</a></li>
             <li class="divider"></li>
             <li><a href="/logout/">Log out</a></li>
         </ul>
@@ -82,7 +83,7 @@
                                                  fees: {{ item_no_storage_count }}</a><br/>
             <hr/>
             <a href="{% url 'work_order_list' status='incomplete' %}">Open Work Orders: {{ work_order_count }}</a><br/>
-            <a href="#">Unmatched Work Orders: {{ unmatched_orders }}</a>
+            <a href="{% url 'work_order_list' status='unmatched' %}">Unmatched Work Orders: {{ unmatched_orders }}</a>
         </div>
     </div>
 

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html lang="en">
+<head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet" href="{% static "css/normalize.css" %}">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h3 class="text-muted">Password reset email sent</h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-10">
+            <div class="alert alert-success">
+                <p>Password reset initiated.</p>
+
+                <p>Please check your email inbox to confirm that you've received the message,
+                   and follow the link it contains.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
