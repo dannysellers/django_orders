@@ -7,16 +7,22 @@
 {% endblock title %}
 
 {% block header %}
-    {% if 'Finish Date' in headers %}
-        Closed Work Orders <span class="subheader">({{ count }})</span>
+    {% if status == 'complete' %}
+        Closed Work Orders
+    {% elif status == 'terminated' %}
+        Terminated Work Orders
+    {% elif status == 'unmatched' %}
+        Unmatched Work Orders
     {% else %}
-        Open Work Orders <span class="subheader">({{ count }})</span>
+        Open Work Orders
     {% endif %}
+     <span class="subheader">({{ count }})</span>
 {% endblock header %}
 
 {% block sub_nav %}
 
     <a href="{% url 'work_order_list' status='incomplete' %}">Incomplete Orders</a>
+    | <a href="{% url 'work_order_list' status='unmatched' %}">Unmatched Orders</a>
     | <a href="{% url 'work_order_list' status='complete' %}">Complete Orders</a>
     | <a href="{% url 'work_order_list' status='terminated' %}">Terminated Orders</a>
 

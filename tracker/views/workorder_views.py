@@ -11,13 +11,15 @@ from ..models import WorkOrder, Shipment
 
 
 @login_required
-def work_orders (request, status = 'incomplete'):
+def work_orders (request, status='incomplete'):
     context = RequestContext(request)
     context_dict = dict()
 
     open_orders = WorkOrder.objects.exclude(status = 4).exclude(status = 999)
     finished_orders = WorkOrder.objects.filter(status = 4)
     terminated_orders = WorkOrder.objects.filter(status = 999)
+    unmatched_orders = WorkOrder.objects.exclude(status = 999)\
+        .exclude(shipment__isnull = False)
 
     header_list = ['Order ID', 'Shipment', 'Owner', 'Create Date', 'Status', '']
 
@@ -34,10 +36,14 @@ def work_orders (request, status = 'incomplete'):
         header_list.pop()
         header_list.insert(4, 'Termination Date')
         context_dict['count'] = terminated_orders.count()
+    elif status == 'unmatched':
+        context_dict['orders'] = unmatched_orders
+        context_dict['count'] = unmatched_orders.count()
     else:
         context_dict['orders'] = open_orders
         context_dict['count'] = open_orders.count()
 
+    context_dict['status'] = status
     context_dict['headers'] = header_list
 
     return render_to_response('tracker/workorder_list.html', context_dict, context)
@@ -70,7 +76,7 @@ def remove_work_order (request, id):
     except WorkOrder.DoesNotExist:
         messages.add_message(request, messages.ERROR, "Can't find any Work Order with ID {}".format(id))
 
-    return HttpResponseRedirect(reverse('work_order_list', args=['incomplete']))
+    return HttpResponseRedirect(reverse('work_order_list', args = ['incomplete']))
 
 
 @login_required
@@ -81,6 +87,7 @@ def link_work_order (request, orderid):
     if request.method != 'POST':
         pass
     else:
+        # TODO: Alert the user to discrepancies b/w the Work Order and the Shipment (i.e. different quantity)
         order = WorkOrder.objects.get(id = orderid)
 
         ship_desc = request.POST['shipid']
@@ -95,7 +102,7 @@ def link_work_order (request, orderid):
 
 # @login_required
 # def submit_work_order (request):
-#     # TODO: Will work orders ever be created/submitted not by the API?
+# # TODO: Will work orders ever be created/submitted not by the API?
 #     # context = RequestContext(request)
 #     # context_dict = ()
 #
