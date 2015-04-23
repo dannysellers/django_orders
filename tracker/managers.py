@@ -91,8 +91,7 @@ class WorkOrderManager(Manager):
                              consolidation = kwargs['consolidation'],
                              palletizing = kwargs['palletization'],
                              misc_services = kwargs['miscservices'],
-                             misc_service_text = kwargs['miscservicetext'],
-                             createdate = timezone.now().date())
+                             misc_service_text = kwargs['miscservicetext'])
 
         return _order
 

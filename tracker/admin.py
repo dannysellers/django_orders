@@ -39,6 +39,15 @@ class ShipOpInline(admin.TabularInline):
     readonly_fields = ('shipment', 'op_code', 'dt')
 
 
+class WorkOrderOpInline(admin.TabularInline):
+    model = models.WorkOrderOperation
+
+    fieldsets = [
+        (None, {'fields': ['order', 'op_code', 'dt']})
+    ]
+    readonly_fields = ('order', 'op_code', 'dt')
+
+
 # Model Admin Pages
 ###################
 
@@ -60,6 +69,15 @@ class ShipOpAdmin(admin.ModelAdmin):
     readonly_fields = ('shipment', 'op_code', 'dt')
 
 
+class WorkOrderOpAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['order', 'op_code', 'dt']})
+    ]
+    list_display = ('order', 'op_code', 'dt')
+    list_filter = ['op_code', 'order']
+    readonly_fields = ('order', 'op_code', 'dt')
+
+
 class CustomerAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['first_name', 'last_name', 'email', 'status']}),
@@ -76,23 +94,29 @@ class CustomerAdmin(admin.ModelAdmin):
 class ShipmentAdmin(admin.ModelAdmin):
     @staticmethod
     def has_workorder (instance):
-        if instance.workorder.exists():
-            return instance.workorder
+        if instance.workorder:
+            return str(instance.workorder)
         else:
             return False
 
     @staticmethod
-    def inventory_count(instance):
+    def inventory_count (instance):
         return instance.inventory.exclude(status = 4).count()
 
+    def most_recent_action_dt (self, instance):
+        op = instance.operations.latest('dt')
+        return op.dt
+
+    most_recent_action_dt.short_description = "Last modified"
+
     fieldsets = [
-        (None, {'fields': ['palletized', 'labor_time', 'tracking_number', 'status']}),
+        (None, {'fields': ['has_workorder', 'palletized', 'labor_time', 'tracking_number', 'status']}),
         ('Notes', {'fields': ['notes'], 'classes': ['collapse']}),
         (READ_ONLY_FIELDS_LABEL, {'fields': ['shipid', 'owner', 'arrival', 'departure'], 'classes': ['collapse']}),
     ]
-    readonly_fields = ('shipid', 'owner', 'arrival', 'departure')
+    readonly_fields = ('shipid', 'owner', 'arrival', 'departure', 'has_workorder')
     inlines = [ShipOpInline]
-    list_display = ('shipid', 'owner', 'inventory_count', 'has_workorder')
+    list_display = ('shipid', 'owner', 'inventory_count', 'has_workorder', 'most_recent_action_dt')
     list_filter = ['status']
 
 
@@ -103,13 +127,19 @@ class InventoryAdmin(admin.ModelAdmin):
         else:
             return True
 
+    def most_recent_action_dt (self, instance):
+        op = instance.operations.latest('dt')
+        return op.dt
+
+    most_recent_action_dt.short_description = "Last modified"
+
     fieldsets = [
         (None, {'fields': ['itemid', 'status', 'storage_fees', 'bool_storage_fees']}),
         ('Dimensions', {'fields': ['length', 'width', 'height', 'volume'], 'classes': ['collapse']}),
         (READ_ONLY_FIELDS_LABEL, {'fields': ['shipset', 'owner', 'arrival', 'departure']})
     ]
     readonly_fields = ('shipset', 'itemid', 'shipset', 'owner', 'arrival', 'departure', 'bool_storage_fees')
-    list_display = ('itemid', 'shipset', 'owner', 'bool_storage_fees')
+    list_display = ('itemid', 'shipset', 'owner', 'bool_storage_fees', 'most_recent_action_dt')
     inlines = [ItemOpInline]
     list_filter = ['status']  # , 'bool_storage_fees']
 
@@ -117,16 +147,26 @@ class InventoryAdmin(admin.ModelAdmin):
 
 
 class WorkOrderAdmin(admin.ModelAdmin):
+    def most_recent_action_dt (self, instance):
+        op = instance.operations.latest('dt')
+        return op.dt
+
+    most_recent_action_dt.short_description = "Last modified"
+
     fieldsets = [
-        (None, {'fields': ['owner', 'shipment', 'contact_phone', 'contact_email']}),
+        (None,
+         {'fields': ['owner', 'shipment', 'contact_phone', 'contact_email', 'status', 'createdate', 'finishdate']}),
         ('Details', {'fields': ['quantity', 'description', 'tracking'], 'classes': ['collapse']}),
-        ('Extras', {'fields': ['gen_inspection', 'photo_inspection', 'item_count', 'bar_code_labeling', 'custom_boxing',
-                               'consolidation', 'palletizing', 'misc_services', 'misc_service_text'],
-                    'classes': ['collapse']})
+        (
+            'Options',
+            {'fields': ['gen_inspection', 'photo_inspection', 'item_count', 'bar_code_labeling', 'custom_boxing',
+                        'consolidation', 'palletizing', 'misc_services', 'misc_service_text'],
+             'classes': ['collapse']})
     ]
-    list_display = ('owner', 'shipment', 'quantity', 'createdate', 'status')
+    list_display = ('owner', 'shipment', 'quantity', 'createdate', 'status', 'most_recent_action_dt')
     readonly_fields = ('owner', 'createdate', 'finishdate')
     list_filter = ['status']
+    inlines = [WorkOrderOpInline]
 
 
 # class ExpiringTokenAdmin(TokenAdmin):
@@ -146,9 +186,10 @@ class WorkOrderAdmin(admin.ModelAdmin):
 admin.site.register(models.Customer, CustomerAdmin)
 admin.site.register(models.Shipment, ShipmentAdmin)
 admin.site.register(models.Inventory, InventoryAdmin)
+admin.site.register(models.WorkOrder, WorkOrderAdmin)
 admin.site.register(models.ShipOperation, ShipOpAdmin)
 admin.site.register(models.ItemOperation, ItemOpAdmin)
-admin.site.register(models.WorkOrder, WorkOrderAdmin)
+admin.site.register(models.WorkOrderOperation, WorkOrderOpAdmin)
 # TODO: Registering this customer Token model admin class required disabling rest_framework.authtoken.admin.TokenAdmin
 # One alternative is to extend rest_framework.authtoken.models.Token
 # admin.site.register(Token, ExpiringTokenAdmin)

@@ -189,7 +189,7 @@ class WorkOrder(AuthStampedModel):
     owner = models.ForeignKey(Customer, related_name = 'workorders')
     # Work orders should correspond to a given Shipment
     # But an order may be received prior to the creation of a Shipment
-    shipment = models.ForeignKey(Shipment, null = True, related_name = 'workorder')
+    shipment = models.OneToOneField(Shipment, null = True, blank = True, related_name = 'workorder')
     contact_phone = models.CharField(max_length = 20)
     contact_email = models.EmailField(max_length = 254)
     quantity = models.IntegerField(max_length = 4, default = 1)
@@ -206,9 +206,8 @@ class WorkOrder(AuthStampedModel):
     misc_services = models.BooleanField(default = False, help_text = "Additional miscellaneous services")
     misc_service_text = models.CharField(max_length = 1000, help_text = "Add'l misc service description")
     status = models.CharField(max_length = 3, choices = INVENTORY_STATUS_CODES, default = 0)
-    # TODO: Change to DateTimes?
-    createdate = models.DateField()
-    finishdate = models.DateField(null = True)
+    createdate = models.DateTimeField(default = timezone.now())
+    finishdate = models.DateTimeField(null = True)
 
     objects = WorkOrderManager()
     audit_log = AuditLog()
@@ -222,7 +221,9 @@ class WorkOrder(AuthStampedModel):
         Fxn to remove work orders (i.e. duplicate submissions) while
         preserving their record
         """
-        self.finishdate = date.today()
+        if self.shipment:
+            self.shipment = None
+        self.finishdate = timezone.now()
         self.description += "\nOrder terminated on " + str(self.finishdate)
         self.status = '999'
         self.save()
@@ -255,7 +256,7 @@ class ShipOperation(Operation):
         verbose_name = "shipment operation"
 
     def __unicode__ (self):
-        return 'Item {}, {}'.format(self.shipment.shipid, self.get_op_code_display())
+        return 'Shipment {}, {}'.format(self.shipment.shipid, self.get_op_code_display())
 
 
 class ItemOperation(Operation):
