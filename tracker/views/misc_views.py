@@ -39,19 +39,21 @@ def index (request):
         return render_to_response('tracker/index.html', context_dict, context)
 
 
-@login_required
 def reset (request):
+    """ Wrap the built-in password reset view and pass it the arguments
+    like the template name, email template name, subject template name
+    and the url to redirect after the password reset is initiated.
+
+    These views aren't login-restricted because end-users will be able to
+    use these views to reset their passwords (at least until I write an
+    equivalent API endpoint). """
     # From http://runnable.com/UqMu5Wsrl3YsAAfX/using-django-s-built-in-views-for-password-reset-for-python
-    # Wrap the built-in password reset view and pass it the arguments
-    # like the template name, email template name, subject template name
-    # and the url to redirect after the password reset is initiated.
     return password_reset(request, template_name = 'reset.html',
                           email_template_name = 'reset_email.html',
                           subject_template_name = 'reset_subject.txt',
                           post_reset_redirect = reverse('password_reset_success'))
 
 
-@login_required
 def reset_confirm (request, uidb64=None, token=None):
     op_group = Group.objects.get_by_natural_key('Operator')
 
