@@ -55,18 +55,16 @@ def reset (request):
 
 
 def reset_confirm (request, uidb64=None, token=None):
-    op_group = Group.objects.get_by_natural_key('Operator')
-
-    if op_group not in request.user.groups:
-        messages.add_message(request, messages.ERROR, "Your account does not have the \
-        appropriate permissions. Please contact an administrator.")
-        # TODO: Log these things
-        return HttpResponseRedirect('/')
-    else:
-        return password_reset_confirm(request, template_name = 'reset_confirm.html',
-                                      uidb64 = uidb64, token = token,
-                                      post_reset_redirect = reverse('password_reset_success'))
+    """
+    Display form for resetting password (link sent in email).
+    """
+    return password_reset_confirm(request, template_name = 'reset_confirm.html',
+                                  uidb64 = uidb64, token = token,
+                                  post_reset_redirect = reverse('password_reset_success'))
 
 
 def success (request):
+    """
+    Show template confirming the password reset email has been sent successfully.
+    """
     return render(request, 'success.html')

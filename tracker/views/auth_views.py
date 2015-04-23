@@ -69,14 +69,13 @@ def user_login (request):
                     # Return user to the same page they were on
                     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
                 else:
-                    messages.add_message(request, messages.ERROR, "This account is inactive and cannot be used.")
+                    messages.add_message(request, messages.ERROR, "Invalid login info.")
                     return HttpResponseRedirect('/')
             else:
-                messages.add_message(request, messages.ERROR, "This account cannot be used to log in.")
+                messages.add_message(request, messages.ERROR, "Invalid login info.")
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
         else:
-            messages.add_message(request, messages.ERROR, "Invalid login info")
+            messages.add_message(request, messages.ERROR, "Invalid login info.")
             return HttpResponseRedirect('/')
     else:
         return render_to_response('tracker/login.html', context)
