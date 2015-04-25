@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework import serializers, exceptions
 # from authentication import ExpiringTokenAuthentication
-from ..models import Customer, Shipment, Inventory, OptExtras
+from ..models import Customer, Shipment, Inventory, OptExtras, WorkOrder
 from rest_framework.authtoken.models import Token
 
 
@@ -20,13 +20,23 @@ class InventorySerializer(serializers.ModelSerializer):
         fields = ('itemid', 'volume', 'storage_fees', 'get_storage_fees', 'status_text')
 
 
+class WorkOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkOrder
+        fields = ('id', 'tracking', 'gen_inspection', 'photo_inspection', 'item_count',
+                  'bar_code_labeling', 'custom_boxing', 'consolidation', 'palletizing',
+                  'misc_services', 'misc_service_text', 'status_text', 'createdate')
+
+
 class ShipmentSerializer(serializers.ModelSerializer):
     inventory = InventorySerializer(many = True)
     extras = ExtrasSerializer(many = True)
+    workorder = WorkOrderSerializer(many = False)
 
     class Meta:
         model = Shipment
-        fields = ('shipid', 'labor_time', 'status_text', 'storage_fees', 'inventory', 'extras')
+        fields = ('shipid', 'labor_time', 'get_status_display', 'storage_fees', 'inventory',
+                  'extras', 'workorder')
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -39,7 +49,6 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # customer = serializers.PrimaryKeyRelatedField(read_only = True)
     customer = CustomerSerializer()
 
     class Meta:
