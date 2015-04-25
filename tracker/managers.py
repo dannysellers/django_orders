@@ -83,15 +83,16 @@ class WorkOrderManager(Manager):
                              quantity = kwargs['quantity'],
                              description = kwargs['description'],
                              tracking = kwargs['tracking'],
-                             gen_inspection = kwargs['geninspection'],
-                             photo_inspection = kwargs['photoinspection'],
-                             item_count = kwargs['itemcount'],
-                             bar_code_labeling = kwargs['barcodes'],
-                             custom_boxing = kwargs['boxing'],
-                             consolidation = kwargs['consolidation'],
-                             palletizing = kwargs['palletization'],
-                             misc_services = kwargs['miscservices'],
-                             misc_service_text = kwargs['miscservicetext'])
+                             # Previously, the u'true' returned by checked checkboxes
+                             gen_inspection = True if kwargs['geninspection'] == 'true' else False,
+                             photo_inspection = True if kwargs['photoinspection'] == 'true' else False,
+                             item_count = True if kwargs['itemcount'] == 'true' else False,
+                             bar_code_labeling = True if kwargs['barcodes'] == 'true' else False,
+                             custom_boxing = True if kwargs['boxing'] == 'true' else False,
+                             consolidation = True if kwargs['consolidation'] == 'true' else False,
+                             palletizing = True if kwargs['palletization'] == 'true' else False,
+                             misc_services = True if kwargs['miscservices'] == 'true' else False,
+                             misc_service_text = True if kwargs['miscservicetext'] == 'true' else False)
 
         return _order
 
