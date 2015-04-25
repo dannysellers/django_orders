@@ -116,7 +116,7 @@ class ShipmentAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ('shipid', 'owner', 'arrival', 'departure', 'has_workorder')
     inlines = [ShipOpInline]
-    list_display = ('shipid', 'owner', 'inventory_count', 'has_workorder', 'most_recent_action_dt')
+    list_display = ('shipid', 'status', 'owner', 'inventory_count', 'has_workorder', 'most_recent_action_dt')
     list_filter = ['status']
 
 
@@ -163,7 +163,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
                         'consolidation', 'palletizing', 'misc_services', 'misc_service_text'],
              'classes': ['collapse']})
     ]
-    list_display = ('owner', 'shipment', 'quantity', 'createdate', 'status', 'most_recent_action_dt')
+    list_display = ('id', 'owner', 'shipment', 'quantity', 'createdate', 'status', 'most_recent_action_dt')
     readonly_fields = ('owner', 'createdate', 'finishdate')
     list_filter = ['status']
     inlines = [WorkOrderOpInline]
