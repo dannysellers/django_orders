@@ -118,6 +118,10 @@ def ship_op_signal (sender, instance, **kwargs):
     # Convert to middleware?
     ShipOperation.objects.create_operation(shipment = instance,
                                            op_code = instance.status)
+    if instance.workorder:
+        # Update the Work Order along with the Shipment
+        WorkOrderOperation.objects.create_operation(order = instance.workorder,
+                                                    op_code = instance.status)
 
 
 class Inventory(AuthStampedModel):
@@ -215,6 +219,10 @@ class WorkOrder(AuthStampedModel):
     def __unicode__ (self):
         # return 'Order {}: {}'.format(self.pk, self.owner.acct)
         return 'Order #{}: {}'.format(self.pk, self.createdate)
+
+    @property
+    def status_text (self):
+        return self.get_status_display()
 
     def remove_order (self):
         """

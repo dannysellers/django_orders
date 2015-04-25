@@ -97,6 +97,10 @@ select.unmatched-order-select {
     margin-right : 0.5rem;
 }
 
+select#order-select {
+    width : 45%;
+}
+
 form.match-shipment-form,
 form.match-order-form {
     margin-top    : 0.5rem;

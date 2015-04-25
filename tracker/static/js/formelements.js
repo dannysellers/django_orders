@@ -97,7 +97,8 @@ $("a.link-order").on('click', function () {
             var sibSelect = $("select#" + self.prop('id') + ".unmatched-order-select");
 
             if (!_data.length) {
-                alert("This customer does not have any unmatched work orders. Try creating one instead.");
+                alert("This customer does not have any unmatched work orders.\n\nThey will need to submit " +
+                "an order before the shipment can be processed.");
                 // Disable the Link button
                 $(self).addClass('disabled');
                 return false
@@ -111,19 +112,9 @@ $("a.link-order").on('click', function () {
 
             // Populate select options
             sibSelect.children().remove();
-            for (var i = 0; i < _data.length; i++) sibSelect.append("<option id=" + i + ">" + _data[i] + "</option>");
+            for (var i = 0; i < _data.length; i++) sibSelect.append("<option>" + _data[i] + "</option>");
         }
     })
-});
-
-$("form.match-order-form").on('submit', function (evt) {
-    console.log(evt);
-    //evt.preventDefault();
-});
-
-$("form.match-shipment-form").on('submit', function(evt) {
-    console.log(evt);
-    //evt.preventDefault();
 });
 
 $(".delete-order").on('click', function () {
