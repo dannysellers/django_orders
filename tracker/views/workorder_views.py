@@ -56,7 +56,7 @@ def work_order_detail (request, id):
 
     order = WorkOrder.objects.get(id = id)
 
-    header_list = ['Owner', 'Acct', 'Create Date', 'Quantity', 'Status']
+    header_list = ['Owner', 'Acct', 'Create Date', 'Shipment', 'Quantity', 'Status']
     if order.status == 4:
         header_list.index('Complete Date', 3)
     context_dict['headers'] = header_list
@@ -85,12 +85,12 @@ def link_work_order (request, orderid):
     Function to handle linking WorkOrder and Shipment objects
     """
     if request.method != 'POST':
-        pass
+        return HttpResponseRedirect(reverse('work_orders'))
     else:
         # TODO: Alert the user to discrepancies b/w the Work Order and the Shipment (i.e. different quantity)
         order = WorkOrder.objects.get(id = orderid)
 
-        ship_desc = request.POST['shipid']
+        ship_desc = request.POST.get('shipid')
         ship_id = re.findall('#(\d+):', ship_desc)[0]
         shipment = Shipment.objects.get(shipid = ship_id)
 
@@ -129,6 +129,7 @@ def get_unmatched_orders (request, ship_id):
     Returns Work Orders belonging to a particular Customer (shipment owner)
     that are unmatched and not deleted
     """
+    # TODO: Method to get unmatched orders by Acct ID
     context_dict = dict()
 
     shipment = Shipment.objects.get(shipid = ship_id)
