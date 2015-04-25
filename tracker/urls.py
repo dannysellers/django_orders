@@ -21,7 +21,6 @@ urlpatterns += patterns('tracker.views.workorder_views',
    url(r'^workorders/(?P<status>\w+)/$', 'work_orders', name = 'work_order_list'),
    url(r'^unmatched_shipments/(?P<order_id>\d+)/$', 'get_unmatched_shipments', name = 'get_unmatched_shipments'),
    url(r'^unmatched_orders/(?P<ship_id>\d+)/$', 'get_unmatched_orders', name = 'get_unmatched_orders'),
-   # url(r'^submitorder/$', 'submit_work_order', name = 'submit_work_order'),
 )
 
 # Authentication patterns

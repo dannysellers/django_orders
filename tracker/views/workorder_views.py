@@ -100,15 +100,6 @@ def link_work_order (request, orderid):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-# @login_required
-# def submit_work_order (request):
-# # TODO: Will work orders ever be created/submitted not by the API?
-#     # context = RequestContext(request)
-#     # context_dict = ()
-#
-#     return HttpResponse("This is the method to create a work order", content_type = 'application/json')
-
-
 @csrf_exempt
 def get_unmatched_shipments (request, order_id):
     """
