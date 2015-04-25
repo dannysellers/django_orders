@@ -9,13 +9,18 @@
 {% endblock title %}
 
 {% block header %}
-    Work Order #{{ order.id }} &#8212; <a href="{% url 'account_detail' account_id=order.owner.acct %}">{{ order.owner.name }}, #{{ order.owner.acct }}</a>
+    Work Order #{{ order.id }} &#8212;
+    <a href="{% url 'account_detail' account_id=order.owner.acct %}">{{ order.owner.name }}, #{{ order.owner.acct }}</a>
 {% endblock header %}
 
 {% block sub_nav %}
     <a href="/workorderreport/{{ order.id }}?type=attachment" class="disabled">Download Work Order</a>
     | <a href="/workorderreport/{{ order.id }}?type=inline" class="disabled">Generate Work Order</a>
 {% endblock sub_nav %}
+
+{% block extra_scripts %}
+    <script src="{% static "js/formelements.js" %}"></script>
+{% endblock extra_scripts %}
 
 {% block content %}
 
@@ -36,9 +41,31 @@
                     </td>
                     <td>#{{ order.owner.acct }}</td>
                     <td>{{ order.createdate }}</td>
-                    {% if order.status == '4'  %}
+                    {% if order.status == '4' %}
                         <td>{{ order.finishdate }}</td>
                     {% endif %}
+                    <td>
+                        {% if order.shipment %}
+                            <a href="{% url 'shipment_detail' shipid=order.shipment.shipid %}">{{ order.shipment }}</a>
+                        {% else %}
+                            <ul class="button-group">
+                                <li class="shipment-button">
+                                    <a href="#" class="small button info link-shipment" id="{{ order.id }}">Link</a>
+                                </li>
+                                <li class="shipment-button">
+                                    <a href="/accounts/{{ order.owner.acct }}/add_shipment/{{ order.id }}/"
+                                       class="small button">Create</a>
+                                </li>
+                            </ul>
+                            <form method="post" class="match-order-form" id="{{ order.id }}"
+                                  action="/workorders/{{ order.id }}/link/" style="display:none;">
+                                {% csrf_token %}
+                                <select name="orderid" class="unmatched-shipment-select" id="{{ order.id }}">
+                                </select>
+                                <button class="tiny button" type="submit" name="submit">Submit</button>
+                            </form>
+                        {% endif %}
+                    </td>
                     <td>{{ order.quantity }}</td>
                     <td>{{ order.get_status_display }}</td>
                 </tr>
@@ -105,6 +132,9 @@
             </label>
             <label>Contact Email:
                 <input type="email" name="email" value="{{ order.contact_email }}" disabled/>
+            </label>
+            <label>Description:
+                <textarea name="description" rows="3" disabled>{{ order.description }}</textarea>
             </label>
         </div>
         <!-- A div to push the other divs left -->
