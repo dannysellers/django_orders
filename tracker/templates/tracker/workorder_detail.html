@@ -60,7 +60,7 @@
                             <form method="post" class="match-order-form" id="{{ order.id }}"
                                   action="/workorders/{{ order.id }}/link/" style="display:none;">
                                 {% csrf_token %}
-                                <select name="orderid" class="unmatched-shipment-select" id="{{ order.id }}">
+                                <select name="shipid" class="unmatched-shipment-select" id="{{ order.id }}">
                                 </select>
                                 <button class="tiny button" type="submit" name="submit">Submit</button>
                             </form>

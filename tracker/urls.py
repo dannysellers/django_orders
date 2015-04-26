@@ -52,7 +52,7 @@ urlpatterns += patterns('tracker.views.ship_views',
     url(r'^shipment/(?P<shipid>\d+)/link/$', 'link_shipment', name = 'link_shipment'),
     url(r'^ship_info$', 'ship_info', name = 'ship_info'),
     url(r'^ship_extras$', 'ship_extras', name = 'ship_extras'),
-    url(r'^accounts/(?P<account_url>\S+)/add_shipment/$', 'add_shipment', name = 'add_shipment'),
+    url(r'^accounts/(?P<account>\d+)/add_shipment/(?P<order>\d+)/$', 'add_shipment', name = 'add_shipment'),
 )
 
 # Report patterns

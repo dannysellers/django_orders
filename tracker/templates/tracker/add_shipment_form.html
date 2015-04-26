@@ -12,6 +12,25 @@
 
 {% block extra_scripts %}
     <script src="{% static "js/formelements.js" %}"></script>
+
+    <script>
+        $("form#add_shipment_form").submit(function () {
+            // Alter the action URL of the form by which shipment is selected
+            var self = $(this);
+            var orderSelect = $("select#order-select");
+            var orderStr = orderSelect.val();
+
+            var basePostURL = '/accounts/' + {{ customer.acct }} +'/add_shipment/';
+            if (orderStr == 'Order not yet received') {
+                basePostURL += '0/';
+            } else {
+                var re = /#(\d+):/;
+                var orderID = re.exec(orderStr)[1];
+                basePostURL += orderID + '/';
+            }
+            self.attr('action', basePostURL);
+        })
+    </script>
 {% endblock extra_scripts %}
 
 {% block sub_nav %}
@@ -24,7 +43,8 @@
     {% endif %}
     {% if user.is_authenticated and customer %}
         {% if customer.status == '1' %}
-            | <a class="remove-link" href="/accounts?remove={{ customer.acct }}" id="{{ customer.inventory.all|stored_count }}">Remove account</a>
+            | <a class="remove-link" href="/accounts?remove={{ customer.acct }}"
+                 id="{{ customer.inventory.all|stored_count }}">Remove account</a>
         {% else %}
             | <a href="#" class="disabled">Remove account</a>
         {% endif %}
@@ -36,7 +56,7 @@
 
     <div class="row">
 
-        <form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/">
+        <form method="post" id="add_shipment_form" action="/accounts/{{ customer.acct }}/add_shipment/0/">
             {% csrf_token %}
 
             <div class="small-5 columns">
@@ -63,6 +83,26 @@
 
             </div>
             <div class="small-7 columns">
+
+                <label>Work Order
+                    <select name="order" id="order-select" class="unmatched-order-select">
+                        {# If len(order_list) == 1, one particular shipment is selected, #}
+                        {# / to draw focus to there being only one eligible shipment. #}
+                        {# Else, a list of all eligible shipments is returned #}
+                        {% if order_list|length_is:'1' %}
+                            {% for order in order_list %}
+                                <option id="{{ order.id }}">{{ order }}</option>
+                            {% endfor %}
+                            <option>Order not yet received</option>
+                        {% else %}
+                            <option>Order not yet received</option>
+                            {% for order in order_list %}
+                                <option id="{{ order.id }}">{{ order }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </label>
+
                 <input type="button" class="small button radius" id="add-extra" value="Add Carton Set">
                 <input type="button" class="small button radius" id="remove-extra" value="Remove Carton Set">
 

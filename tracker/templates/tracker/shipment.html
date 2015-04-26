@@ -72,8 +72,11 @@
                     {% else %}
                         <td>Departure: {{ shipment.departure|date:"m-d-Y" }}</td>
                     {% endif %}
-                    {% if shipment.workorder.exists %}
-                        <td>{{ shipment.workorder.id }}</td>
+                    {% if shipment.workorder %}
+                        <td>
+                            <a href="{% url 'work_order_detail' id=shipment.workorder.id %}">
+                            {{ shipment.workorder.id }}</a>
+                        </td>
                     {% else %}
                         <td>
                             <ul class="button-group">
@@ -81,10 +84,10 @@
                                     <a href="#" class="tiny button info link-order"
                                        id="{{ shipment.shipid }}">Link</a>
                                 </li>
-                                <li class="shipment-button">
-                                    <a href="/accounts/{{ shipment.owner.acct }}/add_shipment/"
-                                       class="tiny button">Create</a>
-                                </li>
+{#                                <li class="shipment-button">#}
+{#                                    <a href="/accounts/{{ shipment.owner.acct }}/add_shipment/"#}
+{#                                       class="tiny button">Create</a>#}
+{#                                </li>#}
                             </ul>
                             <form method="post" class="match-shipment-form" id="{{ shipment.shipid }}"
                                   action="" style="display:none;">
@@ -172,7 +175,7 @@
             <label>Labor time:
                 <input type="text" name="labor_time" value="{{ shipment.labor_time }}"/>
             </label>
-            <label>Shipment notes:
+            <label>Notes:
                 <textarea name="notes">{{ shipment.notes }}</textarea>
             </label>
         </div>

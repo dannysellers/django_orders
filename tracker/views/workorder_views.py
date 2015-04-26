@@ -97,6 +97,9 @@ def link_work_order (request, orderid):
         order.shipment = shipment
         order.save()
 
+        messages.add_message(request, messages.SUCCESS, "Order {0} and Shipment {1} linked successfully.".format(
+            order.id, shipment.shipid
+        ))
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -115,7 +118,7 @@ def get_unmatched_shipments (request, order_id):
 
     _list = Shipment.objects.exclude(status = 4) \
         .filter(owner = _owner) \
-        .exclude(workorder__isnull = False)
+        .exclude(_workorder__isnull = False)
     context_dict['list'] = [str(shipment) for shipment in _list]
 
     return HttpResponse(json.dumps(context_dict), content_type = 'application/json')

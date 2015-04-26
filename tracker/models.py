@@ -94,6 +94,16 @@ class Shipment(AuthStampedModel):
         # return 'Acct #{}, Shipment {}'.format(self.owner.acct, self.shipid)
         return 'Shipment #{}: {}'.format(self.shipid, self.arrival)
 
+    @property
+    def workorder(self):
+        if self._workorder.exists() and self._workorder.count() == 1:
+            return self._workorder.first()
+        elif self._workorder.count() > 1:
+            # TODO: Raise exception?
+            pass
+        else:
+            return None
+
     def storage_fees (self):
         fees = 0.00
         for item in self.inventory.exclude(status = 4):
@@ -191,9 +201,12 @@ class OptExtras(models.Model):
 
 class WorkOrder(AuthStampedModel):
     owner = models.ForeignKey(Customer, related_name = 'workorders')
-    # Work orders should correspond to a given Shipment
-    # But an order may be received prior to the creation of a Shipment
-    shipment = models.OneToOneField(Shipment, null = True, blank = True, related_name = 'workorder')
+    # Work orders should correspond to a given Shipment, but an
+    # order may be received prior to the creation of a Shipment.
+    # A OneToOneField was too restrictive, prohibited Shipments from
+    # being created without any WorkOrder. The workorder property
+    # mimics the behavior of a singleton ForeignKey
+    shipment = models.ForeignKey(Shipment, null = True, blank = True, unique = True, related_name = '_workorder')
     contact_phone = models.CharField(max_length = 20)
     contact_email = models.EmailField(max_length = 254)
     quantity = models.IntegerField(max_length = 4, default = 1)
