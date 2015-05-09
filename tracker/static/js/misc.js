@@ -34,21 +34,15 @@ $('th > input.checkbox').on('click', function () {
 
 $('td.ship-toggle').on('click', function () {
     // Toggles sections of a table, as for folding of shipment <tr>s
-    var th = lnk.parentNode;
+    var th = $(this).parent();
     var table = getParent(th, 'table');
     var len = table.rows.length;
     var tr = getParent(th, 'tr');
     var rowIndex = tr.rowIndex;
     var rowHead = table.rows[rowIndex].cells[1].children[0].innerText; // Ship ID
 
-    lnk.innerHTML = (lnk.innerHTML == "+") ? "-" : "+";
+    this.innerHTML = (this.innerHTML == "+") ? "-" : "+";
 
-    /* ternary operator for:
-     if (table.rows[1].style.display == 'none'){
-     vStyle = ''
-     } else {
-     vStyle = 'none'
-     }; */
     var vStyle = (table.rows[rowIndex + 1].style.display == 'none') ? '' : 'none';
 
     for (var i = rowIndex + 1; i < len; i++) {

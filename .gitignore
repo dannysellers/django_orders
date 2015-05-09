@@ -58,3 +58,6 @@ target/
 
 # Secret keys
 order_tracker/keys.py
+
+tracker/static/img/small-logo-horizontal.png
+.settings/

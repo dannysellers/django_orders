@@ -37,7 +37,7 @@ class UserDetail(APIView):
     @staticmethod
     def get_object (pk):
         try:
-            return User.objects.get(id = pk)
+            return User.objects.select_related().get(id = pk)
         except User.DoesNotExist:
             raise Http404
 
@@ -101,18 +101,19 @@ def receive_work_order (request, acct):
     barcodes	    | FNSKU / Bar code labeling
     """
 
-    try:
-        send_mail(subject = _subject,
-                  message = _message,
-                  from_email = _from_email,
-                  recipient_list = [settings.EMAIL_HOST_USER],
-                  auth_user = settings.EMAIL_HOST_USER,
-                  auth_password = settings.EMAIL_HOST_PASSWORD)
-    except smtplib.SMTPException as e:
-        # log error
-        # try sending an email via Mandrill
-        return Response(data = {'message': 'Error sending message: {}'.format(e)},
-                        status = status.HTTP_503_SERVICE_UNAVAILABLE)
+    if not settings.DEBUG:
+        try:
+            send_mail(subject = _subject,
+                      message = _message,
+                      from_email = _from_email,
+                      recipient_list = [settings.EMAIL_HOST_USER],
+                      auth_user = settings.EMAIL_HOST_USER,
+                      auth_password = settings.EMAIL_HOST_PASSWORD)
+        except smtplib.SMTPException as e:
+            # TODO: log error(s)
+            # try sending an email via Mandrill
+            return Response(data = {'message': 'Error sending message: {}'.format(e)},
+                            status = status.HTTP_503_SERVICE_UNAVAILABLE)
 
     return Response(data = {'message': 'Message sent successfully'},
                     status = status.HTTP_200_OK)
