@@ -64,8 +64,8 @@ urlpatterns += patterns('tracker.views.report_views',
 
 # Invoice patterns
 urlpatterns += patterns('tracker.views.invoice_views',
-    url(r'^shipreport/(?P<shipid>\d+)$', 'shipment_report', name = 'shipment_report'),
-    # url(r'^template/(?P<shipid>\d+)$', 'invoice_template', name = 'invoice_template'),
+    url(r'^shipment/(?P<shipid>\d+)/invoice/(?P<content_type>\w+)$', 'shipment_report', name = 'shipment_report'),
+    url(r'^shipment/(?P<shipid>\d+)/template$', 'invoice_template', name = 'invoice_template'),
 )
 
 # API patterns

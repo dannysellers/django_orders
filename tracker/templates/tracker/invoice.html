@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+{% load static %}
+{% load num_filters %}
+
+<head>
+	<title>Inventory&#8212;Order Tracker</title>
+	<link rel="stylesheet" href="{% static "css/normalize.css" %}"/>
+	<link rel="stylesheet" href="{% static "css/base.css" %}"/>
+	<link rel="stylesheet" href="{% static "css/foundation.css" %}"/>
+</head>
+
+<style>
+	#outer-panel {
+		background-color : #D0D0D0;
+		border-color     : #d0d0d0;
+		padding          : 1rem;
+	}
+
+	div.row:first-child {
+		padding-bottom : 0;
+		margin-bottom  : -1rem;
+	}
+
+	.logo {
+		margin-top : 1rem;
+	}
+
+	body {
+		width: 850px;
+	}
+
+	#timestamp {
+		font-size: small;
+	}
+</style>
+
+<body>
+
+<div class="row">
+	<div class="medium-12 columns">
+		<div class="medium-5 columns">
+			<img class="logo" src="{% static "img/small-logo-horizontal.png" %}">
+		</div>
+		<div class="medium-5 columns">
+			<ul class="vcard" style="margin-top: 15px;width:100%;">
+				<li class="fn">Order Fulfillment Service</li>
+				<li class="street-address">123 Main St.</li>
+				<li class="locality">Anytown, <span class="state">ST</span> <span class="zip">98765</span></li>
+				<li class="email">www.webaddress.com</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="medium-12 column">
+		<hr/>
+	</div>
+</div>
+
+<div class="row">
+	<div class="medium-12 columns">
+		<div class="medium-7 columns">
+			<h4>Contents</h4>
+			<table>
+				<thead>
+				<tr>
+					<td class="text-center">ID</td>
+					<td class="text-center">Volume (ft^3)</td>
+					<td class="text-center">Daily Fees</td>
+					<td class="text-center">Total Fees</td>
+				</tr>
+				</thead>
+				<tbody>
+				{% for item in shipment.inventory.all %}
+					<tr>
+						<td class="text-center">{{ item.itemid }}</td>
+						<td class="text-center">{{ item.volume }}</td>
+						<td class="text-center">${{ item.storage_fees|length:"2" }}</td>
+						<td class="text-center">${{ item.get_total_fees|length:"2" }}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="medium-5 columns" id="info-panel">
+			<div class="panel" id="outer-panel">
+				<div class="panel">
+					<h5><strong>Invoice: Shipment {{ shipment.shipid }}</strong></h5>
+
+					<p><strong>Owner:</strong> {{ shipment.owner.name }}<br/>
+						<strong>Arrival:</strong> {{ shipment.arrival }}<br/>
+						<strong>Departure:</strong> {{ shipment.departure }}<br/>
+						{% if shipment.tracking %}
+							<strong>Tracking Info:</strong> {{ shipment.tracking }}</p>
+						{% endif %}
+					<p><strong>Work Order:</strong> {{ shipment.workorder.id }}<br/>
+						<strong>Receipt:</strong> {{ shipment.workorder.createdate }}<br/></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="medium-12 column">
+		<div class="panel">
+			<strong>Additional Costs / Overview</strong>
+		</div>
+	</div>
+</div>
+
+<div class="row" id="footer">
+	<div class="medium-12 columns">
+		<div class="medium-1 column">
+			<!-- Needed to push the below over to the right -->
+		</div>
+		<div class="medium-5 text-right column" id="timestamp">
+			Generated at {{ now }}
+		</div>
+	</div>
+</div>
+
+</body>
+
+</html>

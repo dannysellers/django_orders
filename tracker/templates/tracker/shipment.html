@@ -13,8 +13,8 @@
 {% endblock header %}
 
 {% block sub_nav %}
-    <a href="/shipreport/{{ shipment.shipid }}?type=attachment">Download Report</a>
-    | <a href="/shipreport/{{ shipment.shipid }}?type=inline">Generate Report</a>
+	<a href="{% url 'shipment_report' shipment.shipid 'attachment' %}">Download Report</a>
+    | <a href="{% url 'shipment_report' shipment.shipid 'inline' %}">Generate Report</a>
 {% endblock sub_nav %}
 
 {% block extra_scripts %}
