@@ -4,21 +4,22 @@ register = template.Library()
 
 
 @register.filter
-def length (value, val_length):
+def length (value, length=2):
     """
-    Receives `value`, truncates to length (used primarily for storage fees/volume)
-    :param value: Value to truncate
-    :param val_length: Length to truncate after the decimal
-    :return:
+    Truncates `value` to `length`
+    :type value: float
+    :type length: int
+    :rtype: str
     """
-    if not value:
-        return '0.00'
-    else:
-        _length = int(val_length)
+    if value:
+        _length = int(length)
         _string = str(value).split('.')
         if len(_string[1]) == 1:
-            _string[1] += '0'
+            _string[1] += '0' * _length - 1
         return _string[0] + '.' + _string[1][:_length]
+    else:
+        return '0.{}'.format('0' * int(length))
+
 
 
 @register.filter
