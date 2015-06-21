@@ -45,7 +45,9 @@ def form_ajax (request, model_name):
         if model.__name__ == model_name:
             _model = model
 
-    context_dict['attr_list'] = [field.name for field in _model._meta.fields]
+    summable_field_types = ['IntegerField', 'FloatField']
+    context_dict['attr_list'] = [field.name for field in _model._meta.fields \
+                                 if field.get_internal_type() in summable_field_types]
 
     return HttpResponse(json.dumps(context_dict), content_type = 'application/json')
 

@@ -55,5 +55,5 @@ def find_subclasses (module, clazz, scope):
         cls
         for name, cls in inspect.getmembers(module)
         if inspect.isclass(cls) and issubclass(cls, clazz)
-        and cls.__module__ == scope
+        and cls.__module__ == scope and not cls._meta.abstract
     ]

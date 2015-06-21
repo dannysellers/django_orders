@@ -15,7 +15,7 @@ def length (value, length=2):
         _length = int(length)
         _string = str(value).split('.')
         if len(_string[1]) == 1:
-            _string[1] += '0' * _length - 1
+            _string[1] += '0'.rjust(_length - 1, '0')
         return _string[0] + '.' + _string[1][:_length]
     else:
         return '0.{}'.format('0' * int(length))
