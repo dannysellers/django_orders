@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
@@ -45,15 +45,8 @@ class CustomerDetail(APIView):
     permission_classes = (IsOwnerOrPrivilegedObject,)
     authentication_classes = (SessionAuthentication, ExpiringTokenAuthentication)
 
-    @staticmethod
-    def get_object (acct):
-        try:
-            return Customer.objects.get(acct = acct)
-        except Customer.DoesNotExist:
-            raise Http404
-
     def get (self, request, acct, format = None):
-        customer = self.get_object(acct)
+        customer = get_object_or_404(Customer, acct = acct)
         serializer = CustomerSerializer(customer, context = {'request': request})
         return Response(serializer.data)
 

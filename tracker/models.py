@@ -224,7 +224,7 @@ class WorkOrder(AuthStampedModel):
     misc_service_text = models.CharField(max_length = 1000, help_text = "Add'l misc service description")
     status = models.CharField(max_length = 3, choices = INVENTORY_STATUS_CODES, default = 0)
     createdate = models.DateTimeField(default = timezone.now())
-    finishdate = models.DateTimeField(null = True)
+    finishdate = models.DateTimeField(null = True, blank = True)
 
     objects = WorkOrderManager()
     audit_log = AuditLog()

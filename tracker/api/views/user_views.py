@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -34,22 +34,15 @@ class UserDetail(APIView):
     permission_classes = (IsOwnerOrPrivilegedObject,)
     authentication_classes = (SessionAuthentication, BasicAuthentication)
 
-    @staticmethod
-    def get_object (pk):
-        try:
-            return User.objects.select_related().get(id = pk)
-        except User.DoesNotExist:
-            raise Http404
-
     def get (self, request, pk, format=None):
-        user = self.get_object(pk)
+        user = get_object_or_404(User, pk = pk)
         # serializer = UserSerializer(user)
         serializer = UserSerializer(user,
                                     context = {'request': request})
         return Response(serializer.data)
 
     def put (self, request, pk, format=None):
-        user = self.get_object(pk)
+        user = get_object_or_404(User, pk = pk)
         serializer = UserSerializer(user, data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -64,10 +57,7 @@ def receive_work_order (request, acct):
     Receives POSTed work order form. At the moment, it just sends us an email,
     but ultimately I'll construct a WorkOrder model to be displayed on the site
     """
-    try:
-        customer = Customer.objects.get(acct = acct)
-    except Customer.DoesNotExist:
-        return Response(status = status.HTTP_404_NOT_FOUND)
+    customer = get_object_or_404(Customer, acct = acct)
 
     _subject = "Order received from #{} ({})".format(customer.acct, customer.name)
 

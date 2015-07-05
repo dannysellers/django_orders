@@ -191,10 +191,7 @@
     window.onload = function () {
         if (oldEvt) oldEvt();
 
-        var custStatus = ({{ customer.status }});
-
-        var t = document.getElementsByClassName('float_user-greeting')[0].children[3].innerText;
-        if (t == 'Log in' || custStatus == 0) {
+        if ('{{ customer.status }}' == '0') {
             disableElements('acctForm');
         }
     };

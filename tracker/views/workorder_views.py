@@ -11,14 +11,14 @@ from ..models import WorkOrder, Shipment
 
 
 @login_required
-def work_orders (request, status='incomplete'):
+def work_orders (request, status = 'incomplete'):
     context = RequestContext(request)
     context_dict = dict()
 
     open_orders = WorkOrder.objects.exclude(status = 4).exclude(status = 999)
     finished_orders = WorkOrder.objects.filter(status = 4)
     terminated_orders = WorkOrder.objects.filter(status = 999)
-    unmatched_orders = WorkOrder.objects.exclude(status = 999)\
+    unmatched_orders = WorkOrder.objects.exclude(status = 999) \
         .exclude(shipment__isnull = False)
 
     header_list = ['Order ID', 'Shipment', 'Owner', 'Create Date', 'Status', '']

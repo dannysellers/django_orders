@@ -160,8 +160,8 @@ def graph_query (request):
                 c.execute("".join(query))
                 cq = c.fetchall()
             except psycopg2.ProgrammingError as e:
-                print(e)
-            # return HttpResponse(json.dumps(e), content_type='application/json')
+                response = dict(error = e)
+                return HttpResponse(json.dumps(response), content_type='application/json')
             count_dict[index] = cq
 
         # Chart.js options

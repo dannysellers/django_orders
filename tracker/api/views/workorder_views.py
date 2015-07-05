@@ -6,33 +6,32 @@ from rest_framework.response import Response
 
 from ..authentication import ExpiringTokenAuthentication
 from ..permissions import IsOwnerOrPrivileged
-from ...models import Inventory
-from ..serializers import InventorySerializer
+from ...models import WorkOrder
+from ..serializers import WorkOrderSerializer
 
 
-class InventoryList(APIView):
+class WorkOrderList(APIView):
     """
-    List all items in storage
+    List all work orders
     """
     permission_classes = (IsOwnerOrPrivileged,)
     authentication_classes = (SessionAuthentication, ExpiringTokenAuthentication)
 
     @staticmethod
-    def get (request, format = None):
-        # inventory = Inventory.objects.all()
-        inventory = Inventory.objects.all().exclude(status = 4)
-        serializer = InventorySerializer(inventory, many = True)
+    def get(request, format = None):
+        workorders = WorkOrder.objects.all().exclude()
+        serializer = WorkOrderSerializer(workorders, many = True)
         return Response(serializer.data)
 
 
-class InventoryDetail(APIView):
+class WorkOrderDetail(APIView):
     """
-    Get information about an Inventory object.
+    Get information about a WorkOrder object
     """
     permission_classes = (IsOwnerOrPrivileged,)
     authentication_classes = (SessionAuthentication, ExpiringTokenAuthentication)
 
-    def get (self, request, itemid, format = None):
-        item = get_object_or_404(Inventory, pk = itemid)
-        serializer = InventorySerializer(item)
+    def get(self, request, id, format = None):
+        order = get_object_or_404(WorkOrder, pk = id)
+        serializer = WorkOrderSerializer(order)
         return Response(serializer.data)

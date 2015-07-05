@@ -25,7 +25,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
         model = WorkOrder
         fields = ('id', 'tracking', 'gen_inspection', 'photo_inspection', 'item_count',
                   'bar_code_labeling', 'custom_boxing', 'consolidation', 'palletizing',
-                  'misc_services', 'misc_service_text', 'status_text', 'createdate')
+                  'misc_services', 'misc_service_text', 'status_text', 'createdate', 'finishdate')
 
 
 class ShipmentSerializer(serializers.ModelSerializer):
